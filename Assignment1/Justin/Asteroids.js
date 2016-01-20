@@ -12,6 +12,8 @@ var asteroidRot = [];
 var asteroidScale = [];
 
 var ship;
+var projectile = [];
+var projectileCount = 0;
 
 var asteroidMat = [];
 
@@ -147,9 +149,20 @@ function movePlayer(){
         ship.translateY(-2);
     }
     if (keyState[32]){
-        ship.material.setValues({ color : 0xff0000 });
+        shoot();
     }
 
+}
+
+function shoot(){
+    console.log(projectileCount);
+    projectileCount++;
+    var projectileMat = new THREE.LineBasicMaterial({color : 0xFF0000});
+    var projectileGeo = new THREE.Geometry();
+    projectileGeo.vertices.push(ship.position, ship.position);
+    projectile[projectileCount] = new THREE.Line(projectileGeo, projectileMat);
+    projectile[projectileCount].rotation = ship.rotation;
+    scene.add(projectile[projectileCount]);
 }
 
 function checkCollision() {
