@@ -105,7 +105,7 @@ function init() {
 function update() {
     requestAnimationFrame(update);
 
-    movePlayer();
+    move();
 
     for (i = 0; i < numOfAsteroids; i++) {
 
@@ -122,7 +122,7 @@ function update() {
 
     }
 
-    checkCollision();
+    //checkCollision();
 
     renderer.render(scene, camera);
 }
@@ -135,7 +135,7 @@ function onKeyUp(event){
     keyState[event.keyCode || event.charCode] = false;
 }
 
-function movePlayer(){
+function move(){
     if (keyState['a'.charCodeAt(0) - 32]){
         ship.rotateZ(0.1);
     }
@@ -152,16 +152,22 @@ function movePlayer(){
         shoot();
     }
 
+    for (i = 1; i <= projectileCount; i++){
+        projectile[i].translateY(5);
+    }
+
 }
 
 function shoot(){
-    console.log(projectileCount);
+    //console.log(projectileCount);
     projectileCount++;
-    var projectileMat = new THREE.LineBasicMaterial({color : 0xFF0000});
+    var projectileMat = new THREE.PointsMaterial({color : 0xFF0000, size : 3});
     var projectileGeo = new THREE.Geometry();
-    projectileGeo.vertices.push(ship.position, ship.position);
-    projectile[projectileCount] = new THREE.Line(projectileGeo, projectileMat);
-    projectile[projectileCount].rotation = ship.rotation;
+    projectileGeo.vertices.push(new THREE.Vector3(0,0,0));
+    projectile[projectileCount] = new THREE.Points(projectileGeo, projectileMat);
+    projectile[projectileCount].translateX(ship.position.x);
+    projectile[projectileCount].translateY(ship.position.y);
+    projectile[projectileCount].rotation.z = ship.rotation.z;
     scene.add(projectile[projectileCount]);
 }
 
