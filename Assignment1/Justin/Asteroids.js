@@ -14,6 +14,7 @@ var asteroidScale = [];
 var ship;
 var projectile = [];
 var projectileCount = 0;
+var shooting = false;
 
 var asteroidMat = [];
 
@@ -108,7 +109,6 @@ function update() {
     move();
 
     for (i = 0; i < numOfAsteroids; i++) {
-
         asteroids[i].position.x += asteroidSpeedX[i];
         asteroids[i].position.y += asteroidSpeedY[i];
         if (asteroids[i].position.x > 330 || asteroids[i].position.x < -330) {
@@ -118,8 +118,13 @@ function update() {
             asteroids[i].position.y = -asteroids[i].position.y;
         }
         asteroids[i].rotateZ(asteroidRot[i]);
+    }
 
-
+    if (ship.position.x > 310 || ship.position.x < -310){
+        ship.position.x *= -1;
+    }
+    if (ship.position.y > 235 || ship.position.y < -235){
+        ship.position.y *= -1;
     }
 
     //checkCollision();
@@ -160,15 +165,25 @@ function move(){
 
 function shoot(){
     //console.log(projectileCount);
-    projectileCount++;
-    var projectileMat = new THREE.PointsMaterial({color : 0xFF0000, size : 3});
-    var projectileGeo = new THREE.Geometry();
-    projectileGeo.vertices.push(new THREE.Vector3(0,0,0));
-    projectile[projectileCount] = new THREE.Points(projectileGeo, projectileMat);
-    projectile[projectileCount].translateX(ship.position.x);
-    projectile[projectileCount].translateY(ship.position.y);
-    projectile[projectileCount].rotation.z = ship.rotation.z;
-    scene.add(projectile[projectileCount]);
+    if (projectileCount > 0){
+        var projX = projectile[projectileCount].position.x - ship.position.x;
+        var projY = projectile[projectileCount].position.y - ship.position.y;
+        var projDist = Math.sqrt(projX * projX + projY * projY);
+        if (projDist > 100) shooting = false;
+    }
+
+    if (!shooting){
+        projectileCount++;
+        shooting = true;
+        var projectileMat = new THREE.PointsMaterial({color : 0xFF0000, size : 3});
+        var projectileGeo = new THREE.Geometry();
+        projectileGeo.vertices.push(new THREE.Vector3(0,0,0));
+        projectile[projectileCount] = new THREE.Points(projectileGeo, projectileMat);
+        projectile[projectileCount].translateX(ship.position.x);
+        projectile[projectileCount].translateY(ship.position.y);
+        projectile[projectileCount].rotation.z = ship.rotation.z;
+        scene.add(projectile[projectileCount]);
+    }
 }
 
 function checkCollision() {
