@@ -1,2 +1,2 @@
 # 3PercentMilk
-Gooooood Cooooooode
+It's good!
