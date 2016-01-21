@@ -25,7 +25,7 @@ function main() {
 
 function init() {
 
-    container = document.createElement('div');
+    container = document.getElementById('myCanvas');
     document.body.appendChild(container);
 
     renderer = new THREE.WebGLRenderer();
