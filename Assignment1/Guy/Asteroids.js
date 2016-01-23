@@ -24,6 +24,9 @@ var shooting = false;
 
 var asteroidMat = [];
 
+
+var points = 0;
+
 /*
     ONLOAD FUNCTION
 */
@@ -56,23 +59,6 @@ function init() {
         keyState[i] = false;
     }
 
-
-    //base asteroid
-    var asteroidGeo = new THREE.Geometry();
-    asteroidGeo.vertices.push(
-        new THREE.Vector3(0, -4, 0),
-        new THREE.Vector3(-2, -2, 0),
-        new THREE.Vector3(-6, -2, 0),
-        new THREE.Vector3(-6, 2, 0),
-        new THREE.Vector3(-2, 4, 0),
-        new THREE.Vector3(-2, 6, 0),
-        new THREE.Vector3(4, 6, 0),
-        new THREE.Vector3(4, 2, 0),
-        new THREE.Vector3(6, 0, 0),
-        new THREE.Vector3(4, -4, 0),
-        new THREE.Vector3(0, -4, 0)
-    );
-
     //player ship
     var shipGeo = new THREE.Geometry();
     shipGeo.vertices.push(
@@ -89,6 +75,34 @@ function init() {
     ship.scale.x = 5;
     ship.scale.y = 5;
     scene.add(ship);
+
+ 
+    //spawn the asteroids
+    spawnAsteroids();
+
+    //event listeners for movement and firing
+    window.addEventListener('keydown', onKeyDown, false);
+    window.addEventListener('keyup', onKeyUp, false);
+}
+
+
+
+function spawnAsteroids() {
+    //base asteroid
+    var asteroidGeo = new THREE.Geometry();
+    asteroidGeo.vertices.push(
+        new THREE.Vector3(0, -4, 0),
+        new THREE.Vector3(-2, -2, 0),
+        new THREE.Vector3(-6, -2, 0),
+        new THREE.Vector3(-6, 2, 0),
+        new THREE.Vector3(-2, 4, 0),
+        new THREE.Vector3(-2, 6, 0),
+        new THREE.Vector3(4, 6, 0),
+        new THREE.Vector3(4, 2, 0),
+        new THREE.Vector3(6, 0, 0),
+        new THREE.Vector3(4, -4, 0),
+        new THREE.Vector3(0, -4, 0)
+    );
 
 
     //randomly spawn asteroids -- each will be scaled differently and will then float around
@@ -118,11 +132,8 @@ function init() {
 
         activeAsteroids++;
     }
-
-    //event listeners for movement and firing
-    window.addEventListener('keydown', onKeyDown, false);
-    window.addEventListener('keyup', onKeyUp, false);
 }
+
 
 //updates ever frame used for animation and input handling
 function update() {
@@ -152,6 +163,10 @@ function update() {
         ship.position.y *= -1;
     }
 
+    //if the player killed all of the asteroids spawn more
+    if (activeAsteroids <= 0) {
+        spawnAsteroids();
+    }
 
     //check for collision between 2 asteroids
     //checkCollision();
@@ -161,15 +176,18 @@ function update() {
     renderer.render(scene, camera);
 }
 
+
 //handles keydown events
 function onKeyDown(event) {
     keyState[event.keyCode || event.charCode] = true;
 }
 
+
 //handles keyup events
 function onKeyUp(event) {
     keyState[event.keyCode || event.charCode] = false;
 }
+
 
 //checks if the user hit specific keys for movement and firing controls
 function handleInput() {
@@ -210,7 +228,7 @@ function projectileCollision(index) {
         var dx = projectile[index].position.x - asteroids[i].position.x;
         var dy = projectile[index].position.y - asteroids[i].position.y;
         var distance = Math.sqrt(dx * dx + dy * dy);
-        if (distance < 20) {
+        if (distance < 10) {
             console.log(asteroids);
 
             //remove the projectile from the scene
@@ -237,6 +255,7 @@ function projectileCollision(index) {
             asteroids.pop();
             activeAsteroids--;
 
+            points += 10;
             /*
             projectile.pop();
             projectileCount--;
