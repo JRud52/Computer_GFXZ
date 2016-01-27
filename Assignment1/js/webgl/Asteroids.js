@@ -177,7 +177,7 @@ function init() {
         textGeo.computeVertexNormals();
         var centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
 
-        material = new THREE.MeshFaceMaterial([
+        material1 = new THREE.MeshFaceMaterial([
                 new THREE.MeshPhongMaterial({
                         color: 0xffffff,
                         shading: THREE.FlatShading
@@ -187,7 +187,7 @@ function init() {
                         shading: THREE.SmoothShading
                 }) // side
         ]);
-        textMesh1 = new THREE.Mesh(textGeo, material);
+        textMesh1 = new THREE.Mesh(textGeo, material1);
 
         textMesh1.position.x = centerOffset;
         textMesh1.position.y = 30;
@@ -196,7 +196,7 @@ function init() {
         textMesh1.rotation.x = 0;
         textMesh1.rotation.y = Math.PI * 2;
         scene.add(textMesh1);
-        
+
         //group = new THREE.Group();
         //group.position.y = 100;
         //scene.add(group);
