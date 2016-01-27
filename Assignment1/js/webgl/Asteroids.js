@@ -35,24 +35,8 @@ var group, textGeo, material, textMesh1, textMesh2;
 
 var mirror = true;
 
-/*
-var text = "three.js",
-
-        height = 20,
-        size = 70,
-        hover = 30,
-
-        curveSegments = 4,
-
-        bevelThickness = 2,
-        bevelSize = 1.5,
-        bevelSegments = 3,
-        bevelEnabled = true,
-
-        font = "droid sans", // helvetiker, optimer, gentilis, droid sans, droid serif
-        weight = "normal", // normal bold
-        style = "normal"; // normal italic
-
+var scoreText, scoreNumber, companyName;
+var scoreMesh;
 
 /*
     ONLOAD FUNCTION
@@ -143,46 +127,42 @@ function init() {
                 scene.add(point);
         }
 
-        material = new THREE.MeshBasicMaterial({ color : 0xffffff });
         //Score FIX THIS GUY!!
-        var textGeo = new THREE.TextGeometry("COMPUTER GRAPHICS!", {
+        createText(scoreText, "Score: ", "FFF", 15, 15, 0.5, -297, 205, 0);
+        scoreNumber = new THREE.TextGeometry(points, {
 
-                size: 40,
-                height: 25,
+                size: 15,
+                height: 15,
                 curveSegments: 4,
 
                 font: 'droid sans',
                 weight: "normal",
                 style: "normal",
 
-                bevelThickness: 1.25,
-                bevelSize: 0.25,
+                bevelThickness: 0.5,
+                bevelSize: 1,
                 bevelEnabled: true,
 
                 material: 0,
                 extrudeMaterial: 1
         });
 
-        textGeo.computeBoundingBox();
-        textGeo.computeVertexNormals();
-        var centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
+        scoreNumber.computeBoundingBox();
+        scoreNumber.computeVertexNormals();
 
-        material = new THREE.MeshBasicMaterial({ color : 0xffffff });
-        textMesh1 = new THREE.Mesh(textGeo, material);
+        material = new THREE.MeshBasicMaterial({
+                color: "#" + "FAF216"
+        });
 
-        textMesh1.position.x = centerOffset;
-        textMesh1.position.y = 170;
-        textMesh1.position.z = 0;
+        scoreMesh = new THREE.Mesh(scoreNumber, material);
 
-        textMesh1.rotation.x = 0;
-        textMesh1.rotation.y = Math.PI * 2;
-        scene.add(textMesh1);
+        scoreMesh.position.x = -210;
+        scoreMesh.position.y = 204;
+        scoreMesh.position.z = 0;
 
-        //group = new THREE.Group();
-        //group.position.y = 100;
-        //scene.add(group);
-        //createText();
+        scene.add(scoreMesh);
 
+        createText(companyName, "© GoodIdea Games", "648691", 8, 8, 0.5, -50, -220, 0);
 
         //spawn the asteroids
         spawnAsteroids();
@@ -190,6 +170,88 @@ function init() {
         //event listeners for movement and firing
         window.addEventListener('keydown', onKeyDown, false);
         window.addEventListener('keyup', onKeyUp, false);
+}
+
+/*
+        Geometry - Object to hold font settings.
+        Text - Text desired to be displayed
+        Color - Color of Text
+        Size - Size of Text
+        Height - Height of Text
+        Thickness - Thickness of bevelSize
+        xPos - X Axis position
+        yPos - Y Axis position
+        zPos - Z Axis position
+*/
+function createText(geometry, text, color, size, height, thickness, xPos, yPos, zPos) {
+        geometry = new THREE.TextGeometry(text, {
+
+                size: size,
+                height: height,
+                curveSegments: 4,
+
+                font: 'droid sans',
+                weight: "normal",
+                style: "normal",
+
+                bevelThickness: 0.5,
+                bevelSize: thickness,
+                bevelEnabled: true,
+
+                material: 0,
+                extrudeMaterial: 1
+        });
+
+        geometry.computeBoundingBox();
+        geometry.computeVertexNormals();
+
+        material = new THREE.MeshBasicMaterial({
+                color: "#" + color
+        });
+
+        textMesh1 = new THREE.Mesh(geometry, material);
+
+        textMesh1.position.x = xPos;
+        textMesh1.position.y = yPos;
+        textMesh1.position.z = zPos;
+
+        scene.add(textMesh1);
+
+}
+
+function updateScore(pts) {
+        scoreNumber = new THREE.TextGeometry(pts, {
+
+                size: 15,
+                height: 15,
+                curveSegments: 4,
+
+                font: 'droid sans',
+                weight: "normal",
+                style: "normal",
+
+                bevelThickness: 0.5,
+                bevelSize: 1,
+                bevelEnabled: true,
+
+                material: 0,
+                extrudeMaterial: 1
+        });
+
+        scoreNumber.computeBoundingBox();
+        scoreNumber.computeVertexNormals();
+
+        material = new THREE.MeshBasicMaterial({
+                color: "#" + "FAF216"
+        });
+
+        scoreMesh = new THREE.Mesh(scoreNumber, material);
+
+        scoreMesh.position.x = -210;
+        scoreMesh.position.y = 204;
+        scoreMesh.position.z = 0;
+
+        scene.add(scoreMesh);
 }
 
 
@@ -364,7 +426,12 @@ function projectileCollision(index) {
                         asteroids.pop();
                         activeAsteroids--;
 
-                        points += 10;
+                        for (z = 0; z < 10; z++) {
+                                setTimeout(function(){
+                                                        scene.remove(scoreMesh);
+                                                        updateScore(++points);
+                                                        scene.add(scoreMesh);}, 2000/z+1);
+                        }
                         /*
                         projectile.pop();
                         projectileCount--;
@@ -427,102 +494,6 @@ function checkCollision() {
                                 }
                         }
                 }
-        }
-
-}
-
-function createText() {
-
-        textGeo = new THREE.TextGeometry(text, {
-
-                size: size,
-                height: height,
-                curveSegments: curveSegments,
-
-                font: font,
-                weight: weight,
-                style: style,
-
-                bevelThickness: bevelThickness,
-                bevelSize: bevelSize,
-                bevelEnabled: bevelEnabled,
-
-                material: 0,
-                extrudeMaterial: 1
-
-        });
-
-        textGeo.computeBoundingBox();
-        textGeo.computeVertexNormals();
-
-        // "fix" side normals by removing z-component of normals for side faces
-        // (this doesn't work well for beveled geometry as then we lose nice curvature around z-axis)
-
-        if (!bevelEnabled) {
-
-                var triangleAreaHeuristics = 0.1 * (height * size);
-
-                for (var i = 0; i < textGeo.faces.length; i++) {
-
-                        var face = textGeo.faces[i];
-
-                        if (face.materialIndex == 1) {
-
-                                for (var j = 0; j < face.vertexNormals.length; j++) {
-
-                                        face.vertexNormals[j].z = 0;
-                                        face.vertexNormals[j].normalize();
-
-                                }
-
-                                var va = textGeo.vertices[face.a];
-                                var vb = textGeo.vertices[face.b];
-                                var vc = textGeo.vertices[face.c];
-
-                                var s = THREE.GeometryUtils.triangleArea(va, vb, vc);
-
-                                if (s > triangleAreaHeuristics) {
-
-                                        for (var j = 0; j < face.vertexNormals.length; j++) {
-
-                                                face.vertexNormals[j].copy(face.normal);
-
-                                        }
-
-                                }
-
-                        }
-
-                }
-
-        }
-
-        var centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
-
-        textMesh1 = new THREE.Mesh(textGeo, material);
-
-        textMesh1.position.x = centerOffset;
-        textMesh1.position.y = hover;
-        textMesh1.position.z = 0;
-
-        textMesh1.rotation.x = 0;
-        textMesh1.rotation.y = Math.PI * 2;
-
-        group.add(textMesh1);
-
-        if (mirror) {
-
-                textMesh2 = new THREE.Mesh(textGeo, material);
-
-                textMesh2.position.x = centerOffset;
-                textMesh2.position.y = -hover;
-                textMesh2.position.z = height;
-
-                textMesh2.rotation.x = Math.PI;
-                textMesh2.rotation.y = Math.PI * 2;
-
-                group.add(textMesh2);
-
         }
 
 }
