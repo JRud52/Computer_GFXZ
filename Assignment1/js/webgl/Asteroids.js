@@ -9,7 +9,7 @@ var container;
 
 var keyState = [];
 
-var numOfAsteroids = 5;
+var numOfAsteroids = 10;
 var activeAsteroids = 0;
 var asteroids = [];
 var asteroidSpeedX = [];
@@ -31,6 +31,28 @@ var music = new Audio('music/vapor.ogg');
 var laser = new Audio('music/laser.ogg');
 var explode = new Audio('music/explosion.ogg');
 
+var group, textGeo, material, textMesh1, textMesh2;
+
+var mirror = true;
+
+/*
+var text = "three.js",
+
+        height = 20,
+        size = 70,
+        hover = 30,
+
+        curveSegments = 4,
+
+        bevelThickness = 2,
+        bevelSize = 1.5,
+        bevelSegments = 3,
+        bevelEnabled = true,
+
+        font = "droid sans", // helvetiker, optimer, gentilis, droid sans, droid serif
+        weight = "normal", // normal bold
+        style = "normal"; // normal italic
+
 
 /*
     ONLOAD FUNCTION
@@ -47,7 +69,9 @@ function init() {
         document.body.appendChild(container);
 
         //webGL renderer size 600x450
-        renderer = new THREE.WebGLRenderer({antialias:true});
+        renderer = new THREE.WebGLRenderer({
+                antialias: true
+        });
         renderer.setPixelRatio(600 / 450);
         renderer.setSize(600, 450);
         container.appendChild(renderer.domElement);
@@ -95,7 +119,7 @@ function init() {
                 var pointMaterial = new THREE.PointsMaterial({
                         size: size,
                         sizeAttenuation: false,
-                        color: '#'+Math.floor(Math.random()*16777215).toString(16)
+                        color: '#' + Math.floor(Math.random() * 16777215).toString(16)
                 });
                 var point = new THREE.Points(pointGeometry, pointMaterial);
                 scene.add(point);
@@ -118,6 +142,65 @@ function init() {
                 var point = new THREE.Points(pointGeometry, pointMaterial);
                 scene.add(point);
         }
+
+        material = new THREE.MeshFaceMaterial([
+                new THREE.MeshPhongMaterial({
+                        color: '#FFFFFF',
+                        shading: THREE.FlatShading
+                }), // front
+                new THREE.MeshPhongMaterial({
+                        color: '#FFFFFF',
+                        shading: THREE.SmoothShading
+                }) // side
+        ]);
+
+        //Score FIX THIS GUY!!
+        var textGeo = new THREE.TextGeometry("COMPUTER GRAPHICS!", {
+
+                size: 100,
+                height: 25,
+                curveSegments: 4,
+
+                font: 'droid sans',
+                weight: "normal",
+                style: "normal",
+
+                bevelThickness: 1.25,
+                bevelSize: 0.25,
+                bevelEnabled: true,
+
+                material: 0,
+                extrudeMaterial: 1
+        });
+
+        textGeo.computeBoundingBox();
+        textGeo.computeVertexNormals();
+        var centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
+
+        material = new THREE.MeshFaceMaterial([
+                new THREE.MeshPhongMaterial({
+                        color: 0xffffff,
+                        shading: THREE.FlatShading
+                }), // front
+                new THREE.MeshPhongMaterial({
+                        color: 0xffffff,
+                        shading: THREE.SmoothShading
+                }) // side
+        ]);
+        textMesh1 = new THREE.Mesh(textGeo, material);
+
+        textMesh1.position.x = centerOffset;
+        textMesh1.position.y = 30;
+        textMesh1.position.z = 0;
+
+        textMesh1.rotation.x = 0;
+        textMesh1.rotation.y = Math.PI * 2;
+        scene.add(textMesh1);
+        
+        //group = new THREE.Group();
+        //group.position.y = 100;
+        //scene.add(group);
+        //createText();
 
 
         //spawn the asteroids
@@ -149,7 +232,7 @@ function spawnAsteroids() {
 
 
         //randomly spawn asteroids -- each will be scaled differently and will then float around
-        for (i = 0; i < numOfAsteroids; i++) {
+        for (var i = 0; i < numOfAsteroids; i++) {
                 asteroidMat[i] = new THREE.LineBasicMaterial({
                         color: 0xFFFFFF
                 });
@@ -363,6 +446,102 @@ function checkCollision() {
                                 }
                         }
                 }
+        }
+
+}
+
+function createText() {
+
+        textGeo = new THREE.TextGeometry(text, {
+
+                size: size,
+                height: height,
+                curveSegments: curveSegments,
+
+                font: font,
+                weight: weight,
+                style: style,
+
+                bevelThickness: bevelThickness,
+                bevelSize: bevelSize,
+                bevelEnabled: bevelEnabled,
+
+                material: 0,
+                extrudeMaterial: 1
+
+        });
+
+        textGeo.computeBoundingBox();
+        textGeo.computeVertexNormals();
+
+        // "fix" side normals by removing z-component of normals for side faces
+        // (this doesn't work well for beveled geometry as then we lose nice curvature around z-axis)
+
+        if (!bevelEnabled) {
+
+                var triangleAreaHeuristics = 0.1 * (height * size);
+
+                for (var i = 0; i < textGeo.faces.length; i++) {
+
+                        var face = textGeo.faces[i];
+
+                        if (face.materialIndex == 1) {
+
+                                for (var j = 0; j < face.vertexNormals.length; j++) {
+
+                                        face.vertexNormals[j].z = 0;
+                                        face.vertexNormals[j].normalize();
+
+                                }
+
+                                var va = textGeo.vertices[face.a];
+                                var vb = textGeo.vertices[face.b];
+                                var vc = textGeo.vertices[face.c];
+
+                                var s = THREE.GeometryUtils.triangleArea(va, vb, vc);
+
+                                if (s > triangleAreaHeuristics) {
+
+                                        for (var j = 0; j < face.vertexNormals.length; j++) {
+
+                                                face.vertexNormals[j].copy(face.normal);
+
+                                        }
+
+                                }
+
+                        }
+
+                }
+
+        }
+
+        var centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
+
+        textMesh1 = new THREE.Mesh(textGeo, material);
+
+        textMesh1.position.x = centerOffset;
+        textMesh1.position.y = hover;
+        textMesh1.position.z = 0;
+
+        textMesh1.rotation.x = 0;
+        textMesh1.rotation.y = Math.PI * 2;
+
+        group.add(textMesh1);
+
+        if (mirror) {
+
+                textMesh2 = new THREE.Mesh(textGeo, material);
+
+                textMesh2.position.x = centerOffset;
+                textMesh2.position.y = -hover;
+                textMesh2.position.z = height;
+
+                textMesh2.rotation.x = Math.PI;
+                textMesh2.rotation.y = Math.PI * 2;
+
+                group.add(textMesh2);
+
         }
 
 }
