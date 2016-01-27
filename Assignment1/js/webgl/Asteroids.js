@@ -143,21 +143,11 @@ function init() {
                 scene.add(point);
         }
 
-        material = new THREE.MeshFaceMaterial([
-                new THREE.MeshPhongMaterial({
-                        color: '#FFFFFF',
-                        shading: THREE.FlatShading
-                }), // front
-                new THREE.MeshPhongMaterial({
-                        color: '#FFFFFF',
-                        shading: THREE.SmoothShading
-                }) // side
-        ]);
-
+        material = new THREE.MeshBasicMaterial({ color : 0xffffff });
         //Score FIX THIS GUY!!
         var textGeo = new THREE.TextGeometry("COMPUTER GRAPHICS!", {
 
-                size: 100,
+                size: 40,
                 height: 25,
                 curveSegments: 4,
 
@@ -177,26 +167,18 @@ function init() {
         textGeo.computeVertexNormals();
         var centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
 
-        material = new THREE.MeshFaceMaterial([
-                new THREE.MeshPhongMaterial({
-                        color: 0xffffff,
-                        shading: THREE.FlatShading
-                }), // front
-                new THREE.MeshPhongMaterial({
-                        color: 0xffffff,
-                        shading: THREE.SmoothShading
-                }) // side
-        ]);
+        material = new THREE.MeshBasicMaterial({ color : 0xffffff });
+
         textMesh1 = new THREE.Mesh(textGeo, material);
 
         textMesh1.position.x = centerOffset;
-        textMesh1.position.y = 30;
+        textMesh1.position.y = 170;
         textMesh1.position.z = 0;
 
         textMesh1.rotation.x = 0;
         textMesh1.rotation.y = Math.PI * 2;
         scene.add(textMesh1);
-        
+
         //group = new THREE.Group();
         //group.position.y = 100;
         //scene.add(group);
