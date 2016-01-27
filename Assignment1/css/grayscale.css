@@ -15,10 +15,12 @@ body {
 #myCanvas {
    width: 100%;
    text-align:center;
+   border:1px solid #000000;
 }
 
 canvas {
    display: inline;
+   border:1px solid #FFF;
 }
 
 html {
