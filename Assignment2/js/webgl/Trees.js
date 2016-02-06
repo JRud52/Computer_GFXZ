@@ -47,6 +47,11 @@ function init() {
 
         mapGeo = new THREE.Geometry();
         var treeGeo = new THREE.BoxGeometry(3, 3, 3);
+
+        //set the pivot point to the bottom of the geometry
+        treeGeo.applyMatrix(new THREE.Matrix4().makeTranslation(0, 1.5, 0));
+
+        //generate the trees
         generateTrees(treeGeo, 100, 400, 200, 10, 50);
 
         var loader = new THREE.TextureLoader();
@@ -68,14 +73,14 @@ function init() {
         scene.add(mesh);
 
         var spotLight = new THREE.SpotLight( 0xffffff );
-	spotLight.name = 'Spot Light';
-	spotLight.position.set( 2000, 4000, 2000 );
-	spotLight.castShadow = true;
-	spotLight.shadowCameraNear = 8;
-	spotLight.shadowCameraFar = 30;
-	spotLight.shadowMapWidth = 1024;
-	spotLight.shadowMapHeight = 1024;
-	scene.add( spotLight );
+	    spotLight.name = 'Spot Light';
+	    spotLight.position.set( 2000, 4000, 2000 );
+	    spotLight.castShadow = true;
+	    spotLight.shadowCameraNear = 8;
+	    spotLight.shadowCameraFar = 30;
+	    spotLight.shadowMapWidth = 1024;
+	    spotLight.shadowMapHeight = 1024;
+	    scene.add( spotLight );
 }
 
 
@@ -109,7 +114,7 @@ function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, yScaleMax) 
                 //randomly place a tree somewhere in the scene
                 tree.position.x = Math.floor(Math.random() * xBound - zBound) * 10;
                 tree.position.z = Math.floor(Math.random() * xBound - zBound) * 10;
-
+                
 
                 //randomize the tree's rotation (0 to 2 Pi)
                 tree.rotation.y = Math.floor(Math.random() * (Math.PI * 2));
