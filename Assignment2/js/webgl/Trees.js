@@ -5,8 +5,9 @@
 
 
 
-var camera, scene, renderer;
+var camera, scene, renderer, controls;
 var mapGeo;
+var clock = new THREE.Clock();
 
 
 /*
@@ -31,16 +32,21 @@ function init() {
         container.appendChild(renderer.domElement);
 
 
-        camera = new THREE.PerspectiveCamera(35, 600 / 400, 0.1, 10000);
-        camera.position.z = 500;
-        camera.position.y = 500;
-        camera.rotateX(-0.4);
+        camera = new THREE.PerspectiveCamera(60, 600 / 450, 0.1, 10000);
+        camera.position.z = 1000;
+        camera.position.y = 2000;
+        camera.lookAt(new THREE.Vector3(500,0,500));
+
+        //controls = new THREE.FirstPersonControls( camera );
+        //controls.movementSpeed = 1000;
+        //controls.lookSpeed = 0.125;
+        //controls.lookVertical = true;
 
         scene = new THREE.Scene();
 
         mapGeo = new THREE.Geometry();
         var treeGeo = new THREE.BoxGeometry(3, 3, 3);
-        generateTrees(treeGeo, 100, 200, 100, 10, 10);
+        generateTrees(treeGeo, 100, 300, 100, 10, 10);
 }
 
 
@@ -48,6 +54,11 @@ function init() {
 //updates every frame used for animation and input handling
 function update() {
         requestAnimationFrame(update);
+
+        //controls.update(clock.getDelta());
+
+
+
 
         //render the scene
         renderer.render(scene, camera);
