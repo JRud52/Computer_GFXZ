@@ -9,34 +9,34 @@ var camera, scene, renderer, controls;
 var mapGeo;
 var clock = new THREE.Clock();
 
+var stats;
 var dae;
 
-			var loader = new THREE.ColladaLoader();
-			loader.options.convertUpAxis = true;
-			loader.load( 'textures/monster.dae', function ( collada ) {
+//Importing the collada model's DAE file Here
+var loader = new THREE.ColladaLoader();
+loader.options.convertUpAxis = true;
+loader.load('textures/monster.dae', function(collada) {
 
-				dae = collada.scene;
+        dae = collada.scene;
 
-				dae.traverse( function ( child ) {
+        dae.traverse(function(child) {
 
-					if ( child instanceof THREE.SkinnedMesh ) {
+                if (child instanceof THREE.SkinnedMesh) {
 
-						var animation = new THREE.Animation( child, child.geometry.animation );
-						animation.play();
+                        var animation = new THREE.Animation(child, child.geometry.animation);
+                        animation.play();
 
-					}
+                }
 
-				} );
+        });
 
-				dae.scale.x = dae.scale.y = dae.scale.z = 0.5;
-                                dae.position.x = 0;
-                                dae.position.y = 0;
-                                dae.position.z = 0;
-				dae.updateMatrix();
+        dae.scale.x = dae.scale.y = dae.scale.z = 0.5;
+        dae.position.x = 0;
+        dae.position.y = 0;
+        dae.position.z = 0;
+        dae.updateMatrix();
 
-			} );
-
-
+});
 
 
 /*
@@ -52,6 +52,7 @@ function main() {
 //initial setup
 function init() {
 
+        //Set to our custom canvas
         container = document.getElementById('myCanvas');
         document.body.appendChild(container);
 
@@ -63,12 +64,13 @@ function init() {
         renderer.setSize(600, 450);
         container.appendChild(renderer.domElement);
 
-
+        //New perspective camera, positioned to face the trees and such.
         camera = new THREE.PerspectiveCamera(60, 600 / 450, 0.1, 10000);
-        camera.position.z = 2000;
+        camera.position.z = 2500;
         camera.position.y = 2000;
         camera.lookAt(new THREE.Vector3(500, 0, 500));
 
+        //!!!!!! First Person Controls if you Desire, in the future ill make these a toggable function//
         //controls = new THREE.FirstPersonControls( camera );
         //controls.movementSpeed = 1000;
         //controls.lookSpeed = 0.125;
@@ -84,26 +86,28 @@ function init() {
         treeGeo.applyMatrix(new THREE.Matrix4().makeTranslation(0, 1.5, 0));
 
         //generate the trees
-        //generateTrees(treeGeo, 100, 400, 200, 10, 50);
+        generateTrees(treeGeo, 100, 400, 200, 10, 35);
 
+        //Making some grass
         var loader = new THREE.TextureLoader();
         var groundTexture = loader.load("textures/grasslight-big.jpg");
         groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
         groundTexture.repeat.set(25, 25);
         groundTexture.anisotropy = 16;
-
+        //Grass's material
         var groundMaterial = new THREE.MeshPhongMaterial({
                 color: 0xffffff,
                 specular: 0x111111,
                 map: groundTexture
         });
-
+        //Grass's Mesh
         var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(20000, 20000), groundMaterial);
         mesh.position.y = 0;
         mesh.rotation.x = -Math.PI / 2;
         mesh.receiveShadow = true;
         scene.add(mesh);
 
+        //Add a spotlight for shadows
         var spotLight = new THREE.SpotLight(0xffffff);
         spotLight.name = 'Spot Light';
         spotLight.position.set(2000, 4000, 2000);
@@ -114,22 +118,20 @@ function init() {
         spotLight.shadowMapHeight = 1024;
         scene.add(spotLight);
 
+        //Add the collada object to the scene
         scene.add(dae);
 
-
+        //Performance Stats
+        stats = new Stats();
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.top = '35px';
+        container.appendChild(stats.domElement);
 }
 
 
-var clock = new THREE.Clock();
+function update() {  //updates every frame used for animation and input handling
 
-//updates every frame used for animation and input handling
-function update() {
-
-        //controls.update(clock.getDelta());
-
-THREE.AnimationHandler.update( clock.getDelta() );
-
-
+        THREE.AnimationHandler.update(clock.getDelta());
         //render the scene
         renderer.render(scene, camera);
 }
@@ -137,11 +139,9 @@ THREE.AnimationHandler.update( clock.getDelta() );
 function animate() {
 
         requestAnimationFrame(animate);
+        stats.update();
         update();
-
 }
-
-
 
 function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, yScaleMax) {
         var mat = new THREE.MeshPhongMaterial({
