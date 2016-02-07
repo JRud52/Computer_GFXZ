@@ -15,7 +15,7 @@ var dae;
 //Importing the collada model's DAE file Here
 var loader = new THREE.ColladaLoader();
 loader.options.convertUpAxis = true;
-loader.load('textures/monster.dae', function(collada) {
+loader.load('textures/Pine Tree.dae', function(collada) {
 
         dae = collada.scene;
 
@@ -34,6 +34,9 @@ loader.load('textures/monster.dae', function(collada) {
         dae.position.x = 0;
         dae.position.y = 0;
         dae.position.z = 0;
+        dae.scale.y = 200;
+        dae.scale.x = 200;
+        dae.scale.z = 200;
         dae.updateMatrix();
 
 });
@@ -62,7 +65,7 @@ function init() {
         });
         renderer.setPixelRatio(600 / 450);
         renderer.setSize(600, 450);
-        renderer.shadowMapEnabled = true;
+        renderer.shadowMap.enabled = true;
         container.appendChild(renderer.domElement);
 
         //New perspective camera, positioned to face the trees and such.
@@ -87,7 +90,7 @@ function init() {
         treeGeo.applyMatrix(new THREE.Matrix4().makeTranslation(0, 1.5, 0));
 
         //generate the trees
-        generateTrees(treeGeo, 100, 400, 200, 10, 35);
+        generateTrees(treeGeo, 100, 400, 200, 50, 10, 30, 20);
 
         //Making some grass
         var loader = new THREE.TextureLoader();
@@ -108,20 +111,13 @@ function init() {
         mesh.receiveShadow = true;
         scene.add(mesh);
 
-        //Add a spotlight for shadows
-        var spotLight = new THREE.SpotLight(0xffffff);
+        //Add a spotlight for shadows - white light with intesity of 1
+        var spotLight = new THREE.SpotLight(0xffffff, 1);
         spotLight.name = 'Spot Light';
         spotLight.position.set(2000, 4000, 2000);
         spotLight.castShadow = true;
         spotLight.shadowCameraNear = true;
         spotLight.intensity = 1;
-    /*
-        spotLight.shadowCameraNear = 8;
-        spotLight.shadowCameraFar = 30;
-        spotLight.shadowMapWidth = 1024;
-        spotLight.shadowMapHeight = 1024;
-    */
-        //scene.add(spotLight);
 
 
         //directional light for shadows
@@ -129,8 +125,10 @@ function init() {
         directionalLight.position.set(2000, 4000, 2000);
         directionalLight.castShadow = true;
         directionalLight.shadowMapEnabled = true;
-        scene.add(directionalLight);
+        //scene.add(directionalLight);
 
+        spotLight.shadowCameraFar = 10000;
+        scene.add(spotLight);
 
         //Add the collada object to the scene
         scene.add(dae);
@@ -157,7 +155,7 @@ function animate() {
         update();
 }
 
-function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, yScaleMax) {
+function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, xScaleMin, yScaleMax, yScaleMin) {
         var mat = new THREE.MeshPhongMaterial({
                 color: 0x00ffff,
                 shininess: 150,
@@ -172,20 +170,19 @@ function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, yScaleMax) 
                 tree.position.x = Math.floor(Math.random() * xBound - zBound) * 10;
                 tree.position.z = Math.floor(Math.random() * xBound - zBound) * 10;
 
-
                 //randomize the tree's rotation (0 to 2 Pi)
                 tree.rotation.y = Math.floor(Math.random() * (Math.PI * 2));
 
                 //randomize the tree's scale
                 //the width and depth of the tree should be the same so it doesnt end up being too thin or stretched
-                //minimum scale of 10
-                tree.scale.x = Math.floor(Math.random() * xScaleMax + 10);
+                tree.scale.x = Math.floor(Math.random() * (xScaleMax - xScaleMin + 1)) + xScaleMin;
                 tree.scale.z = tree.scale.x;
 
-                tree.scale.y = Math.floor(Math.random() * tree.scale.x * yScaleMax + 10);
+                tree.scale.y = Math.floor(Math.random() * tree.scale.x * (yScaleMax - yScaleMin)) + yScaleMin;
                 tree.position.y = 0;
 
                 tree.castShadow = true;
+                tree.receiveShadow = true;
                 scene.add(tree);
         }
 }
