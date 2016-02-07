@@ -12,7 +12,7 @@
   </asset>
   <library_images>
     <image id="Leaves0142_1_S_png" name="Leaves0142_1_S_png">
-      <init_from>Leaves0142_1_S.png</init_from>
+      <init_from>./Leaves0142_1_S.png</init_from>
     </image>
   </library_images>
   <library_effects>
