@@ -62,6 +62,7 @@ function init() {
         });
         renderer.setPixelRatio(600 / 450);
         renderer.setSize(600, 450);
+        renderer.shadowMapEnabled = true;
         container.appendChild(renderer.domElement);
 
         //New perspective camera, positioned to face the trees and such.
@@ -112,12 +113,24 @@ function init() {
         spotLight.name = 'Spot Light';
         spotLight.position.set(2000, 4000, 2000);
         spotLight.castShadow = true;
+        spotLight.shadowCameraNear = true;
+        spotLight.intensity = 1;
+    /*
         spotLight.shadowCameraNear = 8;
         spotLight.shadowCameraFar = 30;
         spotLight.shadowMapWidth = 1024;
         spotLight.shadowMapHeight = 1024;
+    */
         scene.add(spotLight);
-
+    
+    /*
+        //directional light for shadows
+        var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(2000, 4000, 2000);
+        directionalLight.castShadow = true;
+        directionalLight.shadowMapEnabled = true;
+        scene.add(directionalLight);
+    */
         //Add the collada object to the scene
         scene.add(dae);
 
@@ -153,7 +166,7 @@ function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, yScaleMax) 
 
         for (i = 0; i < maxTrees; i++) {
                 tree = new THREE.Mesh(treeGeo, mat);
-
+              
                 //randomly place a tree somewhere in the scene
                 tree.position.x = Math.floor(Math.random() * xBound - zBound) * 10;
                 tree.position.z = Math.floor(Math.random() * xBound - zBound) * 10;
@@ -171,7 +184,7 @@ function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, yScaleMax) 
                 tree.scale.y = Math.floor(Math.random() * tree.scale.x * yScaleMax + 10);
                 tree.position.y = 0;
 
-
+                tree.castShadow = true;
                 scene.add(tree);
         }
 }
