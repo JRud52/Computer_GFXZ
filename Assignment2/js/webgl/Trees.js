@@ -121,16 +121,17 @@ function init() {
         spotLight.shadowMapWidth = 1024;
         spotLight.shadowMapHeight = 1024;
     */
-        scene.add(spotLight);
-    
-    /*
+        //scene.add(spotLight);
+
+
         //directional light for shadows
         var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
         directionalLight.position.set(2000, 4000, 2000);
         directionalLight.castShadow = true;
         directionalLight.shadowMapEnabled = true;
         scene.add(directionalLight);
-    */
+
+
         //Add the collada object to the scene
         scene.add(dae);
 
@@ -166,7 +167,7 @@ function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, yScaleMax) 
 
         for (i = 0; i < maxTrees; i++) {
                 tree = new THREE.Mesh(treeGeo, mat);
-              
+
                 //randomly place a tree somewhere in the scene
                 tree.position.x = Math.floor(Math.random() * xBound - zBound) * 10;
                 tree.position.z = Math.floor(Math.random() * xBound - zBound) * 10;
