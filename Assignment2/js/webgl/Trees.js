@@ -170,6 +170,7 @@ function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, xScaleMin, 
                 tree.position.y = 0;
 
                 tree.castShadow = true;
+                tree.receiveShadow = true;
                 scene.add(tree);
         }
 }
