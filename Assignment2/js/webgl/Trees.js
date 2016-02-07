@@ -15,7 +15,7 @@ var dae;
 //Importing the collada model's DAE file Here
 var loader = new THREE.ColladaLoader();
 loader.options.convertUpAxis = true;
-loader.load('textures/Pine Tree.dae', function(collada) {
+loader.load('textures/CartoonTree.dae', function(collada) {
 
         dae = collada.scene;
 
@@ -30,13 +30,10 @@ loader.load('textures/Pine Tree.dae', function(collada) {
 
         });
 
-        dae.scale.x = dae.scale.y = dae.scale.z = 0.5;
+        dae.scale.x = dae.scale.y = dae.scale.z = 100;
         dae.position.x = 0;
         dae.position.y = 0;
         dae.position.z = 0;
-        dae.scale.y = 200;
-        dae.scale.x = 200;
-        dae.scale.z = 200;
         dae.updateMatrix();
 
 });
@@ -90,7 +87,7 @@ function init() {
         treeGeo.applyMatrix(new THREE.Matrix4().makeTranslation(0, 1.5, 0));
 
         //generate the trees
-        generateTrees(treeGeo, 100, 400, 200, 50, 10, 30, 20);
+        //generateTrees(treeGeo, 100, 400, 200, 50, 10, 30, 20);
 
         //Making some grass
         var loader = new THREE.TextureLoader();
@@ -130,16 +127,23 @@ function init() {
         spotLight.shadowCameraFar = 10000;
         scene.add(spotLight);
 
-        //Add the collada object to the scene
-        scene.add(dae);
-
         //Performance Stats
         stats = new Stats();
         stats.domElement.style.position = 'absolute';
         stats.domElement.style.top = '35px';
         container.appendChild(stats.domElement);
+
+        setTimeout(function(){addObjects();},1000);
 }
 
+function addObjects() {
+
+        scene.add(dae);
+
+        dae.position.x += 100;
+        dae.updateMatrix();
+        scene.add(dae);
+}
 
 function update() {  //updates every frame used for animation and input handling
 
