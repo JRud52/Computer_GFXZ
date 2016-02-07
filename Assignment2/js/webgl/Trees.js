@@ -15,7 +15,7 @@ var dae;
 //Importing the collada model's DAE file Here
 var loader = new THREE.ColladaLoader();
 loader.options.convertUpAxis = true;
-loader.load('textures/monster.dae', function(collada) {
+loader.load('textures/Pine Tree.dae', function(collada) {
 
         dae = collada.scene;
 
@@ -34,6 +34,9 @@ loader.load('textures/monster.dae', function(collada) {
         dae.position.x = 0;
         dae.position.y = 0;
         dae.position.z = 0;
+        dae.scale.y = 200;
+        dae.scale.x = 200;
+        dae.scale.z = 200;
         dae.updateMatrix();
 
 });
