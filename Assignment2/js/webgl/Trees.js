@@ -9,12 +9,42 @@ var camera, scene, renderer, controls;
 var mapGeo;
 var clock = new THREE.Clock();
 
+var dae;
+
+			var loader = new THREE.ColladaLoader();
+			loader.options.convertUpAxis = true;
+			loader.load( 'textures/monster.dae', function ( collada ) {
+
+				dae = collada.scene;
+
+				dae.traverse( function ( child ) {
+
+					if ( child instanceof THREE.SkinnedMesh ) {
+
+						var animation = new THREE.Animation( child, child.geometry.animation );
+						animation.play();
+
+					}
+
+				} );
+
+				dae.scale.x = dae.scale.y = dae.scale.z = 0.5;
+                                dae.position.x = 0;
+                                dae.position.y = 0;
+                                dae.position.z = 0;
+				dae.updateMatrix();
+
+			} );
+
+
+
 
 /*
     ONLOAD FUNCTION
 */
 function main() {
         init();
+        animate();
         update();
 }
 
@@ -26,7 +56,9 @@ function init() {
         document.body.appendChild(container);
 
         //webGL renderer size 600x450
-        renderer = new THREE.WebGLRenderer({antialias: true});
+        renderer = new THREE.WebGLRenderer({
+                antialias: true
+        });
         renderer.setPixelRatio(600 / 450);
         renderer.setSize(600, 450);
         container.appendChild(renderer.domElement);
@@ -52,7 +84,7 @@ function init() {
         treeGeo.applyMatrix(new THREE.Matrix4().makeTranslation(0, 1.5, 0));
 
         //generate the trees
-        generateTrees(treeGeo, 100, 400, 200, 10, 50);
+        //generateTrees(treeGeo, 100, 400, 200, 10, 50);
 
         var loader = new THREE.TextureLoader();
         var groundTexture = loader.load("textures/grasslight-big.jpg");
@@ -72,30 +104,41 @@ function init() {
         mesh.receiveShadow = true;
         scene.add(mesh);
 
-        var spotLight = new THREE.SpotLight( 0xffffff );
-	    spotLight.name = 'Spot Light';
-	    spotLight.position.set( 2000, 4000, 2000 );
-	    spotLight.castShadow = true;
-	    spotLight.shadowCameraNear = 8;
-	    spotLight.shadowCameraFar = 30;
-	    spotLight.shadowMapWidth = 1024;
-	    spotLight.shadowMapHeight = 1024;
-	    scene.add( spotLight );
+        var spotLight = new THREE.SpotLight(0xffffff);
+        spotLight.name = 'Spot Light';
+        spotLight.position.set(2000, 4000, 2000);
+        spotLight.castShadow = true;
+        spotLight.shadowCameraNear = 8;
+        spotLight.shadowCameraFar = 30;
+        spotLight.shadowMapWidth = 1024;
+        spotLight.shadowMapHeight = 1024;
+        scene.add(spotLight);
+
+        scene.add(dae);
+
+
 }
 
 
+var clock = new THREE.Clock();
 
 //updates every frame used for animation and input handling
 function update() {
-        requestAnimationFrame(update);
 
         //controls.update(clock.getDelta());
 
-
+THREE.AnimationHandler.update( clock.getDelta() );
 
 
         //render the scene
         renderer.render(scene, camera);
+}
+
+function animate() {
+
+        requestAnimationFrame(animate);
+        update();
+
 }
 
 
@@ -114,7 +157,7 @@ function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, yScaleMax) 
                 //randomly place a tree somewhere in the scene
                 tree.position.x = Math.floor(Math.random() * xBound - zBound) * 10;
                 tree.position.z = Math.floor(Math.random() * xBound - zBound) * 10;
-                
+
 
                 //randomize the tree's rotation (0 to 2 Pi)
                 tree.rotation.y = Math.floor(Math.random() * (Math.PI * 2));
