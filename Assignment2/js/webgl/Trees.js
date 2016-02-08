@@ -34,12 +34,12 @@ function init() {
         //Performance Stats
         stats = new Stats();
         stats.domElement.style.position = 'absolute';
-        stats.domElement.style.left = '44px';
+        stats.domElement.style.right= '44px';
         container.appendChild(stats.domElement);
 
         //webGL renderer size 600x450
         renderer = new THREE.WebGLRenderer({
-                antialias: true
+                antialias: false
         });
         renderer.setPixelRatio(($(container).width()-100) / 450);
         renderer.setSize($(container).width()-100,450);
@@ -50,7 +50,11 @@ function init() {
         camera = new THREE.PerspectiveCamera(60, ($(container).width()-100) / 450, 0.1, 10000);
         camera.position.z = 2500;
         camera.position.y = 2000;
-        camera.lookAt(new THREE.Vector3(500, 0, 500));
+
+        // Mouse control
+	controls = new THREE.OrbitControls( camera, renderer.domElement );
+	controls.target.set( 0, 0, 0 );
+	controls.update();
 
         scene = new THREE.Scene();
          scene.fog = new THREE.FogExp2(0xe6e6e6, 0.0002);
@@ -62,7 +66,7 @@ function init() {
         treeGeo.applyMatrix(new THREE.Matrix4().makeTranslation(0, 1.5, 0));
 
         //generate the trees
-        generateTrees(treeGeo, 100, 400, 200, 75, 40, 150, 50);
+        generateTrees(treeGeo, 150, 5000, 5000, 75, 40, 150, 50);
 
         //Making some grass
         var loader = new THREE.TextureLoader();
@@ -107,6 +111,7 @@ function init() {
         //setTimeout(function(){addObjects();},1000);
 
 
+        /*
         // particle system parameters
         particleCount = 10000;
         particles = new THREE.Geometry();
@@ -135,6 +140,7 @@ function init() {
 
         // add it to the scene
         scene.add(particleSystem);
+        */
 }
 
 function addObjects() {
@@ -187,8 +193,8 @@ function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, xScaleMin, 
                 tree = new THREE.Mesh(treeGeo, mat);
 
                 //randomly place a tree somewhere in the scene
-                tree.position.x = Math.floor(Math.random() * xBound - zBound) * 10;
-                tree.position.z = Math.floor(Math.random() * xBound - zBound) * 10;
+                tree.position.x = (Math.random() * (xBound*2) - xBound);
+                tree.position.z = (Math.random() * (zBound*2) - zBound);
 
                 //randomize the tree's rotation (0 to 2 Pi)
                 tree.rotation.y = Math.floor(Math.random() * (Math.PI * 2));
