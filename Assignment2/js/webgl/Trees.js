@@ -31,26 +31,26 @@ function init() {
         container = document.getElementById('myCanvas');
         document.body.appendChild(container);
 
+        //Performance Stats
+        stats = new Stats();
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.left = '44px';
+        container.appendChild(stats.domElement);
+
         //webGL renderer size 600x450
         renderer = new THREE.WebGLRenderer({
                 antialias: true
         });
-        renderer.setPixelRatio(600 / 450);
-        renderer.setSize(600, 450);
+        renderer.setPixelRatio(($(container).width()-100) / 450);
+        renderer.setSize($(container).width()-100,450);
         renderer.shadowMap.enabled = true;
         container.appendChild(renderer.domElement);
 
         //New perspective camera, positioned to face the trees and such.
-        camera = new THREE.PerspectiveCamera(60, 600 / 450, 0.1, 10000);
+        camera = new THREE.PerspectiveCamera(60, ($(container).width()-100) / 450, 0.1, 10000);
         camera.position.z = 2500;
         camera.position.y = 2000;
         camera.lookAt(new THREE.Vector3(500, 0, 500));
-
-        //!!!!!! First Person Controls if you Desire, in the future ill make these a toggable function//
-        controls = new THREE.FirstPersonControls( camera );
-        controls.movementSpeed = 1000;
-        controls.lookSpeed = 0.125;
-        controls.lookVertical = true;
 
         scene = new THREE.Scene();
          scene.fog = new THREE.FogExp2(0xe6e6e6, 0.0002);
@@ -69,7 +69,7 @@ function init() {
         var groundTexture = loader.load("textures/grasslight-big.jpg");
         groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
         groundTexture.repeat.set(25, 25);
-        groundTexture.anisotropy = 16;
+        groundTexture.anisotropy = 25;
         //Grass's material
         var groundMaterial = new THREE.MeshPhongMaterial({
                 color: 0xffffff,
@@ -102,18 +102,7 @@ function init() {
         spotLight.shadowCameraFar = 10000;
         scene.add(spotLight);
 
-        //Performance Stats
-        stats = new Stats();
-        stats.domElement.style.position = 'absolute';
-        stats.domElement.style.top = '35px';
-        container.appendChild(stats.domElement);
 
-        //setTimeout(function(){addObjects();},1000);
-
-        var objectLoader = new THREE.ObjectLoader();
-        objectLoader.load('textures/meme.json', function (obj) {
-                scene.add( obj );
-        });
 
         //setTimeout(function(){addObjects();},1000);
 
@@ -168,7 +157,6 @@ function update() {
             }
         }
     */
-        THREE.AnimationHandler.update(clock.getDelta());
         //render the scene
         renderer.render(scene, camera);
 
