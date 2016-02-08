@@ -12,6 +12,7 @@ var clock = new THREE.Clock();
 var stats;
 var dae;
 
+/**
 //Importing the collada model's DAE file Here
 var loader = new THREE.ColladaLoader();
 loader.options.convertUpAxis = true;
@@ -37,6 +38,8 @@ loader.load('textures/CartoonTree.dae', function(collada) {
         dae.updateMatrix();
 
 });
+*/
+
 
 
 /*
@@ -133,15 +136,16 @@ function init() {
         stats.domElement.style.top = '35px';
         container.appendChild(stats.domElement);
 
-        setTimeout(function(){addObjects();},1000);
+        //setTimeout(function(){addObjects();},1000);
+
+        var objectLoader = new THREE.ObjectLoader();
+        objectLoader.load('textures/meme.json', function (obj) {
+                scene.add( obj );
+        });
 }
 
 function addObjects() {
 
-        scene.add(dae);
-
-        dae.position.x += 100;
-        dae.updateMatrix();
         scene.add(dae);
 }
 

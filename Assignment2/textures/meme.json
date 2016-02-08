@@ -1,0 +1,126 @@
+{
+    "animations": [{
+        "tracks": [],
+        "name": "default",
+        "fps": 29
+    }],
+    "images": [{
+        "name": "tumblr_o19zg1ibmk1syqltto1_500.jpg",
+        "uuid": "BE9A615D-6456-3129-AC73-C714146533D6",
+        "url": "tumblr_o19zg1ibmk1syqltto1_500.jpg"
+    }],
+    "textures": [{
+        "repeat": [1,1],
+        "name": "mat_jpg",
+        "uuid": "17DECC95-14D9-3F79-9D14-AC9219B62301",
+        "wrap": [1000,1000],
+        "magFilter": 1006,
+        "image": "BE9A615D-6456-3129-AC73-C714146533D6",
+        "minFilter": 1008,
+        "mapping": 300,
+        "anisotropy": 1
+    },{
+        "repeat": [1,1],
+        "name": "mat_jpg",
+        "uuid": "17DECC95-14D9-3F79-9D14-AC9219B62301",
+        "wrap": [1000,1000],
+        "magFilter": 1006,
+        "image": "BE9A615D-6456-3129-AC73-C714146533D6",
+        "minFilter": 1008,
+        "mapping": 300,
+        "anisotropy": 1
+    }],
+    "materials": [{
+        "emissive": 0,
+        "name": "matMaterial",
+        "map": "17DECC95-14D9-3F79-9D14-AC9219B62301",
+        "blending": "NormalBlending",
+        "ambient": 9211020,
+        "specularMap": "17DECC95-14D9-3F79-9D14-AC9219B62301",
+        "depthWrite": true,
+        "vertexColors": false,
+        "type": "MeshPhongMaterial",
+        "color": 9211020,
+        "specular": 460551,
+        "uuid": "1B7D8AE1-BF2C-3792-A561-EB657B65DBE2",
+        "depthTest": true,
+        "shininess": 50,
+        "side": 2
+    }],
+    "geometries": [{
+        "type": "Geometry",
+        "materials": [{
+            "colorAmbient": [0.552157,0.552157,0.552157],
+            "wireframe": false,
+            "blending": "NormalBlending",
+            "mapSpecularWrap": ["RepeatWrapping","RepeatWrapping"],
+            "transparent": false,
+            "depthTest": true,
+            "colorEmissive": [0,0,0],
+            "mapDiffuse": "tumblr_o19zg1ibmk1syqltto1_500.jpg",
+            "visible": true,
+            "DbgIndex": 0,
+            "specularCoef": 50,
+            "mapSpecularRepeat": [1,1],
+            "mapSpecular": "tumblr_o19zg1ibmk1syqltto1_500.jpg",
+            "opacity": 1,
+            "mapSpecularAnisotropy": 1,
+            "shading": "phong",
+            "DbgColor": 15658734,
+            "mapDiffuseWrap": ["RepeatWrapping","RepeatWrapping"],
+            "mapDiffuseRepeat": [1,1],
+            "colorDiffuse": [0.552157,0.552157,0.552157],
+            "colorSpecular": [0.029412,0.029412,0.029412],
+            "doubleSided": true,
+            "DbgName": "matMaterial",
+            "depthWrite": true,
+            "mapDiffuseAnisotropy": 1
+        }],
+        "uuid": "15641190-4052-3871-BF5E-F046F6B1B496",
+        "data": {
+            "morphTargets": [],
+            "name": "BoxGeometry",
+            "influencesPerVertex": 2,
+            "faces": [43,0,2,3,1,0,0,1,2,3,0,1,2,3,43,4,6,7,5,0,0,1,2,3,4,5,6,7,43,0,1,4,5,0,2,3,0,1,0,3,4,7,43,7,6,3,2,0,0,1,2,3,6,5,2,1,43,2,0,5,7,0,2,3,0,1,1,0,7,6,43,1,3,6,4,0,0,1,2,3,3,2,5,4],
+            "skinWeights": [],
+            "animations": [],
+            "vertices": [1.6822,-1.26441,1.30798,1.6822,1.26441,1.30798,1.6822,-1.26441,-1.61054,1.6822,1.26441,-1.61054,-1.6822,1.26441,1.30798,-1.6822,-1.26441,1.30798,-1.6822,1.26441,-1.61054,-1.6822,-1.26441,-1.61054],
+            "bones": [],
+            "uvs": [[0,1,0,0,1,0,1,1]],
+            "normals": [0.577349,-0.577349,0.577349,0.577349,-0.577349,-0.577349,0.577349,0.577349,-0.577349,0.577349,0.577349,0.577349,-0.577349,0.577349,0.577349,-0.577349,0.577349,-0.577349,-0.577349,-0.577349,-0.577349,-0.577349,-0.577349,0.577349],
+            "metadata": {
+                "morphTargets": 0,
+                "materials": 1,
+                "faces": 6,
+                "vertices": 8,
+                "bones": 0,
+                "uvs": 1,
+                "normals": 8,
+                "generator": "io_three",
+                "version": 3
+            },
+            "skinIndices": []
+        }
+    }],
+    "object": {
+        "type": "Scene",
+        "children": [{
+            "name": "Box",
+            "uuid": "DDA9AE26-14F9-3E6A-9BDD-AF02F6D2F286",
+            "matrix": [-1,0,0,0,0,0,1,0,0,1,0,0,0,0.2791,-0.2085,1],
+            "visible": true,
+            "type": "Mesh",
+            "material": "1B7D8AE1-BF2C-3792-A561-EB657B65DBE2",
+            "castShadow": true,
+            "receiveShadow": true,
+            "geometry": "15641190-4052-3871-BF5E-F046F6B1B496"
+        }],
+        "matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+        "uuid": "1DB304A8-98FB-4588-B318-9FCB60384CB0"
+    },
+    "metadata": {
+        "type": "Object",
+        "generator": "io_three",
+        "version": 4.4
+    }
+}
