@@ -82,7 +82,7 @@ function init() {
         controls.lookVertical = true;
 
         scene = new THREE.Scene();
-
+         scene.fog = new THREE.FogExp2(0xe6e6e6, 0.0002);
 
         mapGeo = new THREE.Geometry();
         var treeGeo = new THREE.CylinderGeometry(0, 4, 10, 32, 1, true);
@@ -137,12 +137,12 @@ function init() {
         stats.domElement.style.top = '35px';
         container.appendChild(stats.domElement);
 
-    
+
 
         //setTimeout(function(){addObjects();},1000);
 
 
-        // particle system parameters 
+        // particle system parameters
         particleCount = 10000;
         particles = new THREE.Geometry();
         var pMaterial = new THREE.ParticleBasicMaterial({
@@ -150,7 +150,7 @@ function init() {
             size: 10
         });
 
-        
+
         for (var p = 0; p < particleCount; p++) {
             //create the single particle
             var pX = (Math.random() * 400 - 200) * 10;
@@ -186,8 +186,8 @@ function update() {
     /*
         particleSystem.position.y -= 10;
 
-        
-        for (i = 0; i < particleCount; i++){     
+
+        for (i = 0; i < particleCount; i++){
             var particle = particles[i];
 
             // check if we need to reset
@@ -199,7 +199,7 @@ function update() {
         THREE.AnimationHandler.update(clock.getDelta());
         //render the scene
         renderer.render(scene, camera);
-    
+
 }
 
 function animate() {
