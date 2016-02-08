@@ -3,16 +3,14 @@
     Group Members: Justin, Tyler, Will, Michael, Guy
 */
 
-
-
-var camera, scene, renderer, controls;
+var camera, scene, renderer, controls, stats;
 var mapGeo;
 var particleSystem;
 var particleCount;
 var particles;
 var clock = new THREE.Clock();
 
-var stats;
+var spotLight;
 
 /*
     ONLOAD FUNCTION
@@ -20,7 +18,6 @@ var stats;
 function main() {
         init();
         animate();
-        update();
 }
 
 
@@ -57,11 +54,13 @@ function init() {
 	controls.update();
 
         scene = new THREE.Scene();
-         scene.fog = new THREE.FogExp2(0xe6e6e6, 0.0002);
 
+        //Creating Fog
+        scene.fog = new THREE.FogExp2(0xe6e6e6, 0.0002);
+
+        //Creating the geomtry for th etree
         mapGeo = new THREE.Geometry();
         var treeGeo = new THREE.CylinderGeometry(0, 4, 10, 32, 1, true);
-
         //set the pivot point to the bottom of the geometry
         treeGeo.applyMatrix(new THREE.Matrix4().makeTranslation(0, 1.5, 0));
 
@@ -88,84 +87,59 @@ function init() {
         scene.add(mesh);
 
         //Add a spotlight for shadows - white light with intesity of 1
-        var spotLight = new THREE.SpotLight(0xffffff, 1);
+        spotLight = new THREE.SpotLight(0xffffff, 1);
         spotLight.name = 'Spot Light';
-        spotLight.position.set(2000, 4000, 2000);
+        spotLight.position.set(5000, 5000, 0);
         spotLight.castShadow = true;
         spotLight.shadowCameraNear = true;
         spotLight.intensity = 1;
-
-
-        //directional light for shadows
-        var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-        directionalLight.position.set(2000, 4000, 2000);
-        directionalLight.castShadow = true;
-        directionalLight.shadowMapEnabled = true;
-        //scene.add(directionalLight);
-
-        spotLight.shadowCameraFar = 10000;
+        spotLight.shadowCameraFar = 100000;
         scene.add(spotLight);
 
+        var light = new THREE.AmbientLight( 0x202020 ); // soft white light
+        scene.add(light);
 
 
-        //setTimeout(function(){addObjects();},1000);
-
-
-        /*
-        // particle system parameters
-        particleCount = 10000;
-        particles = new THREE.Geometry();
-        var pMaterial = new THREE.ParticleBasicMaterial({
-            color: 0x99d6ff,
-            size: 10
-        });
-
-
-        for (var p = 0; p < particleCount; p++) {
-            //create the single particle
-            var pX = (Math.random() * 400 - 200) * 10;
-            var pY = (Math.random() * 400 - 200) * 10;
-            var pZ = (Math.random() * 400 - 200) * 10;
-            var particle = new THREE.Vector3(pX, pY, pZ);
-
-            // add the single particle
-            particles.vertices.push(particle);
-        }
-
-        // rain particle system
-        particleSystem = new THREE.ParticleSystem(
-            particles,
-            pMaterial
-        );
-
-        // add it to the scene
-        scene.add(particleSystem);
-        */
 }
 
-function addObjects() {
-
-        scene.add(dae);
-}
+var state1, state2, state3, state4;
 
 //updates every frame used for animation and input handling
 function update() {
-    /*
-        particleSystem.position.y -= 10;
 
+        var rotateAmount = 10;
 
-        for (i = 0; i < particleCount; i++){
-            var particle = particles[i];
+        if(spotLight.position.x >= 5000 && spotLight.position.y >= 5000)
+                state1 = true;
+        if(spotLight.position.x >= 5000 && spotLight.position.y <= -5000)
+                state2 = true;
+        if(spotLight.position.x <= -5000 && spotLight.position.y <= -5000)
+                state3 = true;
+        if(spotLight.position.x <= -5000 && spotLight.position.y >= 5000)
+                state4 = true;
 
-            // check if we need to reset
-            if (particle.position.y < -200) {
-                particle.position.y = 200;
-            }
+        if(state1) {
+                spotLight.position.y -= rotateAmount;
+                state4 = false;
         }
-    */
+        if(state2) {
+                spotLight.position.x -= rotateAmount*2;
+                state1 = false;
+        }
+        if(state3) {
+                spotLight.position.y += rotateAmount;
+                state2 = false;
+        }
+        if(state4) {
+                spotLight.position.x += rotateAmount*2;
+                state3 = false;
+        }
+
+        console.log(spotLight.position.x);
+        console.log(spotLight.position.y);
+
         //render the scene
         renderer.render(scene, camera);
-
 }
 
 function animate() {
@@ -183,7 +157,7 @@ function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, xScaleMin, 
 
         var mat = new THREE.MeshPhongMaterial({
             color: 0x09C580,
-            shininess: 250,
+            shininess: 0,
             specular: 0x222222,
             shading: THREE.SmoothShading,
             map: treeTexture
