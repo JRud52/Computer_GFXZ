@@ -7,40 +7,12 @@
 
 var camera, scene, renderer, controls;
 var mapGeo;
+var particleSystem;
+var particleCount;
+var particles;
 var clock = new THREE.Clock();
 
 var stats;
-var dae;
-
-/**
-//Importing the collada model's DAE file Here
-var loader = new THREE.ColladaLoader();
-loader.options.convertUpAxis = true;
-loader.load('textures/CartoonTree.dae', function(collada) {
-
-        dae = collada.scene;
-
-        dae.traverse(function(child) {
-
-                if (child instanceof THREE.SkinnedMesh) {
-
-                        var animation = new THREE.Animation(child, child.geometry.animation);
-                        animation.play();
-
-                }
-
-        });
-
-        dae.scale.x = dae.scale.y = dae.scale.z = 100;
-        dae.position.x = 0;
-        dae.position.y = 0;
-        dae.position.z = 0;
-        dae.updateMatrix();
-
-});
-*/
-
-
 
 /*
     ONLOAD FUNCTION
@@ -75,22 +47,22 @@ function init() {
         camera.lookAt(new THREE.Vector3(500, 0, 500));
 
         //!!!!!! First Person Controls if you Desire, in the future ill make these a toggable function//
-        //controls = new THREE.FirstPersonControls( camera );
-        //controls.movementSpeed = 1000;
-        //controls.lookSpeed = 0.125;
-        //controls.lookVertical = true;
+        controls = new THREE.FirstPersonControls( camera );
+        controls.movementSpeed = 1000;
+        controls.lookSpeed = 0.125;
+        controls.lookVertical = true;
 
         scene = new THREE.Scene();
-
+         scene.fog = new THREE.FogExp2(0xe6e6e6, 0.0002);
 
         mapGeo = new THREE.Geometry();
-        var treeGeo = new THREE.BoxGeometry(3, 3, 3);
+        var treeGeo = new THREE.CylinderGeometry(0, 4, 10, 32, 1, true);
 
         //set the pivot point to the bottom of the geometry
         treeGeo.applyMatrix(new THREE.Matrix4().makeTranslation(0, 1.5, 0));
 
         //generate the trees
-        //generateTrees(treeGeo, 100, 400, 200, 50, 10, 30, 20);
+        generateTrees(treeGeo, 100, 400, 200, 75, 40, 150, 50);
 
         //Making some grass
         var loader = new THREE.TextureLoader();
@@ -142,6 +114,38 @@ function init() {
         objectLoader.load('textures/meme.json', function (obj) {
                 scene.add( obj );
         });
+
+        //setTimeout(function(){addObjects();},1000);
+
+
+        // particle system parameters
+        particleCount = 10000;
+        particles = new THREE.Geometry();
+        var pMaterial = new THREE.ParticleBasicMaterial({
+            color: 0x99d6ff,
+            size: 10
+        });
+
+
+        for (var p = 0; p < particleCount; p++) {
+            //create the single particle
+            var pX = (Math.random() * 400 - 200) * 10;
+            var pY = (Math.random() * 400 - 200) * 10;
+            var pZ = (Math.random() * 400 - 200) * 10;
+            var particle = new THREE.Vector3(pX, pY, pZ);
+
+            // add the single particle
+            particles.vertices.push(particle);
+        }
+
+        // rain particle system
+        particleSystem = new THREE.ParticleSystem(
+            particles,
+            pMaterial
+        );
+
+        // add it to the scene
+        scene.add(particleSystem);
 }
 
 function addObjects() {
@@ -149,11 +153,25 @@ function addObjects() {
         scene.add(dae);
 }
 
-function update() {  //updates every frame used for animation and input handling
+//updates every frame used for animation and input handling
+function update() {
+    /*
+        particleSystem.position.y -= 10;
 
+
+        for (i = 0; i < particleCount; i++){
+            var particle = particles[i];
+
+            // check if we need to reset
+            if (particle.position.y < -200) {
+                particle.position.y = 200;
+            }
+        }
+    */
         THREE.AnimationHandler.update(clock.getDelta());
         //render the scene
         renderer.render(scene, camera);
+
 }
 
 function animate() {
@@ -164,11 +182,17 @@ function animate() {
 }
 
 function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, xScaleMin, yScaleMax, yScaleMin) {
+        var loader = new THREE.TextureLoader();
+        var treeTexture = loader.load("textures/TreeTexture.png");
+        treeTexture.wrapS = treeTexture.wrapT = THREE.RepeatWrapping;
+        treeTexture.anisotropy = 16;
+
         var mat = new THREE.MeshPhongMaterial({
-                color: 0x00ffff,
-                shininess: 150,
-                specular: 0x222222,
-                shading: THREE.SmoothShading,
+            color: 0x09C580,
+            shininess: 250,
+            specular: 0x222222,
+            shading: THREE.SmoothShading,
+            map: treeTexture
         });
 
         for (i = 0; i < maxTrees; i++) {
@@ -186,7 +210,7 @@ function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, xScaleMin, 
                 tree.scale.x = Math.floor(Math.random() * (xScaleMax - xScaleMin + 1)) + xScaleMin;
                 tree.scale.z = tree.scale.x;
 
-                tree.scale.y = Math.floor(Math.random() * tree.scale.x * (yScaleMax - yScaleMin)) + yScaleMin;
+                tree.scale.y = Math.floor(Math.random() * (yScaleMax - yScaleMin + 1)) + yScaleMin;
                 tree.position.y = 0;
 
                 tree.castShadow = true;
