@@ -12,6 +12,10 @@ var clock = new THREE.Clock();
 
 var spotLight;
 
+//Audio files
+var music = new Audio('music/plains.ogg');
+var rain = new Audio('music/rain.ogg');
+
 /*
     ONLOAD FUNCTION
 */
@@ -23,6 +27,9 @@ function main() {
 
 //initial setup
 function init() {
+
+        music.play();
+        rain.play();
 
         //Set to our custom canvas
         container = document.getElementById('myCanvas');
@@ -96,14 +103,13 @@ function init() {
         spotLight.shadowCameraFar = 100000;
         scene.add(spotLight);
 
-        var light = new THREE.AmbientLight( 0x202020 ); // soft white light
+        var light = new THREE.AmbientLight( 0x303030 ); // soft white light
         scene.add(light);
 
 
 }
 
 var state1, state2, state3, state4;
-
 //updates every frame used for animation and input handling
 function update() {
 
@@ -134,10 +140,6 @@ function update() {
                 spotLight.position.x += rotateAmount*2;
                 state3 = false;
         }
-
-        console.log(spotLight.position.x);
-        console.log(spotLight.position.y);
-
         //render the scene
         renderer.render(scene, camera);
 }
