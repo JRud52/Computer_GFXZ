@@ -81,13 +81,13 @@ function init() {
 
 
         mapGeo = new THREE.Geometry();
-        var treeGeo = new THREE.BoxGeometry(3, 3, 3);
+        var treeGeo = new THREE.CylinderGeometry(0, 4, 10, 32, 1, true);
 
         //set the pivot point to the bottom of the geometry
         treeGeo.applyMatrix(new THREE.Matrix4().makeTranslation(0, 1.5, 0));
 
         //generate the trees
-        //generateTrees(treeGeo, 100, 400, 200, 50, 10, 30, 20);
+        generateTrees(treeGeo, 100, 400, 200, 75, 40, 150, 50);
 
         //Making some grass
         var loader = new THREE.TextureLoader();
@@ -133,7 +133,7 @@ function init() {
         stats.domElement.style.top = '35px';
         container.appendChild(stats.domElement);
 
-        setTimeout(function(){addObjects();},1000);
+        //setTimeout(function(){addObjects();},1000);
 }
 
 function addObjects() {
@@ -160,11 +160,17 @@ function animate() {
 }
 
 function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, xScaleMin, yScaleMax, yScaleMin) {
+        var loader = new THREE.TextureLoader();
+        var treeTexture = loader.load("textures/TreeTexture.png");
+        treeTexture.wrapS = treeTexture.wrapT = THREE.RepeatWrapping;
+        treeTexture.anisotropy = 16;
+
         var mat = new THREE.MeshPhongMaterial({
-                color: 0x00ffff,
-                shininess: 150,
-                specular: 0x222222,
-                shading: THREE.SmoothShading,
+            color: 0x09C580,
+            shininess: 250,
+            specular: 0x222222,
+            shading: THREE.SmoothShading,
+            map: treeTexture
         });
 
         for (i = 0; i < maxTrees; i++) {
@@ -182,7 +188,7 @@ function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, xScaleMin, 
                 tree.scale.x = Math.floor(Math.random() * (xScaleMax - xScaleMin + 1)) + xScaleMin;
                 tree.scale.z = tree.scale.x;
 
-                tree.scale.y = Math.floor(Math.random() * tree.scale.x * (yScaleMax - yScaleMin)) + yScaleMin;
+                tree.scale.y = Math.floor(Math.random() * (yScaleMax - yScaleMin + 1)) + yScaleMin;
                 tree.position.y = 0;
 
                 tree.castShadow = true;
