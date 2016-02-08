@@ -28,8 +28,8 @@ function main() {
 //initial setup
 function init() {
 
-        music.play();
-        rain.play();
+      //  music.play();
+     //   rain.play();
 
         //Set to our custom canvas
         container = document.getElementById('myCanvas');
@@ -56,9 +56,9 @@ function init() {
         camera.position.y = 2000;
 
         // Mouse control
-	controls = new THREE.OrbitControls( camera, renderer.domElement );
-	controls.target.set( 0, 0, 0 );
-	controls.update();
+	    controls = new THREE.OrbitControls( camera, renderer.domElement );
+	    controls.target.set( 0, 0, 0 );
+	    controls.update();
 
         scene = new THREE.Scene();
 
@@ -106,6 +106,25 @@ function init() {
         var light = new THREE.AmbientLight( 0x303030 ); // soft white light
         scene.add(light);
 
+
+        //skybox
+        var skyGeo = new THREE.SphereGeometry(6000, 60, 40);
+        var skyTexture = loader.load("textures/nightSky.jpg");
+        var SkyUni = {
+            texture: { type: 't', value: skyTexture }
+        };
+
+        var skyMat = new THREE.ShaderMaterial({
+            uniforms: SkyUni,
+            vertexShader: document.getElementById('sky-vertex').textContent,
+            fragmentShader: document.getElementById('sky-fragment').textContent
+        });
+
+        skyBox = new THREE.Mesh(skyGeo, skyMat);
+        skyBox.scale.set(-1, 1, 1);
+        skyBox.eulerOrder = 'XZY';
+        skyBox.renderDepth = 1000.0;
+        scene.add(skyBox);
 
 }
 
