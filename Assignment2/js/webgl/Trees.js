@@ -12,6 +12,9 @@ var clock = new THREE.Clock();
 
 var spotLight;
 
+//texture loader
+var loader = new THREE.TextureLoader();;
+
 //Audio files
 var music = new Audio('music/plains.ogg');
 var rain = new Audio('music/rain.ogg');
@@ -75,7 +78,6 @@ function init() {
         generateTrees(treeGeo, 150, 5000, 5000, 75, 40, 150, 50);
 
         //Making some grass
-        var loader = new THREE.TextureLoader();
         var groundTexture = loader.load("textures/grasslight-big.jpg");
         groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
         groundTexture.repeat.set(25, 25);
@@ -128,10 +130,22 @@ function init() {
         skyBox.scale.set(-1.5, 1.5, 1.5);
         skyBox.rotation.order = 'XZY';
         skyBox.renderOrder = 1000.0;
+        skyBox.rotation.x = Math.PI / 2;
 
         scene.add(skyBox);
 
+ //       makeTree();
 }
+
+
+function makeTree() {
+    var geometry = new THREE.CylinderGeometry(50, 50, 2000, 32);
+    var bark = loader.load("textures/bark.jpg")
+    var material = new THREE.MeshBasicMaterial({ color: 0x5c5c3d, map: bark });
+    var cylinder = new THREE.Mesh(geometry, material);
+    scene.add(cylinder);
+}
+
 
 var state1, state2, state3, state4;
 //updates every frame used for animation and input handling
@@ -176,7 +190,6 @@ function animate() {
 }
 
 function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, xScaleMin, yScaleMax, yScaleMin) {
-        var loader = new THREE.TextureLoader();
         var treeTexture = loader.load("textures/TreeTexture.png");
         treeTexture.wrapS = treeTexture.wrapT = THREE.RepeatWrapping;
         treeTexture.anisotropy = 16;
