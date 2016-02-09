@@ -134,17 +134,67 @@ function init() {
 
         scene.add(skyBox);
 
- //       makeTree();
+        makeTree(4);
 }
 
 
-function makeTree() {
-    var geometry = new THREE.CylinderGeometry(50, 50, 2000, 32);
-    var bark = loader.load("textures/bark.jpg")
-    var material = new THREE.MeshBasicMaterial({ color: 0x5c5c3d, map: bark });
-    var cylinder = new THREE.Mesh(geometry, material);
-    scene.add(cylinder);
+function makeTree(branchCount) {
+        var geometry = new THREE.CylinderGeometry(50, 50, 1000, 32);
+
+        //move pivot point to the bottom of the tree trunk
+        geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, 500, 0));
+
+        //texture the tree
+        var bark = loader.load("textures/bark.jpg")
+        var material = new THREE.MeshBasicMaterial({ color: 0x5c5c3d, map: bark });
+        var tree = new THREE.Mesh(geometry, material);
+        tree.position.y = 0;
+
+        //add branches
+        for (i = 0; i < branchCount; i++) {
+            var branch = new THREE.Mesh(geometry, material);
+
+            //branches should be smaller than the trunk
+            branch.scale.set(0.5, 0.5, 0.5);
+
+            //rotate the branches
+            branch.rotation.z = Math.PI / 4;
+
+            branch.rotation.y = Math.PI / (Math.PI * 2 / i) + (Math.random() * 2);
+
+            //make some branches go to different directions
+            if (i % 2 == 0) {
+                branch.rotation.z *= -1;                
+            }
+
+            //move the branches up on the tree
+            branch.position.y = 1000 / branchCount + (200 * i) - 50;
+
+            //add the branch to the tree
+            tree.add(branch);
+
+            //apply the same process for the smaller branches
+            for (j = 0; j < branchCount; j++) {
+                var innerBranch = new THREE.Mesh(geometry, material);
+
+                innerBranch.scale.set(0.25, 0.25, 0.25);
+                innerBranch.rotation.z = Math.PI / (4 + (Math.random() * (j + 5)));
+
+                if (j % 2 == 0) {
+                    innerBranch.rotation.z *= -1;
+                }
+
+                innerBranch.position.y = 750 / branchCount + (150 * j) - 12;
+
+                //add the innerBranch to the branch
+                branch.add(innerBranch);
+            }
+        }
+
+        tree.scale.set(0.5, 0.5, 0.5);
+        scene.add(tree);
 }
+
 
 
 var state1, state2, state3, state4;
@@ -153,6 +203,8 @@ function update() {
 
         var rotateAmount = 10;
 
+        //rotates the spot light around the scene to act as a moving sun
+        //this uses a simple FSM to determine the proper roations and postions of the light at a given point
         if(spotLight.position.x >= 5000 && spotLight.position.y >= 5000)
                 state1 = true;
         if(spotLight.position.x >= 5000 && spotLight.position.y <= -5000)
@@ -189,6 +241,7 @@ function animate() {
         update();
 }
 
+//places trees randomly in the world
 function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, xScaleMin, yScaleMax, yScaleMin) {
         var treeTexture = loader.load("textures/TreeTexture.png");
         treeTexture.wrapS = treeTexture.wrapT = THREE.RepeatWrapping;
@@ -203,8 +256,10 @@ function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, xScaleMin, 
         });
 
         for (i = 0; i < maxTrees; i++) {
-                tree = new THREE.Mesh(treeGeo, mat);
+                var treeType = Math.floor(Math.random() * 1000) % 2;
 
+                var tree = new THREE.Mesh(treeGeo, mat);
+               
                 //randomly place a tree somewhere in the scene
                 tree.position.x = (Math.random() * (xBound*2) - xBound);
                 tree.position.z = (Math.random() * (zBound*2) - zBound);
