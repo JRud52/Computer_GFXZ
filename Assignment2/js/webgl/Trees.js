@@ -51,7 +51,7 @@ function init() {
         container.appendChild(renderer.domElement);
 
         //New perspective camera, positioned to face the trees and such.
-        camera = new THREE.PerspectiveCamera(60, ($(container).width()-100) / 450, 0.1, 10000);
+        camera = new THREE.PerspectiveCamera(60, ($(container).width()-100) / 450, 0.1, 15000);
         camera.position.z = 2500;
         camera.position.y = 2000;
 
@@ -107,23 +107,28 @@ function init() {
         scene.add(light);
 
 
-        //skybox
+        //skydome
         var skyGeo = new THREE.SphereGeometry(6000, 60, 40);
-        var skyTexture = loader.load("textures/nightSky.jpg");
+
+        //load the texture for the skydome
+        var skyTexture = loader.load("textures/sky.jpg");
         var SkyUni = {
             texture: { type: 't', value: skyTexture }
         };
 
+        //shaders used for mapping the texture onto the dome
         var skyMat = new THREE.ShaderMaterial({
             uniforms: SkyUni,
             vertexShader: document.getElementById('sky-vertex').textContent,
             fragmentShader: document.getElementById('sky-fragment').textContent
         });
 
+        //create the mesh and adjust its scale and render settings because we are inside the sphere
         skyBox = new THREE.Mesh(skyGeo, skyMat);
-        skyBox.scale.set(-1, 1, 1);
-        skyBox.eulerOrder = 'XZY';
-        skyBox.renderDepth = 1000.0;
+        skyBox.scale.set(-1.5, 1.5, 1.5);
+        skyBox.rotation.order = 'XZY';
+        skyBox.renderOrder = 1000.0;
+
         scene.add(skyBox);
 
 }
