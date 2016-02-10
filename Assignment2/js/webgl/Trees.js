@@ -140,7 +140,7 @@ var state1, state2, state3, state4;
 //updates every frame used for animation and input handling
 function update() {
 
-        var rotateAmount = 10;
+        var rotateAmount = 25;
 
         //rotates the spot light around the scene to act as a moving sun
         //this uses a simple FSM to determine the proper roations and postions of the light at a given point
