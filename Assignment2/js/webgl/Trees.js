@@ -17,7 +17,7 @@ var loader = new THREE.TextureLoader();;
 
 //Audio files
 var music = new Audio('music/plains.ogg');
-var rain = new Audio('music/rain.ogg');
+
 
 /*
     ONLOAD FUNCTION
@@ -31,8 +31,8 @@ function main() {
 //initial setup
 function init() {
 
-      //  music.play();
-     //   rain.play();
+        //some nice tunes
+        music.play();
 
         //Set to our custom canvas
         container = document.getElementById('myCanvas');
@@ -133,68 +133,7 @@ function init() {
         skyBox.rotation.x = Math.PI / 2;
 
         scene.add(skyBox);
-
-        makeTree(4);
 }
-
-
-function makeTree(branchCount) {
-        var geometry = new THREE.CylinderGeometry(50, 50, 1000, 32);
-
-        //move pivot point to the bottom of the tree trunk
-        geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, 500, 0));
-
-        //texture the tree
-        var bark = loader.load("textures/bark.jpg")
-        var material = new THREE.MeshBasicMaterial({ color: 0x5c5c3d, map: bark });
-        var tree = new THREE.Mesh(geometry, material);
-        tree.position.y = 0;
-
-        //add branches
-        for (i = 0; i < branchCount; i++) {
-            var branch = new THREE.Mesh(geometry, material);
-
-            //branches should be smaller than the trunk
-            branch.scale.set(0.5, 0.5, 0.5);
-
-            //rotate the branches
-            branch.rotation.z = Math.PI / 4;
-
-            branch.rotation.y = Math.PI / (Math.PI * 2 / i) + (Math.random() * 2);
-
-            //make some branches go to different directions
-            if (i % 2 == 0) {
-                branch.rotation.z *= -1;                
-            }
-
-            //move the branches up on the tree
-            branch.position.y = 1000 / branchCount + (200 * i) - 50;
-
-            //add the branch to the tree
-            tree.add(branch);
-
-            //apply the same process for the smaller branches
-            for (j = 0; j < branchCount; j++) {
-                var innerBranch = new THREE.Mesh(geometry, material);
-
-                innerBranch.scale.set(0.25, 0.25, 0.25);
-                innerBranch.rotation.z = Math.PI / (4 + (Math.random() * (j + 5)));
-
-                if (j % 2 == 0) {
-                    innerBranch.rotation.z *= -1;
-                }
-
-                innerBranch.position.y = 750 / branchCount + (150 * j) - 12;
-
-                //add the innerBranch to the branch
-                branch.add(innerBranch);
-            }
-        }
-
-        tree.scale.set(0.5, 0.5, 0.5);
-        scene.add(tree);
-}
-
 
 
 var state1, state2, state3, state4;
@@ -230,6 +169,7 @@ function update() {
                 spotLight.position.x += rotateAmount*2;
                 state3 = false;
         }
+
         //render the scene
         renderer.render(scene, camera);
 }
@@ -247,6 +187,7 @@ function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, xScaleMin, 
         treeTexture.wrapS = treeTexture.wrapT = THREE.RepeatWrapping;
         treeTexture.anisotropy = 16;
 
+        //pine tree material
         var mat = new THREE.MeshPhongMaterial({
             color: 0x09C580,
             shininess: 0,
@@ -255,11 +196,96 @@ function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, xScaleMin, 
             map: treeTexture
         });
 
-        for (i = 0; i < maxTrees; i++) {
-                var treeType = Math.floor(Math.random() * 1000) % 2;
+        //texture the tree
+        var bark = loader.load("textures/bark.jpg")
+        //bark material
+        var material = new THREE.MeshBasicMaterial({ color: 0x5c5c3d, map: bark });
 
-                var tree = new THREE.Mesh(treeGeo, mat);
-               
+        for (k = 0; k < maxTrees; k++) {
+                //randomize the tree type
+                var treeType = Math.floor(Math.random() * 1000) % 2;
+                var tree;
+
+                if (treeType % 2 == 0) {
+                    //tree with no leaves made out of cylinders
+                    var branchCount = Math.round(Math.random()) + 3;
+                    var geometry = new THREE.CylinderGeometry(50, 50, 1000, 32);
+
+                    //move pivot point to the bottom of the tree trunk
+                    geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, 500, 0));
+
+                   
+                    
+                    tree = new THREE.Mesh(geometry, material);
+                    tree.position.y = 0;
+
+                    //add branches
+                    for (i = 0; i < branchCount; i++) {
+                        var branch = new THREE.Mesh(geometry, material);
+
+                        //branches should be smaller than the trunk
+                        branch.scale.set(0.5, 0.5, 0.5);
+
+                        //rotate the branches
+                        branch.rotation.z = Math.PI / 4;
+
+                        branch.rotation.y = Math.PI / (Math.PI * 2 / i) + (Math.random() * 2);
+
+                        //make some branches go to different directions
+                        if (i % 2 == 0) {
+                            branch.rotation.z *= -1;
+                        }
+
+                        //move the branches up on the tree
+                        branch.position.y = 1000 / branchCount + (200 * i) - 50;
+
+                        //add the branch to the tree
+                        tree.add(branch);
+
+                        //apply the same process for the smaller branches
+                        for (j = 0; j < branchCount; j++) {
+                            var innerBranch = new THREE.Mesh(geometry, material);
+
+                            innerBranch.scale.set(0.25, 0.25, 0.25);
+                            innerBranch.rotation.z = Math.PI / (4 + (Math.random() * (j + 5)));
+
+                            if (j % 2 == 0) {
+                                innerBranch.rotation.z *= -1;
+                            }
+
+                            innerBranch.position.y = 750 / branchCount + (150 * j) - 12;
+
+                            //enable shadows on the inner branch
+                            innerBranch.castShadow = true;
+                            innerBranch.receiveShadow = true;
+
+                            //add the innerBranch to the branch
+                            branch.add(innerBranch);
+                        }
+
+                        //enable shadows on the branch
+                        branch.castShadow = true;
+                        branch.receiveShadow = true;
+                    }
+
+                    heightScale = Math.random() * (1.25 - 0.5) + 0.5;
+                    tree.scale.set(0.5, heightScale, 0.5);
+                }
+                else {
+                    //pine tree (cone)
+                    tree = new THREE.Mesh(treeGeo, mat);
+
+                    //randomize the tree's scale
+                    //the width and depth of the tree should be the same so it doesnt end up being too thin or stretched
+                    tree.scale.x = Math.floor(Math.random() * (xScaleMax - xScaleMin + 1)) + xScaleMin;
+                    tree.scale.z = tree.scale.x;
+
+                    tree.scale.y = Math.floor(Math.random() * (yScaleMax - yScaleMin + 1)) + yScaleMin;
+
+                 
+                }
+
+
                 //randomly place a tree somewhere in the scene
                 tree.position.x = (Math.random() * (xBound*2) - xBound);
                 tree.position.z = (Math.random() * (zBound*2) - zBound);
@@ -267,16 +293,10 @@ function generateTrees(treeGeo, maxTrees, xBound, zBound, xScaleMax, xScaleMin, 
                 //randomize the tree's rotation (0 to 2 Pi)
                 tree.rotation.y = Math.floor(Math.random() * (Math.PI * 2));
 
-                //randomize the tree's scale
-                //the width and depth of the tree should be the same so it doesnt end up being too thin or stretched
-                tree.scale.x = Math.floor(Math.random() * (xScaleMax - xScaleMin + 1)) + xScaleMin;
-                tree.scale.z = tree.scale.x;
-
-                tree.scale.y = Math.floor(Math.random() * (yScaleMax - yScaleMin + 1)) + yScaleMin;
-                tree.position.y = 0;
-
+                //make the tree cast and recieve shadows
                 tree.castShadow = true;
                 tree.receiveShadow = true;
+
                 scene.add(tree);
         }
 }
