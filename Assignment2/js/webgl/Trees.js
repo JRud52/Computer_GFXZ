@@ -31,8 +31,8 @@ function main() {
 //initial setup
 function init() {
 
-      //  music.play();
-     //   rain.play();
+        music.play();
+        rain.play();
 
         //Set to our custom canvas
         container = document.getElementById('myCanvas');
