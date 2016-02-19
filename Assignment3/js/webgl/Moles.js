@@ -9,13 +9,18 @@ var clock = new THREE.Clock();
 var spotLight;
 var molecule;
 
+//Go get the file into a string, then use the molecule option//
 var xyzFiles = {
-        Ambient: function() { createMolecule('ambient'); },
-        Directional: function() { createMolecule('directional'); },
-        Point: function() { createMolecule('point'); },
-        Hemisphere: function() { createMolecule('hemisphere'); },
-        Spot: function() { createMolecule('spot'); }
+        Anatoxin: function() { createMolecule('anatoxin'); },
+        Heroin: function() { createMolecule('heroin'); },
+        Lactose: function() { createMolecule('lactose'); },
+        Methamphetamine: function() { createMolecule('methamphetamine'); },
+        Tetrasilete: function() { createMolecule('tetrasilete'); },
+        Caffeine: function() { createMolecule('caffeine'); },
+        loadFile: function() { $('#myInput').click(); }
 };
+
+var params
 
 var lightingTypes = {
         Ambient: function() { updateLighting('ambient'); },
@@ -28,6 +33,8 @@ var lightingTypes = {
 //TODO move guy's browse for a file into the gui menu.
 //TODO Add the ability to change lighting styles.
 //TODO Add the ability to select from preset xyz files in the menu.
+//TODO add color controller for lighting
+//TODO add rotation speed with a listener to live update.
 
 /*
     ONLOAD FUNCTION
@@ -45,7 +52,16 @@ function init() {
         container = document.getElementById('myCanvas');
         document.body.appendChild(container);
 
-        var gui = new dat.GUI({ autoPlace: false });
+        var gui = new dat.GUI({ autoPlace: false, width: 325 });
+
+        var guiF1 = gui.addFolder('Molecules', "a");
+        guiF1.add(xyzFiles, 'Anatoxin').name('Anatoxin-a');
+        guiF1.add(xyzFiles, 'Heroin');
+        guiF1.add(xyzFiles, 'Lactose');
+        guiF1.add(xyzFiles, 'Methamphetamine');
+        guiF1.add(xyzFiles, 'Tetrasilete');
+        guiF1.add(xyzFiles, 'Caffeine');
+        guiF1.add(xyzFiles, 'loadFile').name('Upload XYZ');
 
         var guiF2 = gui.addFolder('Lighting Types');
         guiF2.add(lightingTypes, 'Ambient' );
@@ -116,6 +132,7 @@ function init() {
                         }
 
                         xyz = fileReader.result;
+                        console.log(xyz);
                         createMolecule(xyz)
                 }
 
