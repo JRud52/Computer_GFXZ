@@ -9,6 +9,14 @@ var clock = new THREE.Clock();
 var spotLight;
 var molecule;
 
+var xyzFiles = {
+        Ambient: function() { createMolecule('ambient'); },
+        Directional: function() { createMolecule('directional'); },
+        Point: function() { createMolecule('point'); },
+        Hemisphere: function() { createMolecule('hemisphere'); },
+        Spot: function() { createMolecule('spot'); }
+};
+
 var lightingTypes = {
         Ambient: function() { updateLighting('ambient'); },
         Directional: function() { updateLighting('directional'); },
@@ -129,7 +137,6 @@ function update() {
 function animate() {
 
         requestAnimationFrame(animate);
-        stats.update();
         update();
 }
 
