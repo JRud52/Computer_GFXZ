@@ -18,6 +18,12 @@ body {
    border:1px solid #000000;
 }
 
+#myCanvasLeft {
+   width: 100%;
+   padding-left: 100px;
+   border:1px solid #000000;
+}
+
 canvas {
    display: inline;
    border:1px solid #FFF;

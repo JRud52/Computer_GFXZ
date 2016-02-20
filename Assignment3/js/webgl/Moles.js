@@ -34,7 +34,7 @@ var xyzFiles = {
         }
 };
 
-var lightingTypes = {
+var lighting = {
         Ambient: function() {
                 updateLighting('ambient');
         },
@@ -50,6 +50,7 @@ var lightingTypes = {
         Spot: function() {
                 updateLighting('spot');
         }
+
 };
 
 //TODO move guy's browse for a file into the gui menu.
@@ -70,7 +71,7 @@ function main() {
 function init() {
 
         //Set to our custom canvas
-        container = document.getElementById('myCanvas');
+        container = document.getElementById('myCanvasLeft');
         document.body.appendChild(container);
 
         var gui = new dat.GUI({
@@ -88,29 +89,29 @@ function init() {
         guiF1.add(xyzFiles, 'loadFile').name('Upload XYZ');
 
         var guiF2 = gui.addFolder('Lighting Types');
-        guiF2.add(lightingTypes, 'Ambient');
-        guiF2.add(lightingTypes, 'Directional');
-        guiF2.add(lightingTypes, 'Point');
-        guiF2.add(lightingTypes, 'Hemisphere');
-        guiF2.add(lightingTypes, 'Spot');
+        guiF2.add(lighting, 'Ambient');
+        guiF2.add(lighting, 'Directional');
+        guiF2.add(lighting, 'Point');
+        guiF2.add(lighting, 'Hemisphere');
+        guiF2.add(lighting, 'Spot');
 
 
         gui.domElement.style.position = "absolute";
-        gui.domElement.style.top = '100px';
-        gui.domElement.style.right = '0px';
-        container.appendChild(gui.domElement);
+        gui.domElement.style.top = '290px';
+        gui.domElement.style.right = '300px';
+        document.body.appendChild(gui.domElement);
 
-        //webGL renderer size 600x450
+
         renderer = new THREE.WebGLRenderer({
                 antialias: false
         });
-        renderer.setPixelRatio(($(container).width() - 100) / 450);
-        renderer.setSize($(container).width() - 100, 450);
+        renderer.setPixelRatio(500 / 450);
+        renderer.setSize(500, 450);
         renderer.shadowMap.enabled = true;
         container.appendChild(renderer.domElement);
 
         //New perspective camera, positioned to face the trees and such.
-        camera = new THREE.PerspectiveCamera(60, ($(container).width() - 100) / 450, 0.1, 15000);
+        camera = new THREE.PerspectiveCamera(60, 500 / 450, 0.1, 15000);
         camera.position.z = 15;
         camera.position.y = 0;
 
@@ -152,20 +153,18 @@ function init() {
 }
 
 function readMolecule(xyzURL) {
-        console.log('hello');
-
         $.ajax({
                 type: 'POST',
-            url: xyzURL,
-            async: true,
-            datatype: 'text',
-            success: function (xyz){
-                    if (molecule != null) {
-                            scene.remove(molecule);
-                            molecule = null;
-                    }
-                    createMolecule(xyz);
-            }
+                url: xyzURL,
+                async: true,
+                datatype: 'text',
+                success: function(xyz) {
+                        if (molecule != null) {
+                                scene.remove(molecule);
+                                molecule = null;
+                        }
+                        createMolecule(xyz);
+                }
         });
 }
 
@@ -233,7 +232,7 @@ function createMolecule(xyz) {
                 }
 
 
-                var mat = new THREE.MeshBasicMaterial({
+                var mat = new THREE.MeshPhongMaterial({
                         color: atomColor
                 });
 
