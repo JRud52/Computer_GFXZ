@@ -6,8 +6,16 @@
 var camera, scene, renderer, controls, stats;
 var clock = new THREE.Clock();
 
-var spotLight;
-var molecule;
+var ambientLight = new THREE.AmbientLight();
+var directionalLight = new THREE.DirectionalLight();
+var hemisphereLight = new THREE.HemisphereLight();
+var pointLight = new THREE.PointLight();
+var spotLight = new THREE.SpotLight();
+
+var molecule = new THREE.Object3D();
+
+
+//visible
 
 //This works on server side only!
 var xyzFiles = {
@@ -36,27 +44,35 @@ var xyzFiles = {
 
 var lighting = {
         Ambient: function() {
-                updateLighting('ambient');
+                ambientLight.visible = !ambientLight.visible;
         },
         Directional: function() {
-                updateLighting('directional');
+                directionalLight.visible = !directionalLight.visible;
         },
         Point: function() {
-                updateLighting('point');
+                pointLight.visible = !pointLight.visible;
         },
         Hemisphere: function() {
-                updateLighting('hemisphere');
+                hemisphereLight.visible = !hemisphereLight.visible;
         },
         Spot: function() {
-                updateLighting('spot');
+                spotLight.visible = !spotLight.visible;
         }
-
 };
 
-//TODO move guy's browse for a file into the gui menu.
+var options = {
+
+        size: 1,
+        lightColor: [ 0, 0, 0 ]
+};
+
+//TODO Differentiate size of atoms based on atomic value.
 //TODO Add the ability to change lighting styles.
 //TODO add color controller for lighting
-//TODO add rotation speed with a listener to live update.
+//TODO add rotation speed.
+//TODO Add atom count maybe somewhere.
+//TODO Add more xyz molecules
+//TODO Allow changing of lighting distance, and intensity.
 
 /*
     ONLOAD FUNCTION
@@ -73,6 +89,25 @@ function init() {
         //Set to our custom canvas
         container = document.getElementById('myCanvasLeft');
         document.body.appendChild(container);
+
+        renderer = new THREE.WebGLRenderer({
+                antialias: true
+        });
+        renderer.setPixelRatio(550 / 450);
+        renderer.setSize(550, 450);
+        container.appendChild(renderer.domElement);
+
+        //New perspective camera, positioned to face the trees and such.
+        camera = new THREE.PerspectiveCamera(60, 550/450, 0.1, 10000);
+        camera.position.z = 15;
+        camera.position.y = 0;
+
+        // Mouse control
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.target.set(0, 0, 0);
+        controls.update();
+
+        scene = new THREE.Scene();
 
         var gui = new dat.GUI({
                 autoPlace: false,
@@ -95,42 +130,43 @@ function init() {
         guiF2.add(lighting, 'Hemisphere');
         guiF2.add(lighting, 'Spot');
 
+        var guiF3 = gui.addFolder('Render Options');
+        guiF3.add(options, 'size', 0, 2);
+        guiF3.addColor(options, 'lightColor');
 
         gui.domElement.style.position = "absolute";
         gui.domElement.style.top = '290px';
         gui.domElement.style.right = '300px';
         document.body.appendChild(gui.domElement);
-
-
-        renderer = new THREE.WebGLRenderer({
-                antialias: false
-        });
-        renderer.setPixelRatio(500 / 450);
-        renderer.setSize(500, 450);
-        renderer.shadowMap.enabled = true;
-        container.appendChild(renderer.domElement);
-
-        //New perspective camera, positioned to face the trees and such.
-        camera = new THREE.PerspectiveCamera(60, 500 / 450, 0.1, 15000);
-        camera.position.z = 15;
-        camera.position.y = 0;
-
-        // Mouse control
-        controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.target.set(0, 0, 0);
-        controls.update();
-
-        scene = new THREE.Scene();
+        guiF1.open();
+        guiF2.open();
+        guiF3.open();
 
         //Add a spotlight for shadows - white light with intesity of 1
-        spotLight = new THREE.SpotLight(0xffffff, 0.5);
-        spotLight.name = 'Spot Light';
-        spotLight.position.set(5000, 5000, 0);
+        spotLight = new THREE.SpotLight(0xffffff, 1);
+        spotLight.position.set(0, 0, 15);
         spotLight.castShadow = true;
-        spotLight.shadowCameraNear = true;
-        spotLight.intensity = 1;
-        spotLight.shadowCameraFar = 100000;
         scene.add(spotLight);
+
+        ambientLight = new THREE.AmbientLight(0xFFFFFF, 10);
+        ambientLight.position.set(0,0,15);
+        ambientLight.castShadow = true;
+        scene.add(ambientLight);
+
+        directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
+        directionalLight.position.set(0,0,15);
+        directionalLight.castShadow = true;
+        scene.add(directionalLight);
+
+        hemisphereLight = new THREE.HemisphereLight(0xFFFFFF, 0xC1C1D1, 1);
+        hemisphereLight.castShadow = true;
+        scene.add(hemisphereLight);
+
+        pointLight = new THREE.PointLight(0xFFFFFF, 5, 100, 10);
+        pointLight.position.set(0,0,15);
+        pointLight.castShadow = true;
+        scene.add(pointLight);
+
 
         var fileInput = document.getElementById('myInput');
         fileInput.addEventListener('change', function(e) {
@@ -141,11 +177,12 @@ function init() {
                 fileReader.onload = function(e) {
                         if (molecule != null) {
                                 scene.remove(molecule);
-                                molecule = null;
+                                molecule = new THREE.Object3D();
                         }
 
                         xyz = fileReader.result;
                         createMolecule(xyz);
+                        console.log(xyz);
                 }
 
                 fileReader.readAsText(file);
@@ -161,7 +198,7 @@ function readMolecule(xyzURL) {
                 success: function(xyz) {
                         if (molecule != null) {
                                 scene.remove(molecule);
-                                molecule = null;
+                                molecule = new THREE.Object3D();
                         }
                         createMolecule(xyz);
                 }
@@ -169,10 +206,7 @@ function readMolecule(xyzURL) {
 }
 
 //updates every frame used for animation and input handling
-function update() {
-        if (molecule != null) {
-                molecule.rotateY(0.01);
-        }
+function render() {
 
         //render the scene
         renderer.render(scene, camera);
@@ -180,8 +214,20 @@ function update() {
 
 function animate() {
 
+        var atoms = molecule.children;
+        for(i = 0; i < atoms.length; i++) {
+
+                atoms[i].scale.x = options.size;
+                atoms[i].scale.y = options.size;
+                atoms[i].scale.z = options.size;
+        }
+
+        if (molecule != null) {
+                molecule.rotateY(0.01);
+        }
+
         requestAnimationFrame(animate);
-        update();
+        render();
 }
 
 function createMolecule(xyz) {
@@ -190,9 +236,6 @@ function createMolecule(xyz) {
 
         //number of atoms is the fist line
         var atomCount = data[0];
-
-        //parent of the other spheres
-        molecule = new THREE.Object3D();
 
         //make all of the atoms
         for (var i = 0; i < atomCount; i++) {
