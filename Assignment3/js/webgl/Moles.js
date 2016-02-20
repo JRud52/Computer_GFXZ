@@ -63,13 +63,14 @@ var lighting = {
 var options = {
 
         size: 1,
-        lightColor: [ 0, 0, 0 ]
+        lightColor: "#ffffff",
+        secLightColor: "#ffffff",
+        intensity: 1
 };
 
 //TODO Differentiate size of atoms based on atomic value.
-//TODO Add the ability to change lighting styles.
-//TODO add color controller for lighting
-//TODO add rotation speed.
+//TODO Change lighting menu style to boolean type.
+//TODO add rotation speed, toggle off rotation
 //TODO Add atom count maybe somewhere.
 //TODO Add more xyz molecules
 //TODO Allow changing of lighting distance, and intensity.
@@ -91,8 +92,10 @@ function init() {
         document.body.appendChild(container);
 
         renderer = new THREE.WebGLRenderer({
-                antialias: true
+                antialias: true,
+                alpha: true
         });
+        renderer.setClearColor(0x808080 , 0.5);
         renderer.setPixelRatio(550 / 450);
         renderer.setSize(550, 450);
         container.appendChild(renderer.domElement);
@@ -121,7 +124,7 @@ function init() {
         guiF1.add(xyzFiles, 'Methamphetamine');
         guiF1.add(xyzFiles, 'Tetrasilete');
         guiF1.add(xyzFiles, 'Caffeine');
-        guiF1.add(xyzFiles, 'loadFile').name('Upload XYZ');
+        gui.add(xyzFiles, 'loadFile').name('Upload XYZ');
 
         var guiF2 = gui.addFolder('Lighting Types');
         guiF2.add(lighting, 'Ambient');
@@ -133,22 +136,22 @@ function init() {
         var guiF3 = gui.addFolder('Render Options');
         guiF3.add(options, 'size', 0, 2);
         guiF3.addColor(options, 'lightColor');
+        guiF3.addColor(options, 'secLightColor');
+        guiF3.add(options, 'intensity', 0, 10);
 
         gui.domElement.style.position = "absolute";
         gui.domElement.style.top = '290px';
         gui.domElement.style.right = '300px';
         document.body.appendChild(gui.domElement);
-        guiF1.open();
         guiF2.open();
         guiF3.open();
 
-        //Add a spotlight for shadows - white light with intesity of 1
         spotLight = new THREE.SpotLight(0xffffff, 1);
         spotLight.position.set(0, 0, 15);
         spotLight.castShadow = true;
         scene.add(spotLight);
 
-        ambientLight = new THREE.AmbientLight(0xFFFFFF, 10);
+        ambientLight = new THREE.AmbientLight(0xFFFFFF);
         ambientLight.position.set(0,0,15);
         ambientLight.castShadow = true;
         scene.add(ambientLight);
@@ -182,11 +185,11 @@ function init() {
 
                         xyz = fileReader.result;
                         createMolecule(xyz);
-                        console.log(xyz);
                 }
 
                 fileReader.readAsText(file);
         });
+
 }
 
 function readMolecule(xyzURL) {
@@ -205,6 +208,21 @@ function readMolecule(xyzURL) {
         });
 }
 
+function updateLighting(primaryColor, secondaryColor, intensity) {
+
+        ambientLight.color.setHex(primaryColor);
+        directionalLight.color.setHex(primaryColor);
+        pointLight.color.setHex(primaryColor);
+        spotLight.color.setHex(primaryColor);
+        hemisphereLight.color.setHex(primaryColor);
+        hemisphereLight.groundColor.setHex(secondaryColor);
+
+        directionalLight.intensity = intensity;
+        pointLight.intensity = intensity;
+        spotLight.intensity = intensity;
+        hemisphereLight.intensity = intensity;
+}
+
 //updates every frame used for animation and input handling
 function render() {
 
@@ -221,6 +239,11 @@ function animate() {
                 atoms[i].scale.y = options.size;
                 atoms[i].scale.z = options.size;
         }
+
+        var primaryColor = parseInt(options.lightColor.replace(/^#/, ''), 16);
+        var secondaryColor = parseInt(options.secLightColor.replace(/^#/, ''), 16);
+        var intensity = options.intensity;
+        updateLighting(primaryColor, secondaryColor, intensity);
 
         if (molecule != null) {
                 molecule.rotateY(0.01);
@@ -247,33 +270,28 @@ function createMolecule(xyz) {
 
                 var element = atom[0];
 
-                switch (element) {
-                        case "H":
-                                atomColor = new THREE.Color(0xffffff);
-                                break;
-                        case "O":
-                                atomColor = new THREE.Color(0xff0000);
-                                break;
-                        case "Cl":
-                                atomColor = new THREE.Color(0x008000);
-                                break;
-                        case "N":
-                                atomColor = new THREE.Color(0x0000ff);
-                                break;
-                        case "C":
-                                atomColor = new THREE.Color(0x808080);
-                                break;
-                        case "S":
-                                atomColor = new THREE.Color(0xffff00);
-                                break;
-                        case "P":
-                                atomColor = new THREE.Color(0xffffff);
-                                break;
-                        default:
-                                atomColor = new THREE.Color(0xffa500);
-                                break;
-                }
+                var colorArray = {
+                        H: 0xFFFFFF,
+                        C: 0x000000,
+                        N: 0x87CEEB,
+                        O: 0xFF2200,
+                        F: 0x1FF01F, Cl: 0x1FF01F,
+                        Br: 0x992200,
+                        I: 0x6600BB,
+                        He: 0x00FFFF, Ne: 0x00FFFF, Ar: 0x00FFFF, Xe: 0x00FFFF, Kr: 0x00FFFF,
+                        P: 0xFF9900,
+                        S: 0xDDDD00,
+                        B: 0xFFAA77,
+                        Li: 0x7700FF, Na: 0x7700FF, K: 0x7700FF, Rb: 0x7700FF, Cs: 0x7700FF, Fr: 0x7700FF,
+                        Be: 0x007700, Mg: 0x007700, Ca: 0x007700, Sr: 0x007700, Ba: 0x007700, Ra: 0x007700,
+                        Ti: 0x999999,
+                        Fe: 0xDD7700
+                };
 
+                if(!(element in colorArray))
+                        atomColor = new THREE.Color(0xDD77FF);
+                else
+                        atomColor = new THREE.Color(colorArray[element]);
 
                 var mat = new THREE.MeshPhongMaterial({
                         color: atomColor
