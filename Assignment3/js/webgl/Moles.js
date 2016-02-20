@@ -1,4 +1,4 @@
-o/*
+/*
     Graphics Assignment 2
     Group Members: Justin, Tyler, Will, Michael, Guy
 */
@@ -90,7 +90,7 @@ function init() {
 
         //Set to our custom canvas
         container = document.getElementById('myCanvasLeft');
-        document.body.appendChild(container);
+        //document.body.appendChild(container);
 
         renderer = new THREE.WebGLRenderer({
                 antialias: true,
@@ -146,10 +146,9 @@ function init() {
         guiF3.add(options, 'intensity', 0, 10);
 
         //position the dom elemeent of the GUI
-        gui.domElement.style.position = "absolute";
-        gui.domElement.style.top = '290px';
-        gui.domElement.style.right = '300px';
-        document.body.appendChild(gui.domElement);
+        gui.domElement.style.margin = 'auto';
+        gui.domElement.style.marginBottom = '3.5em';
+        document.getElementById("guiOptions").appendChild(gui.domElement);
         guiF2.open();
         guiF3.open();
 
