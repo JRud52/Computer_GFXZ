@@ -1,4 +1,4 @@
-/*
+o/*
     Graphics Assignment 2
     Group Members: Justin, Tyler, Will, Michael, Guy
 */
@@ -212,6 +212,7 @@ function init() {
 
 }
 
+//read the XYZ file
 function readMolecule(xyzURL) {
         $.ajax({
                 type: 'POST',
@@ -329,7 +330,8 @@ function createMolecule(xyz) {
 
 
                 //0.55->1.5 scale on sphere.
-                //scale the atom based on its 
+                //scale the atom based on its row number in the periodic table 
+                //this is not a completely accurate scale it is simply used to help differentiate atoms of significantly different sizes
                 var scaleArray = {
                         H: 0.55, He: 0.55,
                         Li: 0.9, Be: 0.9, B: 0.9, C: 0.9, N: 0.9, O: 0.9, F: 0.9, Ne: 0.9,
