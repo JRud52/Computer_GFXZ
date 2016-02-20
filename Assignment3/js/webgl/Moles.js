@@ -232,13 +232,9 @@ function render() {
 
 function animate() {
 
-        var atoms = molecule.children;
-        for(i = 0; i < atoms.length; i++) {
-
-                atoms[i].scale.x = options.size;
-                atoms[i].scale.y = options.size;
-                atoms[i].scale.z = options.size;
-        }
+        molecule.scale.x = options.size;
+        molecule.scale.y = options.size;
+        molecule.scale.z = options.size;
 
         var primaryColor = parseInt(options.lightColor.replace(/^#/, ''), 16);
         var secondaryColor = parseInt(options.secLightColor.replace(/^#/, ''), 16);
@@ -301,6 +297,24 @@ function createMolecule(xyz) {
                 sphere.position.x = atom[2];
                 sphere.position.y = atom[4];
                 sphere.position.z = atom[6];
+
+                //0.75->1.5 scale on sphere.
+                var scaleArray = {
+                        H: 0.55, He: 0.55,
+                        Li: 0.9, Be: 0.9, B: 0.9, C: 0.9, N: 0.9, O: 0.9, F: 0.9, Ne: 0.9,
+                        Na: 1.05, Mg: 1.05, Al: 1.05, Si: 1.05, P: 1.05, S: 1.05, Cl: 1.05, Ar: 1.05,
+                        K: 1.25, Ca: 1.25, Sc: 1.25, Ti: 1.25, V: 1.25, Cr: 1.25, Mn: 1.25, Fe: 1.25, Co: 1.25, Ni: 1.25, Cu: 1.25, Zn: 1.25, Ga: 1.25, Ge: 1.25, As: 1.25, Se: 1.25, Br: 1.25, K: 1.25
+                }
+
+                var scaleAmount = 1.5;
+                if(element in scaleArray)
+                        scaleAmount = scaleArray[element];
+
+                console.log(element);
+                console.log(scaleAmount);
+                sphere.scale.x = scaleAmount;
+                sphere.scale.y = scaleAmount;
+                sphere.scale.z = scaleAmount;
 
                 molecule.add(sphere);
         }
