@@ -9,30 +9,51 @@ var clock = new THREE.Clock();
 var spotLight;
 var molecule;
 
-//Go get the file into a string, then use the molecule option//
+//This works on server side only!
 var xyzFiles = {
-        Anatoxin: function() { createMolecule('anatoxin'); },
-        Heroin: function() { createMolecule('heroin'); },
-        Lactose: function() { createMolecule('lactose'); },
-        Methamphetamine: function() { createMolecule('methamphetamine'); },
-        Tetrasilete: function() { createMolecule('tetrasilete'); },
-        Caffeine: function() { createMolecule('caffeine'); },
-        loadFile: function() { $('#myInput').click(); }
+        Anatoxin: function() {
+                readMolecule('./molecules/anatoxin-a.xyz');
+        },
+        Heroin: function() {
+                readMolecule('./molecules/heroin.xyz');
+        },
+        Lactose: function() {
+                readMolecule('./molecules/lactose.xyz');
+        },
+        Methamphetamine: function() {
+                readMolecule('./molecules/methamphetamine.xyz');
+        },
+        Tetrasilete: function() {
+                readMolecule('./molecules/tetrasilete.xyz');
+        },
+        Caffeine: function() {
+                readMolecule('./molecules/caffeine.xyz');
+        },
+        loadFile: function() {
+                $('#myInput').click();
+        }
 };
 
-var params
-
 var lightingTypes = {
-        Ambient: function() { updateLighting('ambient'); },
-        Directional: function() { updateLighting('directional'); },
-        Point: function() { updateLighting('point'); },
-        Hemisphere: function() { updateLighting('hemisphere'); },
-        Spot: function() { updateLighting('spot'); }
+        Ambient: function() {
+                updateLighting('ambient');
+        },
+        Directional: function() {
+                updateLighting('directional');
+        },
+        Point: function() {
+                updateLighting('point');
+        },
+        Hemisphere: function() {
+                updateLighting('hemisphere');
+        },
+        Spot: function() {
+                updateLighting('spot');
+        }
 };
 
 //TODO move guy's browse for a file into the gui menu.
 //TODO Add the ability to change lighting styles.
-//TODO Add the ability to select from preset xyz files in the menu.
 //TODO add color controller for lighting
 //TODO add rotation speed with a listener to live update.
 
@@ -52,7 +73,10 @@ function init() {
         container = document.getElementById('myCanvas');
         document.body.appendChild(container);
 
-        var gui = new dat.GUI({ autoPlace: false, width: 325 });
+        var gui = new dat.GUI({
+                autoPlace: false,
+                width: 325
+        });
 
         var guiF1 = gui.addFolder('Molecules', "a");
         guiF1.add(xyzFiles, 'Anatoxin').name('Anatoxin-a');
@@ -64,17 +88,17 @@ function init() {
         guiF1.add(xyzFiles, 'loadFile').name('Upload XYZ');
 
         var guiF2 = gui.addFolder('Lighting Types');
-        guiF2.add(lightingTypes, 'Ambient' );
-        guiF2.add(lightingTypes, 'Directional' );
-        guiF2.add(lightingTypes, 'Point' );
-        guiF2.add(lightingTypes, 'Hemisphere' );
-        guiF2.add(lightingTypes, 'Spot' );
+        guiF2.add(lightingTypes, 'Ambient');
+        guiF2.add(lightingTypes, 'Directional');
+        guiF2.add(lightingTypes, 'Point');
+        guiF2.add(lightingTypes, 'Hemisphere');
+        guiF2.add(lightingTypes, 'Spot');
 
 
         gui.domElement.style.position = "absolute";
         gui.domElement.style.top = '100px';
         gui.domElement.style.right = '0px';
-	container.appendChild(gui.domElement);
+        container.appendChild(gui.domElement);
 
         //webGL renderer size 600x450
         renderer = new THREE.WebGLRenderer({
@@ -97,9 +121,8 @@ function init() {
 
         scene = new THREE.Scene();
 
-
         //Add a spotlight for shadows - white light with intesity of 1
-        spotLight = new THREE.SpotLight(0xffffff, 1);
+        spotLight = new THREE.SpotLight(0xffffff, 0.5);
         spotLight.name = 'Spot Light';
         spotLight.position.set(5000, 5000, 0);
         spotLight.castShadow = true;
@@ -108,18 +131,7 @@ function init() {
         spotLight.shadowCameraFar = 100000;
         scene.add(spotLight);
 
-        var light = new THREE.AmbientLight(0x303030); // soft white light
-        scene.add(light);
-
-
-                        //
-
-
-
-
-
-        //read the file that the user specified
-        var fileInput = document.getElementById("fileInput");
+        var fileInput = document.getElementById('myInput');
         fileInput.addEventListener('change', function(e) {
                 var file = fileInput.files[0];
                 var fileReader = new FileReader();
@@ -132,14 +144,30 @@ function init() {
                         }
 
                         xyz = fileReader.result;
-                        console.log(xyz);
-                        createMolecule(xyz)
+                        createMolecule(xyz);
                 }
 
                 fileReader.readAsText(file);
         });
 }
 
+function readMolecule(xyzURL) {
+        console.log('hello');
+
+        $.ajax({
+                type: 'POST',
+            url: xyzURL,
+            async: true,
+            datatype: 'text',
+            success: function (xyz){
+                    if (molecule != null) {
+                            scene.remove(molecule);
+                            molecule = null;
+                    }
+                    createMolecule(xyz);
+            }
+        });
+}
 
 //updates every frame used for animation and input handling
 function update() {
