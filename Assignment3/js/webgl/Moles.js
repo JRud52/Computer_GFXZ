@@ -44,6 +44,7 @@ var xyzFiles = {
         }
 };
 
+//all types of available lighting that the user can toggle on or off
 var lighting = {
         Ambient: function() {
                 ambientLight.visible = !ambientLight.visible;
@@ -90,7 +91,7 @@ function init() {
 
         //Set to our custom canvas
         container = document.getElementById('myCanvasLeft');
-        document.body.appendChild(container);
+        //document.body.appendChild(container);
 
         renderer = new THREE.WebGLRenderer({
                 antialias: true,
@@ -118,6 +119,7 @@ function init() {
                 width: 325
         });
 
+        //GUI to show some available molecules - server side
         var guiF1 = gui.addFolder('Molecules', "a");
         guiF1.add(xyzFiles, 'Anatoxin').name('Anatoxin-a');
         guiF1.add(xyzFiles, 'Heroin');
@@ -125,8 +127,11 @@ function init() {
         guiF1.add(xyzFiles, 'Methamphetamine');
         guiF1.add(xyzFiles, 'Tetrasilete');
         guiF1.add(xyzFiles, 'Caffeine');
+
+        //allow the user to upload their own XYZ file
         gui.add(xyzFiles, 'loadFile').name('Upload XYZ');
 
+        //GUI to allow the user to select a lighting type
         var guiF2 = gui.addFolder('Lighting Types');
         guiF2.add(lighting, 'Ambient');
         guiF2.add(lighting, 'Directional');
@@ -134,64 +139,79 @@ function init() {
         guiF2.add(lighting, 'Hemisphere');
         guiF2.add(lighting, 'Spot');
 
+        //GUI to allow the user to specify lighting parameters
         var guiF3 = gui.addFolder('Render Options');
         guiF3.add(options, 'size', 0, 2);
         guiF3.addColor(options, 'lightColor');
         guiF3.addColor(options, 'secLightColor');
         guiF3.add(options, 'intensity', 0, 10);
 
-        gui.domElement.style.position = "absolute";
-        gui.domElement.style.top = '290px';
-        gui.domElement.style.right = '300px';
-        document.body.appendChild(gui.domElement);
+        //position the dom elemeent of the GUI
+        gui.domElement.style.margin = 'auto';
+        gui.domElement.style.marginBottom = '3.5em';
+        document.getElementById("guiOptions").appendChild(gui.domElement);
         guiF2.open();
         guiF3.open();
 
+
+        //add a light of each type
+        //light 1: spot light
         spotLight = new THREE.SpotLight(0xffffff, 1);
         spotLight.position.set(0, 0, 15);
         spotLight.castShadow = true;
         scene.add(spotLight);
 
+        //light 2: ambient light
         ambientLight = new THREE.AmbientLight(0xFFFFFF);
         ambientLight.position.set(0,0,15);
         ambientLight.castShadow = true;
         scene.add(ambientLight);
 
+        //light 3: directional light
         directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
         directionalLight.position.set(0,0,15);
         directionalLight.castShadow = true;
         scene.add(directionalLight);
 
+        //light 4: hemisphere light
         hemisphereLight = new THREE.HemisphereLight(0xFFFFFF, 0xC1C1D1, 1);
         hemisphereLight.castShadow = true;
         scene.add(hemisphereLight);
 
+        //light 5: point light
         pointLight = new THREE.PointLight(0xFFFFFF, 5, 100, 10);
         pointLight.position.set(0,0,15);
         pointLight.castShadow = true;
         scene.add(pointLight);
 
-
+        
+        //handler for when the user selects an XYZ file
         var fileInput = document.getElementById('myInput');
-        fileInput.addEventListener('change', function(e) {
+        fileInput.addEventListener('change', function (e) {
+
+                //get and read the file
                 var file = fileInput.files[0];
                 var fileReader = new FileReader();
                 var xyz;
 
-                fileReader.onload = function(e) {
+                fileReader.onload = function (e) {
+                        //if there was already a molecule loaded remove it from the scene
                         if (molecule != null) {
                                 scene.remove(molecule);
                                 molecule = new THREE.Object3D();
                         }
 
+                        //setup the new molecule 
                         xyz = fileReader.result;
                         createMolecule(xyz);
                 }
 
+                //read the file as plain text
                 fileReader.readAsText(file);
         });
 }
 
+//read the XYZ file
 function readMolecule(xyzURL) {
         $.ajax({
                 type: 'POST',
@@ -208,6 +228,7 @@ function readMolecule(xyzURL) {
         });
 }
 
+//updates the lighting parameters for each light in the scene - the parameters are selected by the user via the GUI
 function updateLighting(primaryColor, secondaryColor, intensity) {
 
         ambientLight.color.setHex(primaryColor);
@@ -231,16 +252,19 @@ function render() {
 }
 
 function animate() {
-
+        
+        //scale the molecule to the size specified by the user via the GUI
         molecule.scale.x = options.size;
         molecule.scale.y = options.size;
         molecule.scale.z = options.size;
 
+        //adjust lighting based on the parameters selected by the user
         var primaryColor = parseInt(options.lightColor.replace(/^#/, ''), 16);
         var secondaryColor = parseInt(options.secLightColor.replace(/^#/, ''), 16);
         var intensity = options.intensity;
         updateLighting(primaryColor, secondaryColor, intensity);
 
+        //if we have a molecule rotate it slowly about the Y axis
         if (molecule != null) {
                 molecule.rotateY(0.01);
         }
@@ -266,6 +290,7 @@ function createMolecule(xyz) {
 
                 var element = atom[0];
 
+                //associative array representing the atom colors
                 var colorArray = {
                         H: 0xFFFFFF,
                         C: 0x000000,
@@ -284,40 +309,52 @@ function createMolecule(xyz) {
                         Fe: 0xDD7700
                 };
 
-                if(!(element in colorArray))
+                //ensure that the element is in the array of colors 
+                if (!(element in colorArray))
+                        //default color for elements not in the array
                         atomColor = new THREE.Color(0xDD77FF);
                 else
                         atomColor = new THREE.Color(colorArray[element]);
 
+                //material for the atom
                 var mat = new THREE.MeshPhongMaterial({
                         color: atomColor
                 });
 
+                //the atom is represented by a sphere
                 var sphere = new THREE.Mesh(geo, mat);
                 sphere.position.x = atom[2];
                 sphere.position.y = atom[4];
                 sphere.position.z = atom[6];
 
-                //0.75->1.5 scale on sphere.
+
+                //0.55->1.5 scale on sphere.
+                //scale the atom based on its row number in the periodic table 
+                //this is not a completely accurate scale it is simply used to help differentiate atoms of significantly different sizes
                 var scaleArray = {
                         H: 0.55, He: 0.55,
                         Li: 0.9, Be: 0.9, B: 0.9, C: 0.9, N: 0.9, O: 0.9, F: 0.9, Ne: 0.9,
                         Na: 1.05, Mg: 1.05, Al: 1.05, Si: 1.05, P: 1.05, S: 1.05, Cl: 1.05, Ar: 1.05,
                         K: 1.25, Ca: 1.25, Sc: 1.25, Ti: 1.25, V: 1.25, Cr: 1.25, Mn: 1.25, Fe: 1.25, Co: 1.25, Ni: 1.25, Cu: 1.25, Zn: 1.25, Ga: 1.25, Ge: 1.25, As: 1.25, Se: 1.25, Br: 1.25, K: 1.25
                 }
-
+                
+                //scale defaults to 1.5 if it is not in the scale array
                 var scaleAmount = 1.5;
                 if(element in scaleArray)
                         scaleAmount = scaleArray[element];
 
                 console.log(element);
                 console.log(scaleAmount);
+
+                //scale the sphere
                 sphere.scale.x = scaleAmount;
                 sphere.scale.y = scaleAmount;
                 sphere.scale.z = scaleAmount;
 
+                //add the sphere to the molecule object (so we can rotate the entire object later)
                 molecule.add(sphere);
         }
 
+        //add the molecule to the scene 
         scene.add(molecule);
 }
