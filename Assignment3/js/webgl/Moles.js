@@ -77,9 +77,7 @@ var options = {
 };
 
 //TODO Change lighting menu style to boolean type, only one light on to start with. I give up.
-//TODO Add atom count maybe somewhere.
 //TODO Add more xyz molecules
-//TODO Allow changing of lighting distance, and intensity.
 
 /*
     ONLOAD FUNCTION
@@ -112,7 +110,7 @@ function init() {
 
         // Mouse control
         controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.target.set(0, 0, 0);
+        controls.target.set(0,0,0);
         controls.update();
 
         scene = new THREE.Scene();
@@ -135,7 +133,7 @@ function init() {
         gui.add(xyzFiles, 'loadFile').name('Upload XYZ');
 
         //GUI to allow the user to select a lighting type
-        var guiF2 = gui.addFolder('Lighting Types (By Default, All are On!)');
+        var guiF2 = gui.addFolder('Lighting Types (By Default, All are Enabled!)');
         guiF2.add(lighting, 'Ambient');
         guiF2.add(lighting, 'Directional');
         guiF2.add(lighting, 'Point');
@@ -143,7 +141,7 @@ function init() {
         guiF2.add(lighting, 'Spot');
 
         //GUI to allow the user to specify lighting parameters
-        var guiF3 = gui.addFolder('Render Options');
+        var guiF3 = gui.addFolder('Render Options (Type in Colors)');
         guiF3.add(options, 'size', 0, 2).name('Size');
         guiF3.addColor(options, 'lightColor').name('Primary Light Color');
         guiF3.addColor(options, 'secLightColor').name('Secondary Light Color');
@@ -183,6 +181,7 @@ function init() {
         //light 4: hemisphere light
         hemisphereLight = new THREE.HemisphereLight(0xFFFFFF, 0xC1C1D1, 1);
         hemisphereLight.castShadow = true;
+        hemisphereLight.position.set(0,0,15);
         scene.add(hemisphereLight);
 
         //light 5: point light
@@ -367,5 +366,6 @@ function createMolecule(xyz) {
         //add the molecule to the scene
         scene.add(molecule);
 
-        document.getElementById("formulaText").innerHTML='Test';
+        //Atomic Formula if see fit.
+        //document.getElementById("formulaText").innerHTML='Test';
 }
