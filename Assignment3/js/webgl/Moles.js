@@ -24,7 +24,7 @@ var xyzFiles = {
         Anatoxin: function() {
                 readMolecule('./molecules/anatoxin-a.xyz');
         },
-        Heroin: function() {
+        Diamorphine: function() {
                 readMolecule('./molecules/heroin.xyz');
         },
         Lactose: function() {
@@ -46,6 +46,7 @@ var xyzFiles = {
 
 //all types of available lighting that the user can toggle on or off
 var lighting = {
+
         Ambient: function() {
                 ambientLight.visible = !ambientLight.visible;
         },
@@ -68,11 +69,14 @@ var options = {
         size: 1,
         lightColor: "#ffffff",
         secLightColor: "#ffffff",
-        intensity: 1
+        intensity: 1,
+        isRotating: false,
+        rotateX: 1,
+        rotateY: 0,
+        rotateZ: 0
 };
 
-//TODO Change lighting menu style to boolean type, only one light on to start with.
-//TODO add rotation speed, toggle off rotation
+//TODO Change lighting menu style to boolean type, only one light on to start with. I give up.
 //TODO Add atom count maybe somewhere.
 //TODO Add more xyz molecules
 //TODO Allow changing of lighting distance, and intensity.
@@ -91,7 +95,6 @@ function init() {
 
         //Set to our custom canvas
         container = document.getElementById('myCanvasLeft');
-        //document.body.appendChild(container);
 
         renderer = new THREE.WebGLRenderer({
                 antialias: true,
@@ -116,13 +119,13 @@ function init() {
 
         var gui = new dat.GUI({
                 autoPlace: false,
-                width: 325
+                width: document.getElementById("guiOptions").offsetWidth
         });
 
         //GUI to show some available molecules - server side
-        var guiF1 = gui.addFolder('Molecules', "a");
+        var guiF1 = gui.addFolder('Molecules (Select One)');
         guiF1.add(xyzFiles, 'Anatoxin').name('Anatoxin-a');
-        guiF1.add(xyzFiles, 'Heroin');
+        guiF1.add(xyzFiles, 'Diamorphine');
         guiF1.add(xyzFiles, 'Lactose');
         guiF1.add(xyzFiles, 'Methamphetamine');
         guiF1.add(xyzFiles, 'Tetrasilete');
@@ -132,7 +135,7 @@ function init() {
         gui.add(xyzFiles, 'loadFile').name('Upload XYZ');
 
         //GUI to allow the user to select a lighting type
-        var guiF2 = gui.addFolder('Lighting Types');
+        var guiF2 = gui.addFolder('Lighting Types (By Default, All are On!)');
         guiF2.add(lighting, 'Ambient');
         guiF2.add(lighting, 'Directional');
         guiF2.add(lighting, 'Point');
@@ -141,10 +144,14 @@ function init() {
 
         //GUI to allow the user to specify lighting parameters
         var guiF3 = gui.addFolder('Render Options');
-        guiF3.add(options, 'size', 0, 2);
-        guiF3.addColor(options, 'lightColor');
-        guiF3.addColor(options, 'secLightColor');
-        guiF3.add(options, 'intensity', 0, 10);
+        guiF3.add(options, 'size', 0, 2).name('Size');
+        guiF3.addColor(options, 'lightColor').name('Primary Light Color');
+        guiF3.addColor(options, 'secLightColor').name('Secondary Light Color');
+        guiF3.add(options, 'intensity', 0, 10).name('Intesity');
+        guiF3.add(options, 'isRotating').name('Toggle Rotation');
+        guiF3.add(options, 'rotateX', 0, 10).name('X Rotation');
+        guiF3.add(options, 'rotateY', 0, 10).name('Y Rotation');
+        guiF3.add(options, 'rotateZ', 0, 10).name('Z Rotation');
 
         //position the dom elemeent of the GUI
         gui.domElement.style.margin = 'auto';
@@ -184,7 +191,7 @@ function init() {
         pointLight.castShadow = true;
         scene.add(pointLight);
 
-        
+
         //handler for when the user selects an XYZ file
         var fileInput = document.getElementById('myInput');
         fileInput.addEventListener('change', function (e) {
@@ -201,7 +208,7 @@ function init() {
                                 molecule = new THREE.Object3D();
                         }
 
-                        //setup the new molecule 
+                        //setup the new molecule
                         xyz = fileReader.result;
                         createMolecule(xyz);
                 }
@@ -252,7 +259,7 @@ function render() {
 }
 
 function animate() {
-        
+
         //scale the molecule to the size specified by the user via the GUI
         molecule.scale.x = options.size;
         molecule.scale.y = options.size;
@@ -265,8 +272,10 @@ function animate() {
         updateLighting(primaryColor, secondaryColor, intensity);
 
         //if we have a molecule rotate it slowly about the Y axis
-        if (molecule != null) {
-                molecule.rotateY(0.01);
+        if (options.isRotating && molecule != null) {
+                molecule.rotateX(options.rotateX/100);
+                molecule.rotateY(options.rotateY/100);
+                molecule.rotateZ(options.rotateZ/100);
         }
 
         requestAnimationFrame(animate);
@@ -309,7 +318,7 @@ function createMolecule(xyz) {
                         Fe: 0xDD7700
                 };
 
-                //ensure that the element is in the array of colors 
+                //ensure that the element is in the array of colors
                 if (!(element in colorArray))
                         //default color for elements not in the array
                         atomColor = new THREE.Color(0xDD77FF);
@@ -329,7 +338,7 @@ function createMolecule(xyz) {
 
 
                 //0.55->1.5 scale on sphere.
-                //scale the atom based on its row number in the periodic table 
+                //scale the atom based on its row number in the periodic table
                 //this is not a completely accurate scale it is simply used to help differentiate atoms of significantly different sizes
                 var scaleArray = {
                         H: 0.55, He: 0.55,
@@ -337,7 +346,7 @@ function createMolecule(xyz) {
                         Na: 1.05, Mg: 1.05, Al: 1.05, Si: 1.05, P: 1.05, S: 1.05, Cl: 1.05, Ar: 1.05,
                         K: 1.25, Ca: 1.25, Sc: 1.25, Ti: 1.25, V: 1.25, Cr: 1.25, Mn: 1.25, Fe: 1.25, Co: 1.25, Ni: 1.25, Cu: 1.25, Zn: 1.25, Ga: 1.25, Ge: 1.25, As: 1.25, Se: 1.25, Br: 1.25, K: 1.25
                 }
-                
+
                 //scale defaults to 1.5 if it is not in the scale array
                 var scaleAmount = 1.5;
                 if(element in scaleArray)
@@ -355,6 +364,8 @@ function createMolecule(xyz) {
                 molecule.add(sphere);
         }
 
-        //add the molecule to the scene 
+        //add the molecule to the scene
         scene.add(molecule);
+
+        document.getElementById("formulaText").innerHTML='Test';
 }
