@@ -14,6 +14,8 @@ var spotLight = new THREE.SpotLight();
 
 var molecule = new THREE.Object3D();
 
+var atomicFormula = "test";
+
 
 //visible
 
@@ -68,8 +70,7 @@ var options = {
         intensity: 1
 };
 
-//TODO Differentiate size of atoms based on atomic value.
-//TODO Change lighting menu style to boolean type.
+//TODO Change lighting menu style to boolean type, only one light on to start with.
 //TODO add rotation speed, toggle off rotation
 //TODO Add atom count maybe somewhere.
 //TODO Add more xyz molecules
@@ -189,7 +190,6 @@ function init() {
 
                 fileReader.readAsText(file);
         });
-
 }
 
 function readMolecule(xyzURL) {
