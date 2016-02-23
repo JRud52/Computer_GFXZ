@@ -45,6 +45,7 @@ var xyzFiles = {
 };
 
 //all types of available lighting that the user can toggle on or off
+/*
 var lighting = {
 
         Ambient: function() {
@@ -63,6 +64,7 @@ var lighting = {
                 spotLight.visible = !spotLight.visible;
         }
 };
+*/
 
 var options = {
         size: 1,
@@ -116,9 +118,9 @@ function init() {
         camera.position.y = 0;
 
         // Mouse control
-        controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.target.set(0,0,0);
-        controls.update();
+ //       controls = new THREE.OrbitControls(camera, renderer.domElement);
+ //       controls.target.set(0,0,0);
+ //       controls.update();
 
         scene = new THREE.Scene();
 
