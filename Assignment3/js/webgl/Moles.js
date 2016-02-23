@@ -14,11 +14,6 @@ var spotLight = new THREE.SpotLight();
 
 var molecule = new THREE.Object3D();
 
-var atomicFormula = "test";
-
-
-//visible
-
 //This works on server side only!
 var xyzFiles = {
         Anatoxin: function() {
@@ -55,28 +50,6 @@ var xyzFiles = {
                 $('#myInput').click();
         }
 };
-
-//all types of available lighting that the user can toggle on or off
-/*
-var lighting = {
-
-        Ambient: function() {
-                ambientLight.visible = !ambientLight.visible;
-        },
-        Directional: function() {
-                directionalLight.visible = !directionalLight.visible;
-        },
-        Point: function() {
-                pointLight.visible = !pointLight.visible;
-        },
-        Hemisphere: function() {
-                hemisphereLight.visible = !hemisphereLight.visible;
-        },
-        Spot: function() {
-                spotLight.visible = !spotLight.visible;
-        }
-};
-*/
 
 var options = {
         size: 1,
@@ -119,7 +92,7 @@ function init() {
                 antialias: true,
                 alpha: true
         });
-        renderer.setClearColor(0x808080 , 0.5);
+        renderer.setClearColor(0x505050 , 0.5);
         renderer.setPixelRatio(550 / 450);
         renderer.setSize(550, 450);
         container.appendChild(renderer.domElement);
@@ -129,11 +102,6 @@ function init() {
         camera.position.z = 15;
         camera.position.y = 0;
 
-        // Mouse control
- //       controls = new THREE.OrbitControls(camera, renderer.domElement);
- //       controls.target.set(0,0,0);
- //       controls.update();
-
         scene = new THREE.Scene();
 
 
@@ -142,37 +110,35 @@ function init() {
         spotLight = new THREE.SpotLight(0xffff00, 1);
         spotLight.position.set(0, 0, 15);
         spotLight.castShadow = true;
-        scene.add(spotLight);      
-        
+        scene.add(spotLight);
+
 
         //light 2: ambient light
         ambientLight = new THREE.AmbientLight(0xFFFFFF);
         ambientLight.position.set(0, 0, 15);
         ambientLight.castShadow = true;
-        scene.add(ambientLight);       
+        scene.add(ambientLight);
 
 
         //light 3: directional light
         directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
         directionalLight.position.set(0, 0, 15);
         directionalLight.castShadow = true;
-        scene.add(directionalLight);     
+        scene.add(directionalLight);
 
 
         //light 4: hemisphere light
         hemisphereLight = new THREE.HemisphereLight(0xFFFFFF, 0xC1C1D1, 1);
         hemisphereLight.castShadow = true;
         hemisphereLight.position.set(0, 0, 15);
-        scene.add(hemisphereLight);      
-   
+        scene.add(hemisphereLight);
+
 
         //light 5: point light
         pointLight = new THREE.PointLight(0xFFFFFF, 5, 100, 10);
         pointLight.position.set(0, 0, 15);
         pointLight.castShadow = true;
         scene.add(pointLight);
-        
-        
 
 
         var gui = new dat.GUI({
@@ -208,7 +174,7 @@ function init() {
         }).setValue(lightingOptions.ambientOn);
 
         guiF2.add(lightingOptions, 'directionalOn').name('Directional').setValue(lightingOptions.directionalOn).onChange(function () {
-            if (lightingOptions.directionalOn) {                
+            if (lightingOptions.directionalOn) {
                 directionalLight.intensity = options.intensity;
             }
             else {
@@ -245,7 +211,7 @@ function init() {
 
 
         //GUI to allow the user to specify lighting parameters
-        var guiF3 = gui.addFolder('Render Options (Type in Colors)');
+        var guiF3 = gui.addFolder('Render Options');
         guiF3.add(options, 'size', 0, 2).name('Size');
         guiF3.addColor(options, 'lightColor').name('Primary Light Color');
         guiF3.addColor(options, 'secLightColor').name('Secondary Light Color');
@@ -261,7 +227,6 @@ function init() {
         document.getElementById("guiOptions").appendChild(gui.domElement);
         guiF2.open();
         guiF3.open();
-
 
         //fix an inproper css margin on the color picker
         $('.saturation-field').css('margin-right', 0);
@@ -322,7 +287,7 @@ function updateLighting(primaryColor, secondaryColor, intensity) {
         if(lightingOptions.directionalOn){
             directionalLight.intensity = intensity;
         }
-        
+
         if(lightingOptions.pointOn){
             pointLight.intensity = intensity;
         }
@@ -368,6 +333,20 @@ function animate() {
 }
 
 function createMolecule(xyz) {
+
+        var atomicFormula = "";
+        var elementArray = {
+                H: 0, He: 0,
+                Li: 0, Be: 0, B: 0, C: 0, N: 0, O: 0, F: 0, Ne: 0,
+                Na: 0, Mg: 0, Al: 0, Si: 0, P: 0, S: 0, Cl: 0, Ar: 0,
+                K: 0, Ca: 0, Sc: 0, Ti: 0, V: 0, Cr: 0, Mn: 0, Fe: 0, Co: 0, Ni: 0, Cu: 0, Zn: 0, Ga: 0, Ge: 0, As: 0, Se: 0, Br: 0, Kr: 0,
+                Rb: 0, Sr: 0, Y: 0, Zr: 0, Nb: 0, Mo: 0, Tc: 0, Ru: 0, Rh: 0, Pd: 0, Ag: 0, Cd: 0, In: 0, Sn: 0, Sb: 0, Te: 0, I: 0, Xe: 0,
+                Cs: 0, Ba: 0, Hf: 0, Ta: 0, W: 0, Re: 0, Os: 0, Ir: 0, Pt: 0, Au: 0, Hg: 0, Tl: 0, Pb: 0, Bi: 0, Po: 0, At: 0, Rn: 0,
+                Fr: 0, Ra: 0, Rf: 0, Db: 0, Sg: 0, Bh: 0, Mt: 0, Ds: 0, Rg: 0, Cn: 0, Uut: 0, Fl: 0, Uup: 0, Lv: 0, Uus: 0, Uuo: 0,
+                La: 0, Ce: 0, Pr: 0, Nd: 0, Pm: 0, Sm: 0, Eu: 0, Gd: 0, Tb: 0, Dy: 0, Ho: 0, Er: 0, Tm: 0, Yb: 0, Lu: 0,
+                Ac: 0, Th: 0, Pa: 0, U: 0, Np: 0, Pu: 0, Am: 0, Cm: 0, Bk: 0, Cf: 0, Es: 0, Fm: 0, Md: 0, No: 0, Lr: 0
+        }
+
         //split the xyz file by new lines
         var data = xyz.split('\n');
 
@@ -383,6 +362,7 @@ function createMolecule(xyz) {
                 var atom = data[2 + i].split(/(\s+)/);
 
                 var element = atom[0];
+                elementArray[element]++;
 
                 //associative array representing the atom colors
                 var colorArray = {
@@ -426,7 +406,7 @@ function createMolecule(xyz) {
                 //scale the atom based on its row number in the periodic table
                 //this is not a completely accurate scale it is simply used to help differentiate atoms of significantly different sizes
                 var scaleArray = {
-                        H: 0.55, He: 0.55,
+                        H: 0.60, He: 0.60,
                         Li: 0.9, Be: 0.9, B: 0.9, C: 0.9, N: 0.9, O: 0.9, F: 0.9, Ne: 0.9,
                         Na: 1.05, Mg: 1.05, Al: 1.05, Si: 1.05, P: 1.05, S: 1.05, Cl: 1.05, Ar: 1.05,
                         K: 1.25, Ca: 1.25, Sc: 1.25, Ti: 1.25, V: 1.25, Cr: 1.25, Mn: 1.25, Fe: 1.25, Co: 1.25, Ni: 1.25, Cu: 1.25, Zn: 1.25, Ga: 1.25, Ge: 1.25, As: 1.25, Se: 1.25, Br: 1.25, K: 1.25
@@ -437,9 +417,6 @@ function createMolecule(xyz) {
                 if(element in scaleArray)
                         scaleAmount = scaleArray[element];
 
-                //console.log(element);
-                //console.log(scaleAmount);
-
                 //scale the sphere
                 sphere.scale.x = scaleAmount;
                 sphere.scale.y = scaleAmount;
@@ -447,11 +424,18 @@ function createMolecule(xyz) {
 
                 //add the sphere to the molecule object (so we can rotate the entire object later)
                 molecule.add(sphere);
+
+
         }
 
         //add the molecule to the scene
         scene.add(molecule);
 
+        for (var key in elementArray) {
+                if(elementArray[key] > 0)
+                        atomicFormula += key+"<sub>"+elementArray[key]+"</sub>";
+        }
+
         //Atomic Formula if see fit.
-        //document.getElementById("formulaText").innerHTML='Test';
+        document.getElementById("formulaText").innerHTML="Formula of <b>"+data[1]+"</b>: "+atomicFormula;
 }
