@@ -57,6 +57,7 @@ var xyzFiles = {
 };
 
 //all types of available lighting that the user can toggle on or off
+/*
 var lighting = {
 
         Ambient: function() {
@@ -75,17 +76,25 @@ var lighting = {
                 spotLight.visible = !spotLight.visible;
         }
 };
+*/
 
 var options = {
-
         size: 1,
         lightColor: "#ffffff",
         secLightColor: "#ffffff",
         intensity: 1,
         isRotating: false,
-        rotateX: 1,
-        rotateY: 0,
+        rotateX: 0,
+        rotateY: 1,
         rotateZ: 0
+};
+
+var lightingOptions = {
+    ambientOn: false,
+    directionalOn: true,
+    pointOn: false,
+    hemisphereOn: false,
+    spotOn: false
 };
 
 //TODO Change lighting menu style to boolean type, only one light on to start with. I give up.
@@ -121,11 +130,50 @@ function init() {
         camera.position.y = 0;
 
         // Mouse control
-        controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.target.set(0,0,0);
-        controls.update();
+ //       controls = new THREE.OrbitControls(camera, renderer.domElement);
+ //       controls.target.set(0,0,0);
+ //       controls.update();
 
         scene = new THREE.Scene();
+
+
+        //add a light of each type
+        //light 1: spot light
+        spotLight = new THREE.SpotLight(0xffff00, 1);
+        spotLight.position.set(0, 0, 15);
+        spotLight.castShadow = true;
+        scene.add(spotLight);      
+        
+
+        //light 2: ambient light
+        ambientLight = new THREE.AmbientLight(0xFFFFFF);
+        ambientLight.position.set(0, 0, 15);
+        ambientLight.castShadow = true;
+        scene.add(ambientLight);       
+
+
+        //light 3: directional light
+        directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
+        directionalLight.position.set(0, 0, 15);
+        directionalLight.castShadow = true;
+        scene.add(directionalLight);     
+
+
+        //light 4: hemisphere light
+        hemisphereLight = new THREE.HemisphereLight(0xFFFFFF, 0xC1C1D1, 1);
+        hemisphereLight.castShadow = true;
+        hemisphereLight.position.set(0, 0, 15);
+        scene.add(hemisphereLight);      
+   
+
+        //light 5: point light
+        pointLight = new THREE.PointLight(0xFFFFFF, 5, 100, 10);
+        pointLight.position.set(0, 0, 15);
+        pointLight.castShadow = true;
+        scene.add(pointLight);
+        
+        
+
 
         var gui = new dat.GUI({
                 autoPlace: false,
@@ -148,13 +196,53 @@ function init() {
         //allow the user to upload their own XYZ file
         gui.add(xyzFiles, 'loadFile').name('Upload XYZ');
 
-        //GUI to allow the user to select a lighting type
-        var guiF2 = gui.addFolder('Lighting Types (By Default, All are Enabled!)');
-        guiF2.add(lighting, 'Ambient');
-        guiF2.add(lighting, 'Directional');
-        guiF2.add(lighting, 'Point');
-        guiF2.add(lighting, 'Hemisphere');
-        guiF2.add(lighting, 'Spot');
+        //GUI to allow the user to select a lighting type - each onchange function will add/remove the light accordingly
+        var guiF2 = gui.addFolder('Lighting Types');
+        guiF2.add(lightingOptions, 'ambientOn').name('Ambient').onChange(function () {
+            if (lightingOptions.ambientOn) {
+                scene.add(ambientLight);
+            }
+            else {
+                scene.remove(ambientLight);
+            }
+        }).setValue(lightingOptions.ambientOn);
+
+        guiF2.add(lightingOptions, 'directionalOn').name('Directional').setValue(lightingOptions.directionalOn).onChange(function () {
+            if (lightingOptions.directionalOn) {                
+                directionalLight.intensity = options.intensity;
+            }
+            else {
+                directionalLight.intensity = 0;
+            }
+        }).setValue(lightingOptions.directionalOn);
+
+        guiF2.add(lightingOptions, 'pointOn').name('Point').onChange(function () {
+            if (lightingOptions.pointOn) {
+                pointLight.intensity = options.intensity;
+            }
+            else {
+                pointLight.intensity = 0;
+            }
+        }).setValue(lightingOptions.pointOn);
+
+        guiF2.add(lightingOptions, 'hemisphereOn').name('Hemisphere').onChange(function () {
+            if (lightingOptions.hemisphereOn) {
+                hemisphereLight.intensity = options.intensity;
+            }
+            else {
+                hemisphereLight.intensity = 0;
+            }
+        }).setValue(lightingOptions.hemisphereOn);
+
+        guiF2.add(lightingOptions, 'spotOn').name('Spot').onChange(function () {
+            if (lightingOptions.spotOn) {
+                spotLight.intensity = options.intensity;
+            }
+            else {
+                spotLight.intensity = 0;
+            }
+        }).setValue(lightingOptions.spotOn);
+
 
         //GUI to allow the user to specify lighting parameters
         var guiF3 = gui.addFolder('Render Options (Type in Colors)');
@@ -175,37 +263,8 @@ function init() {
         guiF3.open();
 
 
-        //add a light of each type
-        //light 1: spot light
-        spotLight = new THREE.SpotLight(0xffffff, 1);
-        spotLight.position.set(0, 0, 15);
-        spotLight.castShadow = true;
-        scene.add(spotLight);
-
-        //light 2: ambient light
-        ambientLight = new THREE.AmbientLight(0xFFFFFF);
-        ambientLight.position.set(0,0,15);
-        ambientLight.castShadow = true;
-        scene.add(ambientLight);
-
-        //light 3: directional light
-        directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
-        directionalLight.position.set(0,0,15);
-        directionalLight.castShadow = true;
-        scene.add(directionalLight);
-
-        //light 4: hemisphere light
-        hemisphereLight = new THREE.HemisphereLight(0xFFFFFF, 0xC1C1D1, 1);
-        hemisphereLight.castShadow = true;
-        hemisphereLight.position.set(0,0,15);
-        scene.add(hemisphereLight);
-
-        //light 5: point light
-        pointLight = new THREE.PointLight(0xFFFFFF, 5, 100, 10);
-        pointLight.position.set(0,0,15);
-        pointLight.castShadow = true;
-        scene.add(pointLight);
-
+        //fix an inproper css margin on the color picker
+        $('.saturation-field').css('margin-right', 0);
 
         //handler for when the user selects an XYZ file
         var fileInput = document.getElementById('myInput');
@@ -260,10 +319,21 @@ function updateLighting(primaryColor, secondaryColor, intensity) {
         hemisphereLight.color.setHex(primaryColor);
         hemisphereLight.groundColor.setHex(secondaryColor);
 
-        directionalLight.intensity = intensity;
-        pointLight.intensity = intensity;
-        spotLight.intensity = intensity;
-        hemisphereLight.intensity = intensity;
+        if(lightingOptions.directionalOn){
+            directionalLight.intensity = intensity;
+        }
+        
+        if(lightingOptions.pointOn){
+            pointLight.intensity = intensity;
+        }
+
+        if(lightingOptions.spotOn){
+            spotLight.intensity = intensity;
+        }
+
+        if(lightingOptions.hemisphereOn){
+            hemisphereLight.intensity = intensity;
+        }
 }
 
 //updates every frame used for animation and input handling
@@ -367,8 +437,8 @@ function createMolecule(xyz) {
                 if(element in scaleArray)
                         scaleAmount = scaleArray[element];
 
-                console.log(element);
-                console.log(scaleAmount);
+                //console.log(element);
+                //console.log(scaleAmount);
 
                 //scale the sphere
                 sphere.scale.x = scaleAmount;
