@@ -1,5 +1,5 @@
 /*
-    Graphics Assignment 2
+    Graphics Assignment 3
     Group Members: Justin, Tyler, Will, Michael, Guy
 */
 
@@ -424,8 +424,6 @@ function createMolecule(xyz) {
 
                 //add the sphere to the molecule object (so we can rotate the entire object later)
                 molecule.add(sphere);
-
-
         }
 
         //add the molecule to the scene
