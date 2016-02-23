@@ -247,6 +247,9 @@ function init() {
         guiF3.open();
 
 
+        //fix an inproper css margin on the color picker
+        $('.saturation-field').css('margin-right', 0);
+
         //handler for when the user selects an XYZ file
         var fileInput = document.getElementById('myInput');
         fileInput.addEventListener('change', function (e) {
