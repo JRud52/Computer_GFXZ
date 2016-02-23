@@ -39,6 +39,18 @@ var xyzFiles = {
         Caffeine: function() {
                 readMolecule('./molecules/caffeine.xyz');
         },
+        DNA: function() {
+                readMolecule('./molecules/dna.xyz');
+        },
+        Riboflavin: function() {
+                readMolecule('./molecules/riboflavin.xyz');
+        },
+        Salt: function() {
+                readMolecule('./molecules/salt.xyz');
+        },
+        UraniumHexafluoride: function() {
+                readMolecule('./molecules/uraniumhexafluoride.xyz');
+        },
         loadFile: function() {
                 $('#myInput').click();
         }
@@ -128,6 +140,10 @@ function init() {
         guiF1.add(xyzFiles, 'Methamphetamine');
         guiF1.add(xyzFiles, 'Tetrasilete');
         guiF1.add(xyzFiles, 'Caffeine');
+        guiF1.add(xyzFiles, 'DNA').name('Deoxyribonucleic Acid');
+        guiF1.add(xyzFiles, 'Salt');
+        guiF1.add(xyzFiles, 'Riboflavin');
+        guiF1.add(xyzFiles, 'UraniumHexafluoride').name('Uranium Hexafluoride');
 
         //allow the user to upload their own XYZ file
         gui.add(xyzFiles, 'loadFile').name('Upload XYZ');
