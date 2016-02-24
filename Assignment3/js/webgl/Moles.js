@@ -55,7 +55,7 @@ var xyzFiles = {
                 readMolecule('./molecules/sodiumdichromate.xyz');
         },
         Reineckes: function() {
-                readMolecule('./molecules/reineckesalt.xyz');
+                readMolecule('./molecules/reineckessalt.xyz');
         },
         Phosphomolybdicacid: function() {
                 readMolecule('./molecules/phosphomolybdicacid.xyz');
