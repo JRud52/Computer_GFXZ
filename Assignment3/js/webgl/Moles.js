@@ -6,6 +6,7 @@
 var camera, scene, renderer, controls, stats;
 var clock = new THREE.Clock();
 
+//Create the 5 lights.
 var ambientLight = new THREE.AmbientLight();
 var directionalLight = new THREE.DirectionalLight();
 var hemisphereLight = new THREE.HemisphereLight();
@@ -15,6 +16,7 @@ var spotLight = new THREE.SpotLight();
 var molecule = new THREE.Object3D();
 
 //This works on server side only!
+//All of the included XYZ molecule files.
 var xyzFiles = {
         Anatoxin: function() {
                 readMolecule('./molecules/anatoxin-a.xyz');
@@ -34,9 +36,6 @@ var xyzFiles = {
         Caffeine: function() {
                 readMolecule('./molecules/caffeine.xyz');
         },
-        DNA: function() {
-                readMolecule('./molecules/dna.xyz');
-        },
         Riboflavin: function() {
                 readMolecule('./molecules/riboflavin.xyz');
         },
@@ -45,6 +44,48 @@ var xyzFiles = {
         },
         UraniumHexafluoride: function() {
                 readMolecule('./molecules/uraniumhexafluoride.xyz');
+        },
+        Yttrium: function() {
+                readMolecule('./molecules/yttriumoxosilanediolate.xyz');
+        },
+        Uranyl: function() {
+                readMolecule('./molecules/uranylacetate.xyz');
+        },
+        SodiumDichromate: function() {
+                readMolecule('./molecules/sodiumdichromate.xyz');
+        },
+        Reineckes: function() {
+                readMolecule('./molecules/reineckesalt.xyz');
+        },
+        Phosphomolybdicacid: function() {
+                readMolecule('./molecules/phosphomolybdicacid.xyz');
+        },
+        LeadZirconate: function() {
+                readMolecule('./molecules/leadzirconate.xyz');
+        },
+        Hexadecacarbonylhexarhoium: function() {
+                readMolecule('./molecules/Hexadecacarbonylhexarhodium.xyz');
+        },
+        Ferric: function() {
+                readMolecule('./molecules/ferricnitrate.xyz');
+        },
+        Diammonium: function() {
+                readMolecule('./molecules/diammonium.xyz');
+        },
+        Chlorinetetraoxide: function() {
+                readMolecule('./molecules/chlorinetetroxide.xyz');
+        },
+        Ceric: function() {
+                readMolecule('./molecules/Cericammoniumnitrate.xyz');
+        },
+        Carboplatin: function() {
+                readMolecule('./molecules/carboplatin.xyz');
+        },
+        AmmoniumThiocyanate: function() {
+                readMolecule('./molecules/ammoniumthiocyanate.xyz');
+        },
+        Aluminum: function() {
+                readMolecule('./molecules/aluminumarsenate.xyz');
         },
         loadFile: function() {
                 $('#myInput').click();
@@ -154,9 +195,22 @@ function init() {
         guiF1.add(xyzFiles, 'Methamphetamine');
         guiF1.add(xyzFiles, 'Tetrasilete');
         guiF1.add(xyzFiles, 'Caffeine');
-        guiF1.add(xyzFiles, 'DNA').name('Deoxyribonucleic Acid');
         guiF1.add(xyzFiles, 'Salt');
         guiF1.add(xyzFiles, 'Riboflavin');
+        guiF1.add(xyzFiles, 'Yttrium').name('Yttrium Oxosilanediolate');
+        guiF1.add(xyzFiles, 'Uranyl').name('Uranyl Acetate');
+        guiF1.add(xyzFiles, 'SodiumDichromate').name('Sodium Diochromate');
+        guiF1.add(xyzFiles, 'Reineckes').name('Reineckes Salt');
+        guiF1.add(xyzFiles, 'Phosphomolybdicacid').name('Phosphomolybdic Acid');
+        guiF1.add(xyzFiles, 'LeadZirconate').name('Lead Zirconate Titanate');
+        guiF1.add(xyzFiles, 'Hexadecacarbonylhexarhoium').name('Hexadecacarbonylhexarhodium');
+        guiF1.add(xyzFiles, 'Ferric').name('Ferric Nitrate');
+        guiF1.add(xyzFiles, 'Diammonium').name('Diammonium Dioxidomolybdenum');
+        guiF1.add(xyzFiles, 'Chlorinetetraoxide').name('Chlorine Tetroxide');
+        guiF1.add(xyzFiles, 'Ceric').name('Ceric Ammonium Nitrate');
+        guiF1.add(xyzFiles, 'Carboplatin').name('Carboplatin');
+        guiF1.add(xyzFiles, 'AmmoniumThiocyanate').name('Ammonium Thiocyanate');
+        guiF1.add(xyzFiles, 'Aluminum').name('Aluminum Arsenate');
         guiF1.add(xyzFiles, 'UraniumHexafluoride').name('Uranium Hexafluoride');
 
         //allow the user to upload their own XYZ file
@@ -284,6 +338,7 @@ function updateLighting(primaryColor, secondaryColor, intensity) {
         hemisphereLight.color.setHex(primaryColor);
         hemisphereLight.groundColor.setHex(secondaryColor);
 
+        //Use the intensity only if the light is enabled.
         if(lightingOptions.directionalOn){
             directionalLight.intensity = intensity;
         }
@@ -334,6 +389,7 @@ function animate() {
 
 function createMolecule(xyz) {
 
+        //For determining the atomic formula
         var atomicFormula = "";
         var elementArray = {
                 H: 0, He: 0,
@@ -429,6 +485,7 @@ function createMolecule(xyz) {
         //add the molecule to the scene
         scene.add(molecule);
 
+        //Generate the atomic formula text
         for (var key in elementArray) {
                 if(elementArray[key] > 0)
                         atomicFormula += key+"<sub>"+elementArray[key]+"</sub>";
