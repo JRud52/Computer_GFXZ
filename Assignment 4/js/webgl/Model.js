@@ -40,8 +40,9 @@ function init() {
 
         //New perspective camera, positioned to face the trees and such.
         camera = new THREE.PerspectiveCamera(60, 550/450, 0.1, 10000);
-        camera.position.z = 15;
-        camera.position.y = 0;
+        camera.position.z = 5;
+        camera.position.y = 5;
+        camera.lookAt(new THREE.Vector3(0,0,0));
 
         scene = new THREE.Scene();
 
@@ -50,6 +51,12 @@ function init() {
         ambientLight.position.set(0, 0, 15);
         ambientLight.castShadow = true;
         scene.add(ambientLight);
+
+        var objectLoader = new THREE.ObjectLoader();
+	objectLoader.load("models/feels.json", function ( obj ) {
+	 	scene.add( obj );
+	} );
+
 }
 
 //read the XYZ file
