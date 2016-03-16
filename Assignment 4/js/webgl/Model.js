@@ -3,8 +3,9 @@
     Group Members: Justin, Tyler, Will, Michael, Guy
 */
 
-var camera, scene, renderer, controls, stats;
+var camera, scene, renderer, controls, stats, collisionCube;
 var clock = new THREE.Clock();
+var wallList = [];
 
 /*
     ONLOAD FUNCTION
@@ -105,9 +106,14 @@ function init() {
         }
 
 
+        
+        var cubeGeo = new THREE.BoxGeometry(3, 3, 3);
+        var cubMat = new THREE.MeshPhongMaterial({ color: 0xff0000, wireframe: true });
+        collisionCube = new THREE.Mesh(cubeGeo, cubMat);        
 
+        scene.add(collisionCube);
 
-
+        console.log(collisionCube.position);
 }
 
 function randomInt(min, max) {
@@ -134,13 +140,37 @@ function drawWall(x, z, rY) {
         cube.position.x = x * 10;
         cube.position.z = z * 10;
         cube.rotateY(toRads(rY));
-
+  
+        wallList.push(cube);
+        
         scene.add(cube);
 }
 
 
 //updates every frame used for animation and input handling
 function render() {
+          
+        collisionCube.position.set(camera.position.x, 0, camera.position.z);                
+
+        //cast a ray from the origin of the player's collision cube to each of its vertices
+        //loop through all of the vertices in the collision cube
+        for (var i = 0; i < collisionCube.geometry.vertices.length; i++) {
+            
+            //get the vertex in global space by cloning the vertex in local space then apply the matrix of the collision cube
+            var vertexGlobalSpace = collisionCube.geometry.vertices[i].clone().applyMatrix4(collisionCube.matrix);
+
+            //get the vector that points from the vertex in global space to the cube's origin
+            var rayDirection = vertexGlobalSpace.sub(collisionCube.position);
+
+            //cast a ray from the origin of the player's collision cube towards the vertex - normalize because we only care about direction
+            var ray = new THREE.Raycaster(collisionCube.position, vertexGlobalSpace.normalize());
+
+            //check if the ray to the vertex collides with any of the walls
+            var collisions = ray.intersectObjects(wallList);
+            if (collisions.length > 0 && collisions[0].distance < rayDirection.length()){
+                console.log(" Hit ");
+            }
+        }
 
         //render the scene
         renderer.render(scene, camera);
