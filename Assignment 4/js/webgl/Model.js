@@ -25,19 +25,19 @@ function init() {
                 antialias: true,
                 alpha: true
         });
-        renderer.setClearColor(0x505050 , 0.5);
+        renderer.setClearColor(0x808080, 0.5);
         renderer.setPixelRatio(550 / 450);
         renderer.setSize(550, 450);
         container.appendChild(renderer.domElement);
 
         //New perspective camera, positioned to face the trees and such.
-        camera = new THREE.PerspectiveCamera(90, 550/450, 0.1, 10000);
+        camera = new THREE.PerspectiveCamera(90, 550 / 450, 0.1, 10000);
         //camera.position.z = 5;
         camera.position.y = 50;
-        camera.lookAt(new THREE.Vector3(0,0,0));
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-        var orbit = new THREE.OrbitControls( camera, renderer.domElement );
-			//orbit.enableZoom = false;
+        var orbit = new THREE.OrbitControls(camera, renderer.domElement);
+        //orbit.enableZoom = false;
 
         scene = new THREE.Scene();
 
@@ -45,7 +45,7 @@ function init() {
         ambientLight = new THREE.AmbientLight(0xFFFFFF);
         ambientLight.position.set(0, 0, 15);
         ambientLight.castShadow = true;
-        //scene.add(ambientLight);
+        scene.add(ambientLight);
 
         hemisphereLight = new THREE.HemisphereLight(0xFFFFFF, 0xC1C1D1, 0.25);
         hemisphereLight.castShadow = true;
@@ -53,24 +53,27 @@ function init() {
         scene.add(hemisphereLight);
 
         var objectLoader = new THREE.ObjectLoader();
-	objectLoader.load("models/feels.json", function ( obj ) {
-	 	//scene.add( obj );
-	} );
+        objectLoader.load("models/feels.json", function(obj) {
+                //scene.add( obj );
+        });
 
 
 
         //Grid
         var size = 500, step = 10;
         var geometry = new THREE.Geometry();
-        for ( var i = - size; i <= size; i += step ) {
-        	geometry.vertices.push( new THREE.Vector3( - size, 0, i ) );
-        	geometry.vertices.push( new THREE.Vector3(   size, 0, i ) );
-        	geometry.vertices.push( new THREE.Vector3( i, 0, - size ) );
-        	geometry.vertices.push( new THREE.Vector3( i, 0,   size ) );
+        for (var i = -size; i <= size; i += step) {
+                geometry.vertices.push(new THREE.Vector3(-size, 0, i));
+                geometry.vertices.push(new THREE.Vector3(size, 0, i));
+                geometry.vertices.push(new THREE.Vector3(i, 0, -size));
+                geometry.vertices.push(new THREE.Vector3(i, 0, size));
         }
-        var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.5 } );
-        var line = new THREE.LineSegments( geometry, material );
-        scene.add( line );
+        var material = new THREE.LineBasicMaterial({
+                color: 0x000000,
+                opacity: 0.5
+        });
+        var line = new THREE.LineSegments(geometry, material);
+        scene.add(line);
 
         //0,0,0 point
         var pointGeometry = new THREE.Geometry();
@@ -83,35 +86,56 @@ function init() {
         var point = new THREE.Points(pointGeometry, pointMaterial);
         scene.add(point);
 
-        drawWall(0,0,0);
-        drawWall(10,0,0);
-        drawWall(0,10,0);
-        drawWall(10,10,270);
+        //drawWall(0, 0, 0);
+        //drawWall(1, 0, 0);
+        //drawWall(0, 1, 0);
+        //drawWall(1, 1, 270);
+
+        var degrees = [0, 90, 180, 270];
+
+        for(i = 0; i < 10; i++) {
+
+                for(j = 0; j < 10; j++) {
+
+                        if(randomInt(0,1) == 1) {
+
+                                drawWall(i, j, degrees[randomInt(0,3)]);
+                        }
+                }
+        }
 
 
 
 
 
 }
-function toRads(degrees) { return degrees * (3.14/180) }
 
-//Just give it the X point in the grid to start at
-function drawWall(x,z, rY) {
+function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-        var geometry = new THREE.BoxGeometry( 10, 10, 1 );
-        geometry.translate(5,5,0); //Adjust origin point
-        var material = new THREE.MeshPhongMaterial( {color: 0xFFFFFF, emissive: 0x072534,
-					side: THREE.DoubleSide,
-					shading: THREE.SmoothShading} );
-        var cube = new THREE.Mesh( geometry, material );
+function toRads(degrees) {
+        return degrees * (3.14 / 180)
+}
 
-        cube.position.x = x;
-        cube.position.z = z;
+//Just give it the X and Z point in the grid to start at
+function drawWall(x, z, rY) {
+
+        var geometry = new THREE.BoxGeometry(10, 10, 1);
+        geometry.translate(5, 5, 0); //Adjust origin point
+        var material = new THREE.MeshPhongMaterial({
+                color: 0xFF0000,
+                emissive: 0x072534,
+                side: THREE.DoubleSide,
+                shading: THREE.SmoothShading
+        });
+        var cube = new THREE.Mesh(geometry, material);
+
+        cube.position.x = x * 10;
+        cube.position.z = z * 10;
         cube.rotateY(toRads(rY));
 
         scene.add(cube);
-
-
 }
 
 
