@@ -106,10 +106,7 @@ function init() {
                 }
         }*/
 
-        var maze;
-        var frontier;
-
-        var cells = generateArrays(10);
+        var cells = generateArrays(5);
 
         for(i = 0; i < cells.length; i++) {
                 for(j = 0; j < cells[i].length; j++) {
@@ -120,17 +117,117 @@ function init() {
                         drawWall(cells[i][j].bottomWall[0],cells[i][j].bottomWall[1],cells[i][j].bottomWall[2]);
                 }
         }
+
+        var maze = primsMaze(cells);
 }
 
 function randomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+        return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function toRads(degrees) {
         return degrees * (3.14 / 180)
 }
 
+function pushFrontier(cells, frontier, direction, i, j) {
 
+        if(direction == "right")
+                j += 1;
+
+        else if(direction == "left")
+                j -= 1;
+
+        else if(direction == "up")
+                i -= 1;
+
+        else if(direction == "down")
+                i += 1;
+
+        if(cells[i][j].visited != true) {
+                cells[i][j].visited = true;
+                frontier.push(cells[i][j]);
+        }
+}
+
+function addNeighbours(cells, frontier, i, j) {
+
+        if(i == 0) { //Top Row
+
+                if(j == 0) { //Top Left
+                        pushFrontier(cells, frontier, "right", i, j);
+                }
+                else if(j == cells.length-1) { //Top Right
+                        pushFrontier(cells, frontier, "left", i, j);
+                }
+                else { //Middle
+                        pushFrontier(cells, frontier, "right", i, j);
+                        pushFrontier(cells, frontier, "left", i, j);
+                }
+                pushFrontier(cells, frontier, "down", i, j);
+        }
+        else if(i == cells.length-1) { //Bottom Row
+
+                if(j == 0) { //Bottom Left
+                        pushFrontier(cells, frontier, "right", i, j);
+                }
+                else if(j == cells.length-1) { //Bottom Right
+                        pushFrontier(cells, frontier, "left", i, j);
+                }
+                else { //Middle
+                        pushFrontier(cells, frontier, "right", i, j);
+                        pushFrontier(cells, frontier, "left", i, j);
+                }
+                pushFrontier(cells, frontier, "up", i, j);
+        }
+        else if(j == 0) { //Left Column
+
+                //Top Left already taken care of.
+                //Bottom Left already taken care of.
+                pushFrontier(cells, frontier, "up", i, j);
+                pushFrontier(cells, frontier, "down", i, j);
+                pushFrontier(cells, frontier, "right", i, j);
+        }
+        else if(j == cells.length-1) { //Right Column
+
+                //Top right already taken care of.
+                //Bottom right already taken care of.
+                pushFrontier(cells, frontier, "up", i, j);
+                pushFrontier(cells, frontier, "down", i, j);
+                pushFrontier(cells, frontier, "left", i, j;
+        }
+        else { //Its somewhere NORMAL
+
+                pushFrontier(cells, frontier, "up", i, j); //up
+                pushFrontier(cells, frontier, "down", i, j); //DOWN
+                pushFrontier(cells, frontier, "left", i, j); //left
+                pushFrontier(cells, frontier, "right", i, j); //right
+        }
+}
+
+function primsMaze(cells) {
+
+        var maze = [];
+        var frontier = [];
+
+        var i = randomInt(0, cells.length-1);
+        var j = randomInt(0, cells.length-1);
+
+        addNeighbours(cells, frontier, i, j);
+
+        while(frontier.length != 0) {
+
+                randomNeighbour = randomInt(0, frontier.length);
+                maze.push(frontier[randomNeighbour]);
+                frontier.splice(randomNeighbour,1); // Remove it from the frontier
+
+                frontierX = maze[maze.length-1].xIndex;
+                frontierY = maze[maze.length-1].yIndex;
+
+                if(maze[maze.length-1].xIndex)
+        }
+
+        return maze;
+}
 
 function generateArrays(size) {
 
@@ -150,7 +247,10 @@ function generateArrays(size) {
                                 leftWall: [i,j,270],
                                 rightWall: [i+1,j,270],
                                 topWall: [i,j,0],
-                                bottomWall: [i,j+1,0]
+                                bottomWall: [i,j+1,0],
+                                xIndex: i,
+                                yIndex: j,
+                                visited: false
                         };
                 }
         }
