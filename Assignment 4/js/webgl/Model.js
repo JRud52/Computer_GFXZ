@@ -6,6 +6,8 @@
 var camera, scene, renderer, controls, stats;
 var clock = new THREE.Clock();
 
+
+
 /*
     ONLOAD FUNCTION
 */
@@ -33,7 +35,7 @@ function init() {
         //New perspective camera, positioned to face the trees and such.
         camera = new THREE.PerspectiveCamera(90, 550 / 450, 0.1, 10000);
         //camera.position.z = 5;
-        camera.position.y = 50;
+        camera.position.y = 100;
         camera.lookAt(new THREE.Vector3(0, 0, 0));
 
         var orbit = new THREE.OrbitControls(camera, renderer.domElement);
@@ -91,8 +93,8 @@ function init() {
         //drawWall(0, 1, 0);
         //drawWall(1, 1, 270);
 
+        /*
         var degrees = [0, 90, 180, 270];
-
         for(i = 0; i < 10; i++) {
 
                 for(j = 0; j < 10; j++) {
@@ -102,12 +104,22 @@ function init() {
                                 drawWall(i, j, degrees[randomInt(0,3)]);
                         }
                 }
+        }*/
+
+        var maze;
+        var frontier;
+
+        var cells = generateArrays(10);
+
+        for(i = 0; i < cells.length; i++) {
+                for(j = 0; j < cells[i].length; j++) {
+
+                        drawWall(cells[i][j].leftWall[0],cells[i][j].leftWall[1],cells[i][j].leftWall[2]);
+                        drawWall(cells[i][j].rightWall[0],cells[i][j].rightWall[1],cells[i][j].rightWall[2]);
+                        drawWall(cells[i][j].topWall[0],cells[i][j].topWall[1],cells[i][j].topWall[2]);
+                        drawWall(cells[i][j].bottomWall[0],cells[i][j].bottomWall[1],cells[i][j].bottomWall[2]);
+                }
         }
-
-
-
-
-
 }
 
 function randomInt(min, max) {
@@ -116,6 +128,34 @@ function randomInt(min, max) {
 
 function toRads(degrees) {
         return degrees * (3.14 / 180)
+}
+
+
+
+function generateArrays(size) {
+
+        cells = new Array(size);
+
+        for(i = 0; i < size; i++) {
+
+                cells[i] = new Array(size);
+        }
+
+        for(i = 0; i < cells.length; i++) {
+
+                for(j = 0; j < cells[i].length; j++) {
+
+                        cells[i][j] = {
+
+                                leftWall: [i,j,270],
+                                rightWall: [i+1,j,270],
+                                topWall: [i,j,0],
+                                bottomWall: [i,j+1,0]
+                        };
+                }
+        }
+
+        return cells;
 }
 
 //Just give it the X and Z point in the grid to start at
