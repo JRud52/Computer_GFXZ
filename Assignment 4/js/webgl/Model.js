@@ -45,8 +45,8 @@ function init() {
         //New perspective camera, positioned to face the trees and such.
         camera = new THREE.PerspectiveCamera(50, 550 / 450, 0.1, 1000);
         //camera.position.z = 5;
-        camera.position.y = 100;
-        //camera.lookAt(new THREE.Vector3(0, 0, 0));
+        camera.position.y = 250;
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
 
         var orbit = new THREE.OrbitControls(camera, renderer.domElement);
         //orbit.enableZoom = false;
@@ -437,6 +437,7 @@ function render() {
 //    collisionObj.position.set(camera.position.x, collisionObj.position.y, camera.position.z);
     var collisionObjPos = collisionObj.position.clone();
 
+    /*
     //cast a ray from the origin of the player's collision cube to each of its vertices
     //loop through all of the vertices in the collision cube
     for (var i = 0; i < collisionObj.geometry.vertices.length; i++) {
@@ -486,7 +487,7 @@ function render() {
             console.log(collisionObj.geometry.vertices[i]);
         }
     }
-
+*/
     //render the scene
     renderer.render(scene, camera);
 }
