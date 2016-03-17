@@ -3,15 +3,19 @@
     Group Members: Justin, Tyler, Will, Michael, Guy
 */
 
-var camera, scene, renderer, controls, stats;
+var camera, scene, renderer, controls, stats, collisionObj, lastCubePos;
 var clock = new THREE.Clock();
+var wallList = [];
+
+//Variable for entering keys.
+var keyState = [];
 
 /*
     ONLOAD FUNCTION
 */
 function main() {
-        init();
-        animate();
+    init();
+    animate();
 }
 
 //initial setup
@@ -95,6 +99,19 @@ function init() {
         mesh.rotation.x = -Math.PI / 2;
         mesh.receiveShadow = true;
         scene.add(mesh);
+
+        var collisionGeo = new THREE.CylinderGeometry(4, 4, 1, 16, 1);
+        var collisionMat = new THREE.MeshPhongMaterial({ color: 0xff0000, wireframe: true });
+        collisionObj = new THREE.Mesh(collisionGeo, collisionMat);
+
+        camera.position.y = 20;
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+        scene.add(collisionObj);
+
+        //event listeners for movement and firing
+        window.addEventListener('keydown', onKeyDown, false);
+        window.addEventListener('keyup', onKeyUp, false);
 
         var cells = generateArrays(5);
         primsMaze(cells);
@@ -395,19 +412,106 @@ function drawWall(z, x, rY, clr) {
 
 
         scene.add(cube);
-        animate();
+
+            //add the cube to the list of walls needed for collision
+            wallList.push(cube);
+
+            scene.add(cube);
 }
 
-
+//testing purposes only remove later
+var point = null, point2 = null, point3 = null;
 //updates every frame used for animation and input handling
 function render() {
+    collisionObj.geometry.verticesNeedUpdate = true;
 
-        //render the scene
-        renderer.render(scene, camera);
+//    collisionObj.position.set(camera.position.x, collisionObj.position.y, camera.position.z);
+    var collisionObjPos = collisionObj.position.clone();
+
+    //cast a ray from the origin of the player's collision cube to each of its vertices
+    //loop through all of the vertices in the collision cube
+    for (var i = 0; i < collisionObj.geometry.vertices.length; i++) {
+
+        //get the vertex in global space by cloning the vertex in local space then apply the matrix of the collision cube
+        var vertexGlobalSpace = collisionObj.geometry.vertices[i].clone().applyMatrix4(collisionObj.matrix);
+
+        //get the vector that points from the vertex in global space to the cube's origin
+        var rayDirection = vertexGlobalSpace.sub(collisionObj.position);
+
+        //cast a ray from the origin of the player's collision cube towards the vertex - normalize because we only care about direction
+        var ray = new THREE.Raycaster(collisionObjPos, rayDirection.clone().normalize());
+
+        //check if the ray to the vertex collides with any of the walls
+        var collisions = ray.intersectObjects(wallList);
+        if (collisions.length > 0 && collisions[0].distance < rayDirection.length()){
+            //console.log(" Hit ");
+        }
+
+
+        //TESTING ONLY
+        if (i == 0 && point == null) {
+            var pointGeo = new THREE.SphereGeometry(0.25, 32, 32);
+            var pointMat = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
+            point = new THREE.Mesh(pointGeo, pointMat);
+            scene.add(point);
+            point.position.set(vertexGlobalSpace.x, vertexGlobalSpace.y, vertexGlobalSpace.z);
+            console.log(vertexGlobalSpace);
+            console.log(collisionObj.geometry.vertices[i]);
+        }
+        else if (i == 1 && point2 == null) {
+            var pointGeo = new THREE.SphereGeometry(0.25, 32, 32);
+            var pointMat = new THREE.MeshPhongMaterial({ color: 0x0000ff });
+            point2 = new THREE.Mesh(pointGeo, pointMat);
+            scene.add(point2);
+            point2.position.set(vertexGlobalSpace.x, vertexGlobalSpace.y, vertexGlobalSpace.z);
+            console.log(vertexGlobalSpace);
+            console.log(collisionObj.geometry.vertices[i]);
+        }
+        else if (i == 8 && point3 == null) {
+            var pointGeo = new THREE.SphereGeometry(0.25, 32, 32);
+            var pointMat = new THREE.MeshPhongMaterial({ color: 0x00ffff });
+            point2 = new THREE.Mesh(pointGeo, pointMat);
+            scene.add(point2);
+            point2.position.set(vertexGlobalSpace.x, vertexGlobalSpace.y, vertexGlobalSpace.z);
+            console.log(vertexGlobalSpace);
+            console.log(collisionObj.geometry.vertices[i]);
+        }
+    }
+
+    //render the scene
+    renderer.render(scene, camera);
 }
 
 function animate() {
+    requestAnimationFrame(animate);
+    render();
+}
 
-        requestAnimationFrame(animate);
-        render();
+
+//handles keydown events
+function onKeyDown(event) {
+    keyState[event.keyCode || event.charCode] = true;
+}
+
+//handles keyup events
+function onKeyUp(event) {
+    keyState[event.keyCode || event.charCode] = false;
+}
+
+
+//checks if the user hit specific keys for movement
+function handleInput() {
+    //movement and rotation WASD
+    if (keyState['a'.charCodeAt(0) - 32]) {
+        collisionObj.rotateZ(0.1);
+    }
+    if (keyState['d'.charCodeAt(0) - 32]) {
+        collisionObj.rotateZ(-0.1);
+    }
+    if (keyState['w'.charCodeAt(0) - 32]) {
+        collisionObj.translateY(2);
+    }
+    if (keyState['s'.charCodeAt(0) - 32]) {
+        collisionObj.translateY(-2);
+    }
 }
