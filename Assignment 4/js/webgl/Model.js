@@ -326,8 +326,15 @@ function primsMaze(cells) {
                 addNeighbours(cells, frontier, cellX, cellY);
 
                 frontier.splice(randomNeighbour,1); // Remove it from the frontier
-
         }
+
+        //Remove an entrance and an exit.
+
+        var entranceX = randomInt(0, cells.length-1);
+        var exitX = randomInt(0, cells.length-1);
+
+        cells[entranceX][0].leftWall = null;
+        cells[exitX][cells.length-1].rightWall = null;
 }
 
 function generateArrays(size) {
