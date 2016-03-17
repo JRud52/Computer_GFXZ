@@ -106,7 +106,7 @@ function init() {
                 }
         }*/
 
-        var cells = generateArrays(5);
+        var cells = generateArrays(2);
 
         for(i = 0; i < cells.length; i++) {
                 for(j = 0; j < cells[i].length; j++) {
@@ -117,8 +117,7 @@ function init() {
                         drawWall(cells[i][j].bottomWall[0],cells[i][j].bottomWall[1],cells[i][j].bottomWall[2]);
                 }
         }
-
-        var maze = primsMaze(cells);
+        primsMaze(cells);
 }
 
 function randomInt(min, max) {
@@ -193,7 +192,7 @@ function addNeighbours(cells, frontier, i, j) {
                 //Bottom right already taken care of.
                 pushFrontier(cells, frontier, "up", i, j);
                 pushFrontier(cells, frontier, "down", i, j);
-                pushFrontier(cells, frontier, "left", i, j;
+                pushFrontier(cells, frontier, "left", i, j);
         }
         else { //Its somewhere NORMAL
 
@@ -204,29 +203,39 @@ function addNeighbours(cells, frontier, i, j) {
         }
 }
 
+function removeWall(cells, frontier, i, j) {
+
+
+
+
+}
+
 function primsMaze(cells) {
 
-        var maze = [];
         var frontier = [];
 
         var i = randomInt(0, cells.length-1);
         var j = randomInt(0, cells.length-1);
 
+        cells[i][j].inMaze = true;
+        cells[i][j].visited = true;
+
         addNeighbours(cells, frontier, i, j);
 
         while(frontier.length != 0) {
 
-                randomNeighbour = randomInt(0, frontier.length);
-                maze.push(frontier[randomNeighbour]);
+                var randomNeighbour = randomInt(0, frontier.length-1);
+
+                var cellX = frontier[randomNeighbour].xIndex;
+                var cellY = frontier[randomNeighbour].yIndex;
+
+                cells[cellX][cellY].inMaze = true;
+
+                addNeighbours(cells, frontier, cellX, cellY);
+
                 frontier.splice(randomNeighbour,1); // Remove it from the frontier
 
-                frontierX = maze[maze.length-1].xIndex;
-                frontierY = maze[maze.length-1].yIndex;
-
-                if(maze[maze.length-1].xIndex)
         }
-
-        return maze;
 }
 
 function generateArrays(size) {
@@ -250,7 +259,8 @@ function generateArrays(size) {
                                 bottomWall: [i,j+1,0],
                                 xIndex: i,
                                 yIndex: j,
-                                visited: false
+                                visited: false,
+                                inMaze: false
                         };
                 }
         }
