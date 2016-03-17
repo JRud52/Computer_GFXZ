@@ -6,8 +6,6 @@
 var camera, scene, renderer, controls, stats;
 var clock = new THREE.Clock();
 
-
-
 /*
     ONLOAD FUNCTION
 */
@@ -15,7 +13,6 @@ function main() {
         init();
         animate();
 }
-
 
 //initial setup
 function init() {
@@ -33,10 +30,10 @@ function init() {
         container.appendChild(renderer.domElement);
 
         //New perspective camera, positioned to face the trees and such.
-        camera = new THREE.PerspectiveCamera(90, 550 / 450, 0.1, 10000);
+        camera = new THREE.PerspectiveCamera(50, 550 / 450, 0.1, 1000);
         //camera.position.z = 5;
         camera.position.y = 100;
-        camera.lookAt(new THREE.Vector3(0, 0, 0));
+        //camera.lookAt(new THREE.Vector3(0, 0, 0));
 
         var orbit = new THREE.OrbitControls(camera, renderer.domElement);
         //orbit.enableZoom = false;
@@ -44,25 +41,25 @@ function init() {
         scene = new THREE.Scene();
 
         //light 2: ambient light
-        ambientLight = new THREE.AmbientLight(0xFFFFFF);
+        ambientLight = new THREE.AmbientLight(0x404040);
         ambientLight.position.set(0, 0, 15);
         ambientLight.castShadow = true;
         scene.add(ambientLight);
 
-        hemisphereLight = new THREE.HemisphereLight(0xFFFFFF, 0xC1C1D1, 0.25);
-        hemisphereLight.castShadow = true;
-        hemisphereLight.position.set(0, 15, 0);
-        scene.add(hemisphereLight);
+        var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.75 );
+        directionalLight.position.set( 0, 1, 0 );
+        scene.add( directionalLight );
 
-        var objectLoader = new THREE.ObjectLoader();
-        objectLoader.load("models/feels.json", function(obj) {
+
+
+        //var objectLoader = new THREE.ObjectLoader();
+        //objectLoader.load("models/feels.json", function(obj) {
                 //scene.add( obj );
-        });
-
-
+        //});
 
         //Grid
-        var size = 500, step = 10;
+        /**
+        var size = 250, step = 10;
         var geometry = new THREE.Geometry();
         for (var i = -size; i <= size; i += step) {
                 geometry.vertices.push(new THREE.Vector3(-size, 0, i));
@@ -76,22 +73,31 @@ function init() {
         });
         var line = new THREE.LineSegments(geometry, material);
         scene.add(line);
+        */
 
-        //0,0,0 point
-        var pointGeometry = new THREE.Geometry();
-        pointGeometry.vertices.push(new THREE.Vector3(0, 0, 0));
-        var pointMaterial = new THREE.PointsMaterial({
-                size: 10,
-                sizeAttenuation: false,
-                color: 0xC551F2
+        var loader = new THREE.TextureLoader();;
+        //Making some grass
+        var groundTexture = loader.load("textures/grass.jpg");
+        groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
+        groundTexture.repeat.set(15, 15);
+        groundTexture.anisotropy = 25;
+        //Grass's material
+        var groundMaterial = new THREE.MeshPhongMaterial({
+                color: 0x505050,
+                specular: 0x101010,
+                map: groundTexture
         });
-        var point = new THREE.Points(pointGeometry, pointMaterial);
-        scene.add(point);
+        //Grass's Mesh
+        var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(200, 200), groundMaterial);
+        mesh.position.y = 0;
+        mesh.position.x = 20;
+        mesh.position.z = 20;
+        mesh.rotation.x = -Math.PI / 2;
+        mesh.receiveShadow = true;
+        scene.add(mesh);
 
         var cells = generateArrays(5);
         primsMaze(cells);
-
-
 
         /**
                 ___ ___
@@ -329,7 +335,6 @@ function primsMaze(cells) {
         }
 
         //Remove an entrance and an exit.
-
         var entranceX = randomInt(0, cells.length-1);
         var exitX = randomInt(0, cells.length-1);
 
@@ -387,6 +392,7 @@ function drawWall(z, x, rY, clr) {
         cube.position.x = x * 10;
         cube.position.z = z * 10;
         cube.rotateY(toRads(rY));
+
 
         scene.add(cube);
         animate();
