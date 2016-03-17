@@ -88,36 +88,84 @@ function init() {
         var point = new THREE.Points(pointGeometry, pointMaterial);
         scene.add(point);
 
-        //drawWall(0, 0, 0);
-        //drawWall(1, 0, 0);
-        //drawWall(0, 1, 0);
-        //drawWall(1, 1, 270);
-
-        /*
-        var degrees = [0, 90, 180, 270];
-        for(i = 0; i < 10; i++) {
-
-                for(j = 0; j < 10; j++) {
-
-                        if(randomInt(0,1) == 1) {
-
-                                drawWall(i, j, degrees[randomInt(0,3)]);
-                        }
-                }
-        }*/
-
-        var cells = generateArrays(2);
-
-        for(i = 0; i < cells.length; i++) {
-                for(j = 0; j < cells[i].length; j++) {
-
-                        drawWall(cells[i][j].leftWall[0],cells[i][j].leftWall[1],cells[i][j].leftWall[2]);
-                        drawWall(cells[i][j].rightWall[0],cells[i][j].rightWall[1],cells[i][j].rightWall[2]);
-                        drawWall(cells[i][j].topWall[0],cells[i][j].topWall[1],cells[i][j].topWall[2]);
-                        drawWall(cells[i][j].bottomWall[0],cells[i][j].bottomWall[1],cells[i][j].bottomWall[2]);
-                }
-        }
+        var cells = generateArrays(5);
         primsMaze(cells);
+
+
+
+        /**
+                ___ ___
+                |__    |
+                |______|
+                TEST
+
+        cells = new Array(2);
+
+        for(i = 0; i < 2; i++)
+                cells[i] = new Array(2);
+        cells[0][0] = {
+
+                leftWall: [0,0,270],
+                rightWall: null,
+                topWall: [0,0,0],
+                bottomWall: [0+1,0,0],
+                xIndex: 0,
+                yIndex: 0,
+                visited: false,
+                inMaze: false,
+                leftColor: 0xFF0000,
+                rightColor: 0x00FF00,
+                topColor: 0x0000FF,
+                bottomColor: 0xF0F0F0
+        };
+        cells[0][1] = {
+
+                leftWall: null,
+                rightWall: [0,1+1,270],
+                topWall: [0,1,0],
+                bottomWall: null,
+                xIndex: 0,
+                yIndex: 1,
+                visited: false,
+                inMaze: false,
+                leftColor: 0xFF0000,
+                rightColor: 0x00FF00,
+                topColor: 0x0000FF,
+                bottomColor: 0xF0F0F0
+        };
+        cells[1][0] = {
+
+                leftWall: [1,0,270],
+                rightWall: null,
+                topWall: [1,0,0],
+                bottomWall: [1+1,0,0],
+                xIndex: 1,
+                yIndex: 0,
+                visited: false,
+                inMaze: false,
+                leftColor: 0xFF0000,
+                rightColor: 0x00FF00,
+                topColor: 0x0000FF,
+                bottomColor: 0xF0F0F0
+        };
+        cells[1][1] = {
+
+                leftWall: null,
+                rightWall: [1,1+1,270],
+                topWall: null,
+                bottomWall: [1+1,1,0],
+                xIndex: 1,
+                yIndex: 1,
+                visited: false,
+                inMaze: false,
+                leftColor: 0xFF0000,
+                rightColor: 0x00FF00,
+                topColor: 0x0000FF,
+                bottomColor: 0xF0F0F0
+        };
+        */
+        drawMaze(cells);
+        //drawWall(1,1,0); //Test individual wall drawing
 }
 
 function randomInt(min, max) {
@@ -145,6 +193,23 @@ function pushFrontier(cells, frontier, direction, i, j) {
         if(cells[i][j].visited != true) {
                 cells[i][j].visited = true;
                 frontier.push(cells[i][j]);
+        }
+}
+
+function drawMaze(cells) {
+
+        for(var i = 0; i < cells.length; i++) {
+                for(var j = 0; j < cells[i].length; j++) {
+
+                        if(cells[i][j].leftWall != null)
+                                drawWall(cells[i][j].leftWall[0],cells[i][j].leftWall[1],cells[i][j].leftWall[2], cells[i][j].leftColor);
+                        if(cells[i][j].rightWall != null)
+                                drawWall(cells[i][j].rightWall[0],cells[i][j].rightWall[1],cells[i][j].rightWall[2], cells[i][j].rightColor);
+                        if(cells[i][j].topWall != null)
+                                drawWall(cells[i][j].topWall[0],cells[i][j].topWall[1],cells[i][j].topWall[2], cells[i][j].topColor);
+                        if(cells[i][j].bottomWall != null)
+                                drawWall(cells[i][j].bottomWall[0],cells[i][j].bottomWall[1],cells[i][j].bottomWall[2], cells[i][j].bottomColor);
+                }
         }
 }
 
@@ -203,11 +268,37 @@ function addNeighbours(cells, frontier, i, j) {
         }
 }
 
-function removeWall(cells, frontier, i, j) {
+function removeWall(cells, i, j) {
 
+        var adjacentCells = [];
 
+        if(i != 0 && cells[i-1][j].inMaze == true) //Up
+                adjacentCells.push({ cell: cells[i-1][j], direction: "up" });
+        if(i != cells.length-1 && cells[i+1][j].inMaze == true) //Down
+                adjacentCells.push({ cell: cells[i+1][j], direction: "down" });
+        if(j != 0 && cells[i][j-1].inMaze == true) //Left
+                adjacentCells.push({ cell: cells[i][j-1], direction: "left" });
+        if(j != cells.length-1 && cells[i][j+1].inMaze == true) //Right
+                adjacentCells.push({ cell: cells[i][j+1], direction: "right" });
 
+        var selectedCell = adjacentCells[randomInt(0, adjacentCells.length-1)];
 
+        if(selectedCell.direction == "up") {
+                cells[i][j].topWall = null;
+                selectedCell.cell.bottomWall = null;
+        }
+        else if(selectedCell.direction == "down") {
+                cells[i][j].bottomWall = null;
+                selectedCell.cell.topWall = null;
+        }
+        else if(selectedCell.direction == "left") {
+                cells[i][j].leftWall = null;
+                selectedCell.cell.rightWall = null;
+        }
+        else if(selectedCell.direction == "right") {
+                cells[i][j].rightWall = null;
+                selectedCell.cell.leftWall = null;
+        }
 }
 
 function primsMaze(cells) {
@@ -230,6 +321,7 @@ function primsMaze(cells) {
                 var cellY = frontier[randomNeighbour].yIndex;
 
                 cells[cellX][cellY].inMaze = true;
+                removeWall(cells, cellX, cellY);
 
                 addNeighbours(cells, frontier, cellX, cellY);
 
@@ -254,13 +346,17 @@ function generateArrays(size) {
                         cells[i][j] = {
 
                                 leftWall: [i,j,270],
-                                rightWall: [i+1,j,270],
+                                rightWall: [i,j+1,270],
                                 topWall: [i,j,0],
-                                bottomWall: [i,j+1,0],
+                                bottomWall: [i+1,j,0],
                                 xIndex: i,
                                 yIndex: j,
                                 visited: false,
-                                inMaze: false
+                                inMaze: false,
+                                leftColor: 0xFF0000,
+                                rightColor: 0x00FF00,
+                                topColor: 0x0000FF,
+                                bottomColor: 0xF0F0F0
                         };
                 }
         }
@@ -269,12 +365,12 @@ function generateArrays(size) {
 }
 
 //Just give it the X and Z point in the grid to start at
-function drawWall(x, z, rY) {
+function drawWall(z, x, rY, clr) {
 
         var geometry = new THREE.BoxGeometry(10, 10, 1);
         geometry.translate(5, 5, 0); //Adjust origin point
         var material = new THREE.MeshPhongMaterial({
-                color: 0xFF0000,
+                color: clr,
                 emissive: 0x072534,
                 side: THREE.DoubleSide,
                 shading: THREE.SmoothShading
@@ -286,6 +382,7 @@ function drawWall(x, z, rY) {
         cube.rotateY(toRads(rY));
 
         scene.add(cube);
+        animate();
 }
 
 
