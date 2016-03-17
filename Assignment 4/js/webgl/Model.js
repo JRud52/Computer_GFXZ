@@ -3,7 +3,7 @@
     Group Members: Justin, Tyler, Will, Michael, Guy
 */
 
-var camera, scene, renderer, controls, stats, collisionObj, lastCubePos;
+var camera, scene, renderer, controls, stats, collisionObj, frontNode, backNode;
 var clock = new THREE.Clock();
 var collisionForward = false, collisionBack = false;
 var wallList = [];
@@ -112,15 +112,27 @@ function init() {
         mesh.receiveShadow = true;
         scene.add(mesh);
 
+        //The cylinder acts as a bounding box for collision - it is used internally to position the collision nodes
+        //the material can be changed for debuging to see the collision box
         var collisionGeo = new THREE.CylinderGeometry(3, 3, 1, 16, 1);
         var collisionMat = new THREE.MeshPhongMaterial({
-                color: 0xff0000,
-                wireframe: true
+                transparent: true
         });
         collisionObj = new THREE.Mesh(collisionGeo, collisionMat);
         collisionObj.position.y = 5;
         collisionObj.position.z = -5;
+
+        //3D points in space used to represent collision nodes on the front/back of our character
+        frontNode = new THREE.Object3D();
+        backNode = new THREE.Object3D();
+
+        //the front/back nodes are parented to the collision cylinder 
+        collisionObj.add(frontNode);
+        collisionObj.add(backNode);
         scene.add(collisionObj);
+
+        frontNode.position.z = -3;
+        backNode.position.z = 3;
 
         camera.position.y = 5;
         camera.rotation.y = Math.PI / 4;                
@@ -453,61 +465,12 @@ function drawWall(z, x, rY, clr) {
 
 //updates every frame used for animation and input handling
 function render() {
-    camera.position.set(collisionObj.position.x, collisionObj.position.y, collisionObj.position.z);
-    camera.rotation.set(collisionObj.rotation.x, collisionObj.rotation.y, collisionObj.rotation.z);
+        //make the camera follow the collisionObj 
+        camera.position.set(collisionObj.position.x, collisionObj.position.y, collisionObj.position.z);
+        camera.rotation.set(collisionObj.rotation.x, collisionObj.rotation.y, collisionObj.rotation.z);    
 
-    /*
-        collisionObj.geometry.verticesNeedUpdate = true;
-
-        //    collisionObj.position.set(camera.position.x, collisionObj.position.y, camera.position.z);
-        var collisionObjPos = collisionObj.position.clone();
-        
-    //cast a ray from the origin of the player's collision cube to each of its vertices
-    //loop through all of the vertices in the collision cube
-    for (var i = 0; i < collisionObj.geometry.vertices.length; i++) {
-
-        //get the vertex in global space by cloning the vertex in local space then apply the matrix of the collision cube
-        var vertexGlobalSpace = collisionObj.geometry.vertices[i].clone().applyMatrix4(collisionObj.matrix);
-
-        //get the vector that points from the vertex in global space to the cube's origin
-        var rayDirection = vertexGlobalSpace.sub(collisionObj.position);
-
-        //cast a ray from the origin of the player's collision cube towards the vertex - normalize because we only care about direction
-        var ray = new THREE.Raycaster(collisionObjPos, rayDirection.clone().normalize());
-
-        //check if the ray to the vertex collides with any of the walls
-        var collisions = ray.intersectObjects(wallList);
-        if (collisions.length > 0 && collisions[0].distance < rayDirection.length()){
-            //console.log(" Hit ");
-        }
-
-
-        //TESTING ONLY
-        if (i == 0 && point == null) {
-            var pointGeo = new THREE.SphereGeometry(0.25, 32, 32);
-            var pointMat = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
-            point = new THREE.Mesh(pointGeo, pointMat);
-            scene.add(point);
-            point.position.set(vertexGlobalSpace.x, vertexGlobalSpace.y, vertexGlobalSpace.z);
-        }
-        else if (i == 1 && point2 == null) {
-            var pointGeo = new THREE.SphereGeometry(0.25, 32, 32);
-            var pointMat = new THREE.MeshPhongMaterial({ color: 0x0000ff });
-            point2 = new THREE.Mesh(pointGeo, pointMat);
-            scene.add(point2);
-            point2.position.set(vertexGlobalSpace.x, vertexGlobalSpace.y, vertexGlobalSpace.z);
-        }
-        else if (i == 8 && point3 == null) {
-            var pointGeo = new THREE.SphereGeometry(0.25, 32, 32);
-            var pointMat = new THREE.MeshPhongMaterial({ color: 0x00ffff });
-            point2 = new THREE.Mesh(pointGeo, pointMat);
-            scene.add(point2);
-            point2.position.set(vertexGlobalSpace.x, vertexGlobalSpace.y, vertexGlobalSpace.z);
-        }
-    }
-    */
-
-    handleInput();
+        //check for user input
+        handleInput();
 
         //render the scene
         renderer.render(scene, camera);
@@ -531,26 +494,23 @@ function onKeyUp(event) {
 
 //checks if the user hit specific keys for movement
 function handleInput() {
-        //movement and rotation WASD
+        //movement and rotation using WASD
         if (keyState['a'.charCodeAt(0) - 32]) {
             collisionObj.rotateY(0.025);
-            //console.log(collisionObj.rotation);
-            //collisionObj.rotation.y += 0.025;
         }
         if (keyState['d'.charCodeAt(0) - 32]) {
-            collisionObj.rotateY(-0.025);
-            //collisionObj.rotation.y -= 0.025;
+            collisionObj.rotateY(-0.025);            
         }
-        if (keyState['w'.charCodeAt(0) - 32]) {            
+        if (keyState['w'.charCodeAt(0) - 32]) {
+                //disable forward movement if the frontNode collides with a wall
                 if (!checkCollision(0)) {
-                    collisionObj.translateZ(-0.25);
-                    //collisionObj.position.z -= 0.25;
+                    collisionObj.translateZ(-0.25);                    
                 }    
         }
-        if (keyState['s'.charCodeAt(0) - 32]) {                                   
+        if (keyState['s'.charCodeAt(0) - 32]) {
+                //disable backward movement if the backNode collides with a wall
                 if (!checkCollision(1)) {
                     collisionObj.translateZ(0.25);
-                    //collisionObj.position.z += 0.25;
                 }                
         }
 }
@@ -558,49 +518,28 @@ function handleInput() {
 //check the vertex at the front or back of the object depending on collision
 function checkCollision(direction) {    
     
-    //get the rotation matrix of the collision object
-    var collisionObjRotMatrix = new THREE.Matrix4();
-    collisionObjRotMatrix.extractRotation(collisionObj.matrix);
+    //get the forward/backward direction from the front/back node to the center of the collisionObj
+    var rayDirection = new THREE.Vector3();
 
-    //get the forward/backward direction from the rotation matrix 
-    var rayDirection;
+    //0 = front, 1 = back
     if (direction == 0) {
-        rayDirection = new THREE.Vector3(0, 0, 1);
+        rayDirection.setFromMatrixPosition(frontNode.matrixWorld).sub(collisionObj.position);
     }
     else {
-        rayDirection = new THREE.Vector3(0, 0, -1);
+        rayDirection.setFromMatrixPosition(backNode.matrixWorld).sub(collisionObj.position);
     }
-    rayDirection.applyMatrix4(collisionObjRotMatrix);
+    
     
     var collision = false;
 
     //cast a ray forward the origin of the player's collision object 
     var ray = new THREE.Raycaster(collisionObj.position, rayDirection.clone().normalize());
 
-    var collision = false;
-
-    //check if the ray to the vertex collides with any of the walls
+    //check if the ray to the node collides with any of the walls
     var collisions = ray.intersectObjects(wallList);
     if (collisions.length > 0 && collisions[0].distance < rayDirection.length()) {
         collision = true;
     }
-/*
-    //get the vertex in global space by cloning the vertex in local space then apply the matrix of the collision cube
-    var vertexGlobalSpace = collisionObj.geometry.vertices[direction * 8].clone().applyMatrix4(collisionObj.matrix);
 
-    //get the vector that points from the vertex in global space to the cube's origin
-    var rayDirection = vertexGlobalSpace.sub(collisionObj.position);
-
-    //cast a ray from the origin of the player's collision cube towards the vertex - normalize because we only care about direction
-    var ray = new THREE.Raycaster(collisionObj.position, rayDirection.clone().normalize());
-
-    var collision = false;
-
-    //check if the ray to the vertex collides with any of the walls
-    var collisions = ray.intersectObjects(wallList);
-    if (collisions.length > 0 && collisions[0].distance < rayDirection.length()) {
-        collision = true;
-    }
-*/
     return collision;
 }
