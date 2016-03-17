@@ -10,6 +10,15 @@ var wallList = [];
 //Variable for entering keys.
 var keyState = [];
 
+
+myAudio = new Audio('music/scary.ogg');
+myAudio.addEventListener('ended', function() {
+    this.currentTime = 0;
+    this.play();
+}, false);
+myAudio.play();
+myAudio.volume = 0.05;
+
 /*
     ONLOAD FUNCTION
 */
