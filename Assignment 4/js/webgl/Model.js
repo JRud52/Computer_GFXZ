@@ -46,7 +46,7 @@ function init() {
         container.appendChild(renderer.domElement);
 
         //New perspective camera, positioned to face the trees and such.
-        camera = new THREE.PerspectiveCamera(50, 550 / 450, 0.1, 1000);
+        camera = new THREE.PerspectiveCamera(90, 550 / 450, 0.1, 1000);
         //camera.position.z = 5;
         //camera.position.y = 250;
         //camera.lookAt(new THREE.Vector3(0, 0, 0));
@@ -120,13 +120,15 @@ function init() {
         });
         collisionObj = new THREE.Mesh(collisionGeo, collisionMat);
         collisionObj.position.y = 5;
-        collisionObj.position.z = -5;
+        collisionObj.position.z = 35;
+        collisionObj.position.x = -40;
+        collisionObj.rotation.y = toRads(270);
 
         //3D points in space used to represent collision nodes on the front/back of our character
         frontNode = new THREE.Object3D();
         backNode = new THREE.Object3D();
 
-        //the front/back nodes are parented to the collision cylinder 
+        //the front/back nodes are parented to the collision cylinder
         collisionObj.add(frontNode);
         collisionObj.add(backNode);
         scene.add(collisionObj);
@@ -135,88 +137,17 @@ function init() {
         backNode.position.z = 3;
 
         camera.position.y = 5;
-        camera.rotation.y = Math.PI / 4;                
+        camera.rotation.y = toRads(180);
 
         //event listeners for movement and firing
         window.addEventListener('keydown', onKeyDown, false);
         window.addEventListener('keyup', onKeyUp, false);
 
-        var cells = generateArrays(5);
+        var cells = generateArrays(7);
         primsMaze(cells);
 
-        /**
-                ___ ___
-                |__    |
-                |______|
-                TEST
-
-        cells = new Array(2);
-
-        for(i = 0; i < 2; i++)
-                cells[i] = new Array(2);
-        cells[0][0] = {
-
-                leftWall: [0,0,270],
-                rightWall: null,
-                topWall: [0,0,0],
-                bottomWall: [0+1,0,0],
-                xIndex: 0,
-                yIndex: 0,
-                visited: false,
-                inMaze: false,
-                leftColor: 0xFF0000,
-                rightColor: 0x00FF00,
-                topColor: 0x0000FF,
-                bottomColor: 0xF0F0F0
-        };
-        cells[0][1] = {
-
-                leftWall: null,
-                rightWall: [0,1+1,270],
-                topWall: [0,1,0],
-                bottomWall: null,
-                xIndex: 0,
-                yIndex: 1,
-                visited: false,
-                inMaze: false,
-                leftColor: 0xFF0000,
-                rightColor: 0x00FF00,
-                topColor: 0x0000FF,
-                bottomColor: 0xF0F0F0
-        };
-        cells[1][0] = {
-
-                leftWall: [1,0,270],
-                rightWall: null,
-                topWall: [1,0,0],
-                bottomWall: [1+1,0,0],
-                xIndex: 1,
-                yIndex: 0,
-                visited: false,
-                inMaze: false,
-                leftColor: 0xFF0000,
-                rightColor: 0x00FF00,
-                topColor: 0x0000FF,
-                bottomColor: 0xF0F0F0
-        };
-        cells[1][1] = {
-
-                leftWall: null,
-                rightWall: [1,1+1,270],
-                topWall: null,
-                bottomWall: [1+1,1,0],
-                xIndex: 1,
-                yIndex: 1,
-                visited: false,
-                inMaze: false,
-                leftColor: 0xFF0000,
-                rightColor: 0x00FF00,
-                topColor: 0x0000FF,
-                bottomColor: 0xF0F0F0
-        };
-        */
         drawMaze(cells);
-        //drawWall(1,1,0); //Test individual wall drawing     
+        //drawWall(1,1,0); //Test individual wall drawing
 }
 
 //Returns a random int in a range, inclusive.
@@ -465,9 +396,9 @@ function drawWall(z, x, rY, clr) {
 
 //updates every frame used for animation and input handling
 function render() {
-        //make the camera follow the collisionObj 
+        //make the camera follow the collisionObj
         camera.position.set(collisionObj.position.x, collisionObj.position.y, collisionObj.position.z);
-        camera.rotation.set(collisionObj.rotation.x, collisionObj.rotation.y, collisionObj.rotation.z);    
+        camera.rotation.set(collisionObj.rotation.x, collisionObj.rotation.y, collisionObj.rotation.z);
 
         //check for user input
         handleInput();
@@ -499,25 +430,25 @@ function handleInput() {
             collisionObj.rotateY(0.025);
         }
         if (keyState['d'.charCodeAt(0) - 32]) {
-            collisionObj.rotateY(-0.025);            
+            collisionObj.rotateY(-0.025);
         }
         if (keyState['w'.charCodeAt(0) - 32]) {
                 //disable forward movement if the frontNode collides with a wall
                 if (!checkCollision(0)) {
-                    collisionObj.translateZ(-0.25);                    
-                }    
+                    collisionObj.translateZ(-0.25);
+                }
         }
         if (keyState['s'.charCodeAt(0) - 32]) {
                 //disable backward movement if the backNode collides with a wall
                 if (!checkCollision(1)) {
                     collisionObj.translateZ(0.25);
-                }                
+                }
         }
 }
 
 //check the vertex at the front or back of the object depending on collision
-function checkCollision(direction) {    
-    
+function checkCollision(direction) {
+
     //get the forward/backward direction from the front/back node to the center of the collisionObj
     var rayDirection = new THREE.Vector3();
 
@@ -528,11 +459,11 @@ function checkCollision(direction) {
     else {
         rayDirection.setFromMatrixPosition(backNode.matrixWorld).sub(collisionObj.position);
     }
-    
-    
+
+
     var collision = false;
 
-    //cast a ray forward the origin of the player's collision object 
+    //cast a ray forward the origin of the player's collision object
     var ray = new THREE.Raycaster(collisionObj.position, rayDirection.clone().normalize());
 
     //check if the ray to the node collides with any of the walls
