@@ -22,6 +22,8 @@ myAudio.addEventListener('ended', function() {
 myAudio.play();
 myAudio.volume = 0.05;
 
+var torchLight;
+
 /*
     ONLOAD FUNCTION
 */
@@ -40,7 +42,7 @@ function init() {
                 antialias: true,
                 alpha: true
         });
-        renderer.setClearColor(0x808080, 0.5);
+        renderer.setClearColor(0x000000, 0.5);
         renderer.setPixelRatio(550 / 450);
         renderer.setSize(550, 450);
         container.appendChild(renderer.domElement);
@@ -60,11 +62,11 @@ function init() {
         ambientLight = new THREE.AmbientLight(0x404040);
         ambientLight.position.set(0, 0, 15);
         ambientLight.castShadow = true;
-        scene.add(ambientLight);
+        //scene.add(ambientLight);
 
         var directionalLight = new THREE.DirectionalLight(0xffffff, 0.75);
         directionalLight.position.set(0, 1, 0);
-        scene.add(directionalLight);
+        //scene.add(directionalLight);
 
 
 
@@ -123,6 +125,18 @@ function init() {
         collisionObj.position.z = 35;
         collisionObj.position.x = -40;
         collisionObj.rotation.y = toRads(270);
+
+        var sphere = new THREE.SphereGeometry( 0.05, 32, 32 );
+        sphere.translate(0.45, 0, 0.30);
+
+        torchLight = new THREE.PointLight( 0xdea061, 2, 50 );
+	torchLight.add( new THREE.Mesh( sphere, new THREE.MeshPhongMaterial( { color: 0xdea061 } ) ) );
+        torchLight.position.y = 4.80;
+        torchLight.position.z = 35.05;
+        torchLight.position.x = -39.85;
+
+
+	scene.add( torchLight );
 
         //3D points in space used to represent collision nodes on the front/back of our character
         frontNode = new THREE.Object3D();
@@ -428,20 +442,24 @@ function handleInput() {
         //movement and rotation using WASD
         if (keyState['a'.charCodeAt(0) - 32]) {
             collisionObj.rotateY(0.025);
+            torchLight.rotateY(0.025);
         }
         if (keyState['d'.charCodeAt(0) - 32]) {
             collisionObj.rotateY(-0.025);
+            torchLight.rotateY(-0.025);
         }
         if (keyState['w'.charCodeAt(0) - 32]) {
                 //disable forward movement if the frontNode collides with a wall
                 if (!checkCollision(0)) {
                     collisionObj.translateZ(-0.25);
+                    torchLight.translateX(0.25);
                 }
         }
         if (keyState['s'.charCodeAt(0) - 32]) {
                 //disable backward movement if the backNode collides with a wall
                 if (!checkCollision(1)) {
                     collisionObj.translateZ(0.25);
+                    torchLight.translateX(-0.25);
                 }
         }
 }
