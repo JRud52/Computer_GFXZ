@@ -126,7 +126,18 @@ function init() {
         frontNode = new THREE.Object3D();
         backNode = new THREE.Object3D();
 
-        //the front/back nodes are parented to the collision cylinder 
+
+        var objectLoader = new THREE.ObjectLoader();        
+        objectLoader.load("models/lantern.json", function (obj) {
+            scene.add(obj);
+            collisionObj.add(obj);
+            obj.position.z = -1.5;
+            obj.position.x = 0.5;
+            obj.position.y = -0.5;
+            obj.scale.set(0.1, 0.1, 0.1);
+        });
+
+        //the front/back nodes are parented to the collision cylinder        
         collisionObj.add(frontNode);
         collisionObj.add(backNode);
         scene.add(collisionObj);
