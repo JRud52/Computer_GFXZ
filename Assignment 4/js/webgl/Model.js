@@ -8,6 +8,8 @@ var clock = new THREE.Clock();
 var collisionForward = false, collisionBack = false;
 var wallList = [];
 
+var wallTexture;
+
 //Variable for entering keys.
 var keyState = [];
 
@@ -38,6 +40,8 @@ function init() {
         //Set to our custom canvas
         container = document.getElementById('myCanvasLeft');
 
+
+
         renderer = new THREE.WebGLRenderer({
                 antialias: true,
                 alpha: true
@@ -59,7 +63,8 @@ function init() {
         scene = new THREE.Scene();
 
         //light 2: ambient light
-        ambientLight = new THREE.AmbientLight(0x020202);
+        //ambientLight = new THREE.AmbientLight(0x020202);
+        ambientLight = new THREE.AmbientLight(0xFFFFFF);
         ambientLight.position.set(0, 0, 15);
         ambientLight.castShadow = true;
         scene.add(ambientLight);
@@ -92,6 +97,12 @@ function init() {
         groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
         groundTexture.repeat.set(15, 15);
         groundTexture.anisotropy = 25;
+
+        wallTexture = loader.load("textures/wall.jpg");
+        wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
+        //wallTexture.repeat.set(15, 15);
+        wallTexture.anisotropy = 25;
+
         //Grass's material
         var groundMaterial = new THREE.MeshPhongMaterial({
                 color: 0x505050,
@@ -161,6 +172,8 @@ function init() {
         primsMaze(cells);
 
         drawMaze(cells);
+
+        drawBorder();
         //drawWall(1,1,0); //Test individual wall drawing
 }
 
@@ -174,6 +187,18 @@ function toRads(degrees) {
         return degrees * (3.14 / 180)
 }
 
+function drawBorder() {
+
+        drawWall(-8,-8,0xFFFFFF);
+
+        for(i = -8; i < 12; i++) { drawWall(i,-8, 90, 0xFFFFFF); }
+        for(i = -8; i < 12; i++) { drawWall(-8,i, 0, 0xFFFFFF); }
+        for(i = 12; i > -12; i--) { drawWall(i,12, 90, 0xFFFFFF); }
+        for(i = 12; i > -12; i--) { drawWall(12, i, 0, 0xFFFFFF); }
+
+
+}
+
 //Function that will actually draw the maze, will only draw the wall if it has information for the wall.
 function drawMaze(cells) {
 
@@ -181,13 +206,17 @@ function drawMaze(cells) {
                 for (var j = 0; j < cells[i].length; j++) {
 
                         if (cells[i][j].leftWall != null)
-                                drawWall(cells[i][j].leftWall[0], cells[i][j].leftWall[1], cells[i][j].leftWall[2], cells[i][j].leftColor);
+                                drawWall(cells[i][j].leftWall[0], cells[i][j].leftWall[1], cells[i][j].leftWall[2], 0x606060);
+                                //drawWall(cells[i][j].leftWall[0], cells[i][j].leftWall[1], cells[i][j].leftWall[2], cells[i][j].leftColor);
                         if (cells[i][j].rightWall != null)
-                                drawWall(cells[i][j].rightWall[0], cells[i][j].rightWall[1], cells[i][j].rightWall[2], cells[i][j].rightColor);
+                                drawWall(cells[i][j].rightWall[0], cells[i][j].rightWall[1], cells[i][j].rightWall[2], 0x606060);
+                                //drawWall(cells[i][j].rightWall[0], cells[i][j].rightWall[1], cells[i][j].rightWall[2], cells[i][j].rightColor);
                         if (cells[i][j].topWall != null)
-                                drawWall(cells[i][j].topWall[0], cells[i][j].topWall[1], cells[i][j].topWall[2], cells[i][j].topColor);
+                                drawWall(cells[i][j].topWall[0], cells[i][j].topWall[1], cells[i][j].topWall[2], 0x606060);
+                                //drawWall(cells[i][j].topWall[0], cells[i][j].topWall[1], cells[i][j].topWall[2], cells[i][j].topColor);
                         if (cells[i][j].bottomWall != null)
-                                drawWall(cells[i][j].bottomWall[0], cells[i][j].bottomWall[1], cells[i][j].bottomWall[2], cells[i][j].bottomColor);
+                                drawWall(cells[i][j].bottomWall[0], cells[i][j].bottomWall[1], cells[i][j].bottomWall[2], 0x606060);
+                                //drawWall(cells[i][j].bottomWall[0], cells[i][j].bottomWall[1], cells[i][j].bottomWall[2], cells[i][j].bottomColor);
                 }
         }
 }
@@ -400,12 +429,14 @@ function generateArrays(size) {
 //Will draw a wall given coordinates and a rotation value.
 function drawWall(z, x, rY, clr) {
 
+
         var geometry = new THREE.BoxGeometry(10, 10, 1);
         geometry.translate(5, 5, 0); //Adjust origin point to the bottom left.
         var material = new THREE.MeshPhongMaterial({
                 color: clr,
                 specular: 0x101010,
                 side: THREE.DoubleSide,
+                map: wallTexture,
                 shading: THREE.SmoothShading
         });
         var cube = new THREE.Mesh(geometry, material);
