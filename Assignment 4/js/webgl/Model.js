@@ -59,21 +59,14 @@ function init() {
         scene = new THREE.Scene();
 
         //light 2: ambient light
-        ambientLight = new THREE.AmbientLight(0x404040);
+        ambientLight = new THREE.AmbientLight(0x020202);
         ambientLight.position.set(0, 0, 15);
         ambientLight.castShadow = true;
-        //scene.add(ambientLight);
+        scene.add(ambientLight);
 
         var directionalLight = new THREE.DirectionalLight(0xffffff, 0.75);
         directionalLight.position.set(0, 1, 0);
         //scene.add(directionalLight);
-
-
-
-        //var objectLoader = new THREE.ObjectLoader();
-        //objectLoader.load("models/feels.json", function(obj) {
-        //scene.add( obj );
-        //});
 
         //Grid
         /**
@@ -102,7 +95,7 @@ function init() {
         //Grass's material
         var groundMaterial = new THREE.MeshPhongMaterial({
                 color: 0x505050,
-                specular: 0x101010,
+                specular: 0x000000,
                 map: groundTexture
         });
         //Grass's Mesh
@@ -129,26 +122,19 @@ function init() {
         var sphere = new THREE.SphereGeometry( 0.05, 32, 32 );
         sphere.translate(0.45, 0, 0.30);
 
-        torchLight = new THREE.PointLight( 0xdea061, 2, 50 );
-	torchLight.add( new THREE.Mesh( sphere, new THREE.MeshPhongMaterial( { color: 0xdea061 } ) ) );
-        torchLight.position.y = 4.80;
-        torchLight.position.z = 35.05;
-        torchLight.position.x = -39.85;
-
-
-	scene.add( torchLight );
+        torchLight = new THREE.PointLight( 0xdea061, 5, 200, 35 );
+        scene.add(torchLight);
 
         //3D points in space used to represent collision nodes on the front/back of our character
         frontNode = new THREE.Object3D();
         backNode = new THREE.Object3D();
 
-<<<<<<< HEAD
-        //the front/back nodes are parented to the collision cylinder
-=======
-
-        var objectLoader = new THREE.ObjectLoader();        
+        var objectLoader = new THREE.ObjectLoader();
         objectLoader.load("models/lantern.json", function (obj) {
+
             scene.add(obj);
+
+            collisionObj.add(torchLight);
             collisionObj.add(obj);
             obj.position.z = -1.5;
             obj.position.x = 0.5;
@@ -156,8 +142,7 @@ function init() {
             obj.scale.set(0.1, 0.1, 0.1);
         });
 
-        //the front/back nodes are parented to the collision cylinder        
->>>>>>> ebd6ac6a2dbcc92611455707387e3e824165cdf8
+        //the front/back nodes are parented to the collision cylinder
         collisionObj.add(frontNode);
         collisionObj.add(backNode);
         scene.add(collisionObj);
@@ -362,7 +347,20 @@ function primsMaze(cells) {
         var exitX = randomInt(0, cells.length - 1);
 
         cells[entranceX][0].leftWall = null;
+
+        entranceLight = new THREE.PointLight( 0xdea061, 0.5, 15 );
+        entranceLight.position.y = 5;
+        entranceLight.position.z = entranceX*10+5;
+        entranceLight.position.x = 0;
+        scene.add(entranceLight);
+
         cells[exitX][cells.length - 1].rightWall = null;
+
+        exitLight = new THREE.PointLight( 0xdea061, 0.5, 15 );
+        exitLight.position.y = 5;
+        exitLight.position.z = exitX*10+5;
+        exitLight.position.x = (cells.length-1)*10;
+        scene.add(exitLight);
 }
 
 //Simple function to initialize the array of cells.
@@ -406,7 +404,7 @@ function drawWall(z, x, rY, clr) {
         geometry.translate(5, 5, 0); //Adjust origin point to the bottom left.
         var material = new THREE.MeshPhongMaterial({
                 color: clr,
-                emissive: 0x072534,
+                specular: 0x101010,
                 side: THREE.DoubleSide,
                 shading: THREE.SmoothShading
         });
@@ -457,24 +455,20 @@ function handleInput() {
         //movement and rotation using WASD
         if (keyState['a'.charCodeAt(0) - 32]) {
             collisionObj.rotateY(0.025);
-            torchLight.rotateY(0.025);
         }
         if (keyState['d'.charCodeAt(0) - 32]) {
             collisionObj.rotateY(-0.025);
-            torchLight.rotateY(-0.025);
         }
         if (keyState['w'.charCodeAt(0) - 32]) {
                 //disable forward movement if the frontNode collides with a wall
                 if (!checkCollision(0)) {
                     collisionObj.translateZ(-0.25);
-                    torchLight.translateX(0.25);
                 }
         }
         if (keyState['s'.charCodeAt(0) - 32]) {
                 //disable backward movement if the backNode collides with a wall
                 if (!checkCollision(1)) {
                     collisionObj.translateZ(0.25);
-                    torchLight.translateX(-0.25);
                 }
         }
 }
