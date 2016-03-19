@@ -63,8 +63,8 @@ function init() {
         scene = new THREE.Scene();
 
         //light 2: ambient light
-        //ambientLight = new THREE.AmbientLight(0x020202);
-        ambientLight = new THREE.AmbientLight(0xFFFFFF);
+        ambientLight = new THREE.AmbientLight(0x020202);
+        //TestingLight//ambientLight = new THREE.AmbientLight(0xFFFFFF);
         ambientLight.position.set(0, 0, 15);
         ambientLight.castShadow = true;
         scene.add(ambientLight);
@@ -189,12 +189,25 @@ function toRads(degrees) {
 
 function drawBorder() {
 
-        drawWall(-8,-8,0xFFFFFF);
+        drawWall(0,0, 90,0x606060);
+        drawWall(-1,0, 90,0x606060);
+        drawWall(-2,0, 90,0x606060);
+        drawWall(-3,0, 90,0x606060);
+        drawWall(-4,0, 90,0x606060);
+        drawWall(-5,0, 90,0x606060);
+        drawWall(-6,0, 90,0x606060);
+        drawWall(-7,0, 90,0x606060);
 
-        for(i = -8; i < 12; i++) { drawWall(i,-8, 90, 0xFFFFFF); }
-        for(i = -8; i < 12; i++) { drawWall(-8,i, 0, 0xFFFFFF); }
-        for(i = 12; i > -12; i--) { drawWall(i,12, 90, 0xFFFFFF); }
-        for(i = 12; i > -12; i--) { drawWall(12, i, 0, 0xFFFFFF); }
+        drawWall(8,0, 90,0x606060);
+        drawWall(9,0, 90,0x606060);
+        drawWall(10,0, 90,0x606060);
+        drawWall(11,0, 90,0x606060);
+        drawWall(12,0, 90,0x606060);
+
+        for(i = -8; i < 12; i++) { drawWall(i,-8, 90, 0x606060); }
+        for(i = -8; i < 12; i++) { drawWall(-8,i, 0, 0x606060); }
+        for(i = 12; i > -12; i--) { drawWall(i,12, 90, 0x606060); }
+        for(i = 12; i > -12; i--) { drawWall(12, i, 0, 0x606060); }
 
 
 }
