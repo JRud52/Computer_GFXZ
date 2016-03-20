@@ -53,7 +53,12 @@ function init() {
 
         //New perspective camera, positioned to face the trees and such.
         camera = new THREE.PerspectiveCamera(90, 550 / 450, 0.1, 1000);
+        //camera.position.z = 5;
+        //camera.position.y = 250;
+        //camera.lookAt(new THREE.Vector3(0, 0, 0));
 
+        var orbit = new THREE.OrbitControls(camera, renderer.domElement);
+        //orbit.enableZoom = false;
 
         scene = new THREE.Scene();
 
@@ -122,13 +127,14 @@ function init() {
         collisionObj = new THREE.Mesh(collisionGeo, collisionMat);
         collisionObj.position.y = 5;
         collisionObj.position.z = 35;
-        collisionObj.position.x = -10;
+        collisionObj.position.x = -40;
         collisionObj.rotation.y = toRads(270);
 
         var sphere = new THREE.SphereGeometry( 0.05, 32, 32 );
         sphere.translate(0.45, 0, 0.30);
 
-        torchLight = new THREE.PointLight( 0xdea061, 5, 200, 35 );        
+        torchLight = new THREE.PointLight( 0xdea061, 5, 200, 35 );
+        scene.add(torchLight);
 
         //3D points in space used to represent collision nodes on the front/back of our character
         frontNode = new THREE.Object3D();
@@ -136,6 +142,9 @@ function init() {
 
         var objectLoader = new THREE.ObjectLoader();
         objectLoader.load("models/lantern.json", function (obj) {
+
+            scene.add(obj);
+
             collisionObj.add(torchLight);
             collisionObj.add(obj);
             obj.position.z = -1.5;
@@ -381,7 +390,7 @@ function primsMaze(cells) {
 
         cells[entranceX][0].leftWall = null;
 
-        entranceLight = new THREE.PointLight( 0xdea061, 0.5, 15 );
+        entranceLight = new THREE.PointLight( 0xdea061, 2, 15 );
         entranceLight.position.y = 5;
         entranceLight.position.z = entranceX*10+5;
         entranceLight.position.x = 0;
@@ -389,10 +398,10 @@ function primsMaze(cells) {
 
         cells[exitX][cells.length - 1].rightWall = null;
 
-        exitLight = new THREE.PointLight( 0xdea061, 0.5, 15 );
+        exitLight = new THREE.PointLight( 0xdea061, 2, 15 );
         exitLight.position.y = 5;
         exitLight.position.z = exitX*10+5;
-        exitLight.position.x = (cells.length-1)*10;
+        exitLight.position.x = (cells.length-1)*10+10;
         scene.add(exitLight);
 }
 
@@ -438,8 +447,7 @@ function drawWall(z, x, rY, clr) {
         geometry.translate(5, 5, 0); //Adjust origin point to the bottom left.
         var material = new THREE.MeshPhongMaterial({
                 color: clr,
-                specular: 0x000000,
-               // shininess: 0,
+                specular: 0x101010,
                 side: THREE.DoubleSide,
                 map: wallTexture,
                 shading: THREE.SmoothShading
@@ -450,8 +458,6 @@ function drawWall(z, x, rY, clr) {
         cube.position.x = x * 10;
         cube.position.z = z * 10;
         cube.rotateY(toRads(rY)); //Rotate it.
-        cube.castShadow = false;
-        cube.receiveShadow = false;
         scene.add(cube);
 
         //add the cube to the list of walls needed for collision
