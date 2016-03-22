@@ -1,0 +1,92 @@
+{
+    "images": [],
+    "animations": [{
+        "name": "default",
+        "fps": 29,
+        "tracks": []
+    }],
+    "materials": [{
+        "ambient": 6497573,
+        "specular": 8355711,
+        "type": "MeshPhongMaterial",
+        "side": 2,
+        "depthTest": true,
+        "name": "BoxDefault",
+        "vertexColors": false,
+        "emissive": 0,
+        "shininess": 50,
+        "blending": "NormalBlending",
+        "uuid": "03A99801-89ED-3205-9CCE-582517865AEC",
+        "depthWrite": true,
+        "color": 6497573
+    }],
+    "textures": [],
+    "object": {
+        "matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+        "type": "Scene",
+        "children": [{
+            "name": "Box",
+            "uuid": "DDA9AE26-14F9-3E6A-9BDD-AF02F6D2F286",
+            "matrix": [-1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1],
+            "visible": true,
+            "type": "Mesh",
+            "material": "03A99801-89ED-3205-9CCE-582517865AEC",
+            "castShadow": true,
+            "receiveShadow": true,
+            "geometry": "15641190-4052-3871-BF5E-F046F6B1B496"
+        }],
+        "uuid": "8E341B12-B1CB-4F2F-920A-C7449CA0D12C"
+    },
+    "geometries": [{
+        "materials": [{
+            "colorDiffuse": [0.388235,0.145098,0.145098],
+            "visible": true,
+            "colorEmissive": [0,0,0],
+            "colorSpecular": [0.5,0.5,0.5],
+            "depthWrite": true,
+            "shading": "phong",
+            "colorAmbient": [0.388235,0.145098,0.145098],
+            "wireframe": false,
+            "opacity": 1,
+            "blending": "NormalBlending",
+            "DbgName": "BoxDefault",
+            "depthTest": true,
+            "DbgColor": 15658734,
+            "doubleSided": true,
+            "transparent": false,
+            "DbgIndex": 0,
+            "specularCoef": 50
+        }],
+        "data": {
+            "bones": [],
+            "morphTargets": [],
+            "normals": [0.577349,-0.577349,0.577349,0.577349,-0.577349,-0.577349,0.577349,0.577349,-0.577349,0.577349,0.577349,0.577349,-0.577349,0.577349,0.577349,-0.577349,0.577349,-0.577349,-0.577349,-0.577349,-0.577349,-0.577349,-0.577349,0.577349],
+            "name": "BoxGeometry",
+            "skinWeights": [],
+            "uvs": [[0,1,0,0,1,0,1,1]],
+            "vertices": [0.5,-0.5,0.5,0.5,0.5,0.5,0.5,-0.5,-0.5,0.5,0.5,-0.5,-0.5,0.5,0.5,-0.5,-0.5,0.5,-0.5,0.5,-0.5,-0.5,-0.5,-0.5],
+            "animations": [],
+            "metadata": {
+                "bones": 0,
+                "morphTargets": 0,
+                "faces": 6,
+                "version": 3,
+                "materials": 1,
+                "generator": "io_three",
+                "normals": 8,
+                "uvs": 1,
+                "vertices": 8
+            },
+            "influencesPerVertex": 2,
+            "faces": [43,0,2,3,1,0,0,1,2,3,0,1,2,3,43,4,6,7,5,0,0,1,2,3,4,5,6,7,43,0,1,4,5,0,2,3,0,1,0,3,4,7,43,7,6,3,2,0,0,1,2,3,6,5,2,1,43,2,0,5,7,0,2,3,0,1,1,0,7,6,43,1,3,6,4,0,0,1,2,3,3,2,5,4],
+            "skinIndices": []
+        },
+        "type": "Geometry",
+        "uuid": "15641190-4052-3871-BF5E-F046F6B1B496"
+    }],
+    "metadata": {
+        "generator": "io_three",
+        "type": "Object",
+        "version": 4.4
+    }
+}

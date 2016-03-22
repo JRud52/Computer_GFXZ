@@ -1,0 +1,110 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <title>WebGL Project 4</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <!-- Bootstrap Core CSS -->
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Custom CSS -->
+        <link href="css/grayscale.css" rel="stylesheet">
+
+        <!-- Custom Fonts -->
+        <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href='https://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>
+        <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+
+
+
+</head>
+
+<body onload="main()" id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
+
+        <!-- Navigation -->
+        <nav class="navbar navbar-custom navbar-fixed-top" role="navigation">
+                <div class="container">
+                        <div class="navbar-header">
+                                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+                                        <i class="fa fa-bars"></i>
+                                </button>
+                                <a class="navbar-brand page-scroll" href="../index.html#page-top">
+                                        <i class="fa fa-cubes"></i>
+                                        <span class="light">Tyler</span> Wilding
+                                </a>
+                        </div>
+
+                        <!-- Collect the nav links, forms, and other content for toggling -->
+                        <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
+                                <ul class="nav navbar-nav">
+                                        <!-- Hidden li included to remove active class from about link when scrolled up past about section -->
+                                        <li class="hidden">
+                                                <a href="../index.html#page-top"></a>
+                                        </li>
+                                        <li>
+                                                <a class="page-scroll" href="../index.html#about">About</a>
+                                        </li>
+                                        <li>
+                                                <a class="page-scroll" href="../index.html#graphics">Graphics Projects</a>
+                                        </li>
+                                        <li>
+                                                <a class="page-scroll" href="../index.html#languages">Languages</a>
+                                        </li>
+                                        <li>
+                                                <a class="page-scroll" href="../index.html#download">Downloads</a>
+                                        </li>
+                                        <li>
+                                                <a class="page-scroll" href="../index.html#contact">Contact</a>
+                                        </li>
+                                </ul>
+                        </div>
+                        <!-- /.navbar-collapse -->
+                </div>
+                <!-- /.container -->
+        </nav>
+
+        <!-- About Section -->
+        <section id="about" class="container content-section text-center">
+                <div class="row">
+                        <h2>Project 4</h2>
+                        <h6>Done by - Justin Rhude, Guy Coccimiglio, William Sigouin, Michael Thomas, and Tyler Wilding</h6>
+                        <div class="row">
+                            <div id="myCanvasLeft"></div>
+                        </div>
+                </div>
+        </section>
+
+        <!-- jQuery -->
+        <script src="js/jquery.js"></script>
+        <!-- Bootstrap Core JavaScript -->
+        <script src="js/bootstrap.min.js"></script>
+        <!-- Plugin JavaScript -->
+        <script src="js/jquery.easing.min.js"></script>
+        <!-- Custom Theme JavaScript -->
+        <script src="js/grayscale.js"></script>
+
+        <!-- THREEJS -->
+        <script src="http://threejs.org/examples/js/libs/stats.min.js"></script>
+        <script src="js/three/three.min.js"></script>
+        <script src="js/three/TextGeometry.js"></script>
+        <script src="js/three/FontUtils.js"></script>
+        <script src="js/three/droid_sans_regular.typeface.js"></script>
+        <script src="js/three/FirstPersonControls.js"></script>
+        <script src="js/three/loader/Animation.js"></script>
+        <script src="js/three/loader/AnimationHandler.js"></script>
+        <script src="js/three/loader/KeyFrameAnimation.js"></script>
+        <script src="js/three/loader/ColladaLoader.js"></script>
+        <script src="js/three/stats.min.js"></script>
+        <script src="js/three/OrbitControls.js"></script>
+        <script src="js/three/dat.gui.min.js"></script>     
+
+        <!-- Assignment File -->
+        <script src="js/webgl/House.js"></script>
+        <input id="myInput" type="file" style="visibility:hidden" />
+</body>
+</html>
