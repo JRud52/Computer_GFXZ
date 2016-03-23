@@ -119,6 +119,8 @@ function init() {
 //        primsMaze(cells);      
 //        drawMaze(cells);
 
+        //ENTIRE HOUSE - 70 wide by 70 long by 20 high
+        var house = new THREE.Object3D();
 
         //OUTER WALLS
         var walls = new THREE.Object3D();
@@ -175,10 +177,10 @@ function init() {
         frontWall_Top.rotation.x = Math.PI;
         frontWall_Top.position.y = 20;
 
-        
         frontWall_Top.add(door_Top);
         frontWall.add(door);
-
+        
+        //walls without windows
         var sideWallGeo = new THREE.BoxGeometry(70, 20, 1);
         sideWallGeo.translate(35, 10, 0);
         var sideMat = new THREE.MeshPhongMaterial({
@@ -200,11 +202,42 @@ function init() {
         walls.add(sideWall_L);
         walls.add(sideWall_R);
         walls.add(sideWall_Back);
+        walls.add(frontWall);
+        walls.add(frontWall_Top);
 
-        scene.add(frontWall_Top);
-        scene.add(frontWall);
+        //celing and floor
+        var floorGeo = new THREE.BoxGeometry(70, 0.1, 70);
+        floorGeo.translate(35, 0.05, 35);
+        var floorMat = new THREE.MeshPhongMaterial({
+            color: 0x0000ff,
+            emissive: 0x072534,
+            side: THREE.DoubleSide,
+            shading: THREE.SmoothShading
+        });
+        var floor = new THREE.Mesh(floorGeo, floorMat);
+        floor.translateZ(-70);
+        var celing = floor.clone();
+        celing.translateY(20);
 
-        scene.add(walls);
+
+        //roof 
+        var roofGeo = new THREE.CylinderGeometry(0, 70, 25, 4, 32);
+        roofGeo.rotateY(Math.PI / 4);
+        roofGeo.translate(35, 12.5, 35);
+        var roofMat = new THREE.MeshPhongMaterial({
+            color: 0x000000,
+            emissive: 0x072534
+        });
+        var roof = new THREE.Mesh(roofGeo, roofMat);
+        roof.translateY(20.1);
+        roof.translateZ(-70);
+        
+        house.add(roof)
+        house.add(floor);
+        house.add(celing);
+        house.add(walls);
+
+        scene.add(house);
 }
 
 //Returns a random int in a range, inclusive.
