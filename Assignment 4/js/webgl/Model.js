@@ -16,6 +16,8 @@ var keyState = [];
 //testing purposes only remove later
 var point = null, point2 = null, point3 = null;
 
+var skyBox;
+
 myAudio = new Audio('music/scary.ogg');
 myAudio.addEventListener('ended', function() {
         this.currentTime = 0;
@@ -64,7 +66,7 @@ function init() {
 
         //light 2: ambient light
         ambientLight = new THREE.AmbientLight(0x020202);
-        //TestingLight//ambientLight = new THREE.AmbientLight(0xFFFFFF);
+        //ambientLight = new THREE.AmbientLight(0xFFFFFF);
         ambientLight.position.set(0, 0, 15);
         ambientLight.castShadow = true;
         scene.add(ambientLight);
@@ -175,6 +177,33 @@ function init() {
 
         drawBorder();
         //drawWall(1,1,0); //Test individual wall drawing
+
+        //skydome
+        var skyGeo = new THREE.SphereGeometry(500, 60, 40);
+
+        //load the texture for the skydome
+        var skyTexture = loader.load("textures/sky.jpg");
+        var SkyUni = {
+            texture: { type: 't', value: skyTexture }
+        };
+
+        //shaders used for mapping the texture onto the dome
+        var skyMat = new THREE.ShaderMaterial({
+            color: 0xffffff,
+            uniforms: SkyUni,
+            vertexShader: document.getElementById('sky-vertex').textContent,
+            fragmentShader: document.getElementById('sky-fragment').textContent
+        });
+
+        //create the mesh and adjust its scale and render settings because we are inside the sphere
+        skyBox = new THREE.Mesh(skyGeo, skyMat);
+        skyBox.scale.set(-1.5, 1.5, 1.5);
+        skyBox.rotation.order = 'XZY';
+        skyBox.renderOrder = 1000.0;
+        skyBox.rotation.x = Math.PI / 2;
+        skyBox.rotation.y = Math.PI;
+
+        scene.add(skyBox);
 }
 
 //Returns a random int in a range, inclusive.
@@ -473,6 +502,8 @@ function render() {
 
         //check for user input
         handleInput();
+
+        skyBox.rotateY(0.0005);
 
         //render the scene
         renderer.render(scene, camera);
