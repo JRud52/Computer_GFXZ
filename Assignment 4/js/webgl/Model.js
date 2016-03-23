@@ -5,7 +5,8 @@
 
 var camera, scene, renderer, controls, stats, collisionObj, frontNode, backNode;
 var clock = new THREE.Clock();
-var collisionForward = false, collisionBack = false;
+var collisionForward = false,
+        collisionBack = false;
 var wallList = [];
 
 var wallTexture;
@@ -14,7 +15,9 @@ var wallTexture;
 var keyState = [];
 
 //testing purposes only remove later
-var point = null, point2 = null, point3 = null;
+var point = null,
+        point2 = null,
+        point3 = null;
 
 var skyBox;
 
@@ -132,10 +135,10 @@ function init() {
         collisionObj.position.x = -40;
         collisionObj.rotation.y = toRads(270);
 
-        var sphere = new THREE.SphereGeometry( 0.05, 32, 32 );
+        var sphere = new THREE.SphereGeometry(0.05, 32, 32);
         sphere.translate(0.45, 0, 0.30);
 
-        torchLight = new THREE.PointLight( 0xdea061, 5, 200, 35 );
+        torchLight = new THREE.PointLight(0xdea061, 5, 200, 35);
         scene.add(torchLight);
 
         //3D points in space used to represent collision nodes on the front/back of our character
@@ -143,16 +146,16 @@ function init() {
         backNode = new THREE.Object3D();
 
         var objectLoader = new THREE.ObjectLoader();
-        objectLoader.load("models/lantern.json", function (obj) {
+        objectLoader.load("models/lantern.json", function(obj) {
 
-            scene.add(obj);
+                scene.add(obj);
 
-            collisionObj.add(torchLight);
-            collisionObj.add(obj);
-            obj.position.z = -1.5;
-            obj.position.x = 0.5;
-            obj.position.y = -0.5;
-            obj.scale.set(0.1, 0.1, 0.1);
+                collisionObj.add(torchLight);
+                collisionObj.add(obj);
+                obj.position.z = -1.5;
+                obj.position.x = 0.5;
+                obj.position.y = -0.5;
+                obj.scale.set(0.1, 0.1, 0.1);
         });
 
         //the front/back nodes are parented to the collision cylinder
@@ -184,15 +187,18 @@ function init() {
         //load the texture for the skydome
         var skyTexture = loader.load("textures/sky.jpg");
         var SkyUni = {
-            texture: { type: 't', value: skyTexture }
+                texture: {
+                        type: 't',
+                        value: skyTexture
+                }
         };
 
         //shaders used for mapping the texture onto the dome
         var skyMat = new THREE.ShaderMaterial({
-            color: 0xffffff,
-            uniforms: SkyUni,
-            vertexShader: document.getElementById('sky-vertex').textContent,
-            fragmentShader: document.getElementById('sky-fragment').textContent
+                color: 0xffffff,
+                uniforms: SkyUni,
+                vertexShader: document.getElementById('sky-vertex').textContent,
+                fragmentShader: document.getElementById('sky-fragment').textContent
         });
 
         //create the mesh and adjust its scale and render settings because we are inside the sphere
@@ -216,29 +222,36 @@ function toRads(degrees) {
         return degrees * (3.14 / 180)
 }
 
+//Static border around the entire scene and around the front of the wall.
 function drawBorder() {
 
-        drawWall(0,0, 90,0x606060);
-        drawWall(-1,0, 90,0x606060);
-        drawWall(-2,0, 90,0x606060);
-        drawWall(-3,0, 90,0x606060);
-        drawWall(-4,0, 90,0x606060);
-        drawWall(-5,0, 90,0x606060);
-        drawWall(-6,0, 90,0x606060);
-        drawWall(-7,0, 90,0x606060);
+        drawWall(0, 0, 90, 0x606060);
+        drawWall(-1, 0, 90, 0x606060);
+        drawWall(-2, 0, 90, 0x606060);
+        drawWall(-3, 0, 90, 0x606060);
+        drawWall(-4, 0, 90, 0x606060);
+        drawWall(-5, 0, 90, 0x606060);
+        drawWall(-6, 0, 90, 0x606060);
+        drawWall(-7, 0, 90, 0x606060);
 
-        drawWall(8,0, 90,0x606060);
-        drawWall(9,0, 90,0x606060);
-        drawWall(10,0, 90,0x606060);
-        drawWall(11,0, 90,0x606060);
-        drawWall(12,0, 90,0x606060);
+        drawWall(8, 0, 90, 0x606060);
+        drawWall(9, 0, 90, 0x606060);
+        drawWall(10, 0, 90, 0x606060);
+        drawWall(11, 0, 90, 0x606060);
+        drawWall(12, 0, 90, 0x606060);
 
-        for(i = -8; i < 12; i++) { drawWall(i,-8, 90, 0x606060); }
-        for(i = -8; i < 12; i++) { drawWall(-8,i, 0, 0x606060); }
-        for(i = 12; i > -12; i--) { drawWall(i,12, 90, 0x606060); }
-        for(i = 12; i > -12; i--) { drawWall(12, i, 0, 0x606060); }
-
-
+        for (i = -8; i < 12; i++) {
+                drawWall(i, -8, 90, 0x606060);
+        }
+        for (i = -8; i < 12; i++) {
+                drawWall(-8, i, 0, 0x606060);
+        }
+        for (i = 12; i > -12; i--) {
+                drawWall(i, 12, 90, 0x606060);
+        }
+        for (i = 12; i > -12; i--) {
+                drawWall(12, i, 0, 0x606060);
+        }
 }
 
 //Function that will actually draw the maze, will only draw the wall if it has information for the wall.
@@ -249,16 +262,16 @@ function drawMaze(cells) {
 
                         if (cells[i][j].leftWall != null)
                                 drawWall(cells[i][j].leftWall[0], cells[i][j].leftWall[1], cells[i][j].leftWall[2], 0x606060);
-                                //drawWall(cells[i][j].leftWall[0], cells[i][j].leftWall[1], cells[i][j].leftWall[2], cells[i][j].leftColor);
+                        //drawWall(cells[i][j].leftWall[0], cells[i][j].leftWall[1], cells[i][j].leftWall[2], cells[i][j].leftColor);
                         if (cells[i][j].rightWall != null)
                                 drawWall(cells[i][j].rightWall[0], cells[i][j].rightWall[1], cells[i][j].rightWall[2], 0x606060);
-                                //drawWall(cells[i][j].rightWall[0], cells[i][j].rightWall[1], cells[i][j].rightWall[2], cells[i][j].rightColor);
+                        //drawWall(cells[i][j].rightWall[0], cells[i][j].rightWall[1], cells[i][j].rightWall[2], cells[i][j].rightColor);
                         if (cells[i][j].topWall != null)
                                 drawWall(cells[i][j].topWall[0], cells[i][j].topWall[1], cells[i][j].topWall[2], 0x606060);
-                                //drawWall(cells[i][j].topWall[0], cells[i][j].topWall[1], cells[i][j].topWall[2], cells[i][j].topColor);
+                        //drawWall(cells[i][j].topWall[0], cells[i][j].topWall[1], cells[i][j].topWall[2], cells[i][j].topColor);
                         if (cells[i][j].bottomWall != null)
                                 drawWall(cells[i][j].bottomWall[0], cells[i][j].bottomWall[1], cells[i][j].bottomWall[2], 0x606060);
-                                //drawWall(cells[i][j].bottomWall[0], cells[i][j].bottomWall[1], cells[i][j].bottomWall[2], cells[i][j].bottomColor);
+                        //drawWall(cells[i][j].bottomWall[0], cells[i][j].bottomWall[1], cells[i][j].bottomWall[2], cells[i][j].bottomColor);
                 }
         }
 }
@@ -419,18 +432,18 @@ function primsMaze(cells) {
 
         cells[entranceX][0].leftWall = null;
 
-        entranceLight = new THREE.PointLight( 0xdea061, 2, 15 );
+        entranceLight = new THREE.PointLight(0xdea061, 2, 15);
         entranceLight.position.y = 5;
-        entranceLight.position.z = entranceX*10+5;
+        entranceLight.position.z = entranceX * 10 + 5;
         entranceLight.position.x = 0;
         scene.add(entranceLight);
 
         cells[exitX][cells.length - 1].rightWall = null;
 
-        exitLight = new THREE.PointLight( 0xdea061, 2, 15 );
+        exitLight = new THREE.PointLight(0xdea061, 2, 15);
         exitLight.position.y = 5;
-        exitLight.position.z = exitX*10+5;
-        exitLight.position.x = (cells.length-1)*10+10;
+        exitLight.position.z = exitX * 10 + 5;
+        exitLight.position.x = (cells.length - 1) * 10 + 10;
         scene.add(exitLight);
 }
 
@@ -529,21 +542,21 @@ function onKeyUp(event) {
 function handleInput() {
         //movement and rotation using WASD
         if (keyState['a'.charCodeAt(0) - 32]) {
-            collisionObj.rotateY(0.025);
+                collisionObj.rotateY(0.025);
         }
         if (keyState['d'.charCodeAt(0) - 32]) {
-            collisionObj.rotateY(-0.025);
+                collisionObj.rotateY(-0.025);
         }
         if (keyState['w'.charCodeAt(0) - 32]) {
                 //disable forward movement if the frontNode collides with a wall
                 if (!checkCollision(0)) {
-                    collisionObj.translateZ(-0.25);
+                        collisionObj.translateZ(-0.25);
                 }
         }
         if (keyState['s'.charCodeAt(0) - 32]) {
                 //disable backward movement if the backNode collides with a wall
                 if (!checkCollision(1)) {
-                    collisionObj.translateZ(0.25);
+                        collisionObj.translateZ(0.25);
                 }
         }
 }
@@ -551,28 +564,26 @@ function handleInput() {
 //check the vertex at the front or back of the object depending on collision
 function checkCollision(direction) {
 
-    //get the forward/backward direction from the front/back node to the center of the collisionObj
-    var rayDirection = new THREE.Vector3();
+        //get the forward/backward direction from the front/back node to the center of the collisionObj
+        var rayDirection = new THREE.Vector3();
 
-    //0 = front, 1 = back
-    if (direction == 0) {
-        rayDirection.setFromMatrixPosition(frontNode.matrixWorld).sub(collisionObj.position);
-    }
-    else {
-        rayDirection.setFromMatrixPosition(backNode.matrixWorld).sub(collisionObj.position);
-    }
+        //0 = front, 1 = back
+        if (direction == 0) {
+                rayDirection.setFromMatrixPosition(frontNode.matrixWorld).sub(collisionObj.position);
+        } else {
+                rayDirection.setFromMatrixPosition(backNode.matrixWorld).sub(collisionObj.position);
+        }
 
+        var collision = false;
 
-    var collision = false;
+        //cast a ray forward the origin of the player's collision object
+        var ray = new THREE.Raycaster(collisionObj.position, rayDirection.clone().normalize());
 
-    //cast a ray forward the origin of the player's collision object
-    var ray = new THREE.Raycaster(collisionObj.position, rayDirection.clone().normalize());
+        //check if the ray to the node collides with any of the walls
+        var collisions = ray.intersectObjects(wallList);
+        if (collisions.length > 0 && collisions[0].distance < rayDirection.length()) {
+                collision = true;
+        }
 
-    //check if the ray to the node collides with any of the walls
-    var collisions = ray.intersectObjects(wallList);
-    if (collisions.length > 0 && collisions[0].distance < rayDirection.length()) {
-        collision = true;
-    }
-
-    return collision;
+        return collision;
 }
