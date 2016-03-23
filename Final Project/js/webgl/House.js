@@ -47,19 +47,16 @@ function init() {
         renderer.setSize(550, 450);
         container.appendChild(renderer.domElement);
 
-        //New perspective camera, positioned to face the trees and such.
+        //New perspective camera
         camera = new THREE.PerspectiveCamera(50, 550 / 450, 0.1, 1000);
 
         scene = new THREE.Scene();
 
-        //light 2: ambient light
-        ambientLight = new THREE.AmbientLight(0x404040);
-        ambientLight.position.set(0, 0, 15);
-        ambientLight.castShadow = true;
+        var ambientLight = new THREE.AmbientLight(0x1f1f1f);
         scene.add(ambientLight);
-
-        var directionalLight = new THREE.DirectionalLight(0xffffff, 0.75);
-        directionalLight.position.set(0, 1, 0);
+                        
+        var directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        directionalLight.position.set(0, 0, 10);        
         scene.add(directionalLight);
 
 
@@ -115,9 +112,26 @@ function init() {
         window.addEventListener('keydown', onKeyDown, false);
         window.addEventListener('keyup', onKeyUp, false);
 
-//        var cells = generateArrays(5);
-//        primsMaze(cells);      
-//        drawMaze(cells);
+
+        //Textures
+        var ceilingTex = loader.load("textures/drywall.jpg");
+        ceilingTex.wrapS = ceilingTex.wrapT = THREE.RepeatWrapping;
+        ceilingTex.repeat.set(15, 15);
+        ceilingTex.anisotropy = 25;
+
+        var wallTex = loader.load("textures/brick.jpg");
+        wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
+        wallTex.repeat.set(15, 15);
+        wallTex.anisotropy = 25;
+
+        var floorTex = loader.load("textures/woodFloor.jpg");
+        floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
+        floorTex.repeat.set(15, 15);
+        floorTex.anisotropy = 25;
+
+        var doorTex = loader.load("textures/door.jpg");
+        doorTex.wrapS = doorTex.wrapT = THREE.RepeatWrapping;        
+        doorTex.anisotropy = 25;
 
         //ENTIRE HOUSE - 70 wide by 70 long by 20 high
         var house = new THREE.Object3D();
@@ -131,12 +145,10 @@ function init() {
         var frontWall_R = new THREE.Object3D();
 
         var geometry = new THREE.BoxGeometry(10, 10, 1);
-        geometry.translate(5, 5, 0); //Adjust origin point to the bottom left.
+        //Adjust origin point to the bottom left.
+        geometry.translate(5, 5, 0);
         var material = new THREE.MeshPhongMaterial({
-            color: 0xffffff,
-            emissive: 0x072534,
-            side: THREE.DoubleSide,
-            shading: THREE.SmoothShading
+            map: wallTex
         });
 
         var fullSlab = new THREE.Mesh(geometry, material);       
@@ -159,10 +171,7 @@ function init() {
         frontWall.add(frontWall_R);
 
         var doorMat = new THREE.MeshPhongMaterial({
-            color: 0xff0000,
-            emissive: 0x072534,
-            side: THREE.DoubleSide,
-            shading: THREE.SmoothShading
+            map: doorTex
         });
 
         var door = fullSlab.clone();
@@ -180,13 +189,8 @@ function init() {
         frontWall_Top.add(door_Top);
         frontWall.add(door);
         
-        //walls without windows
-        var wallTex = loader.load("textures/brick.jpg");
-        wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
-        wallTex.repeat.set(15, 15);
-        wallTex.anisotropy = 25;
-
-        var sideWallGeo = new THREE.BoxGeometry(70, 20, 1);
+        //outer walls without windows        
+        var sideWallGeo = new THREE.BoxGeometry(71, 20, 1);
         sideWallGeo.translate(35, 10, 0);
         var sideMat = new THREE.MeshPhongMaterial({
             map: wallTex
@@ -211,11 +215,6 @@ function init() {
         var floorGeo = new THREE.BoxGeometry(70, 0.1, 70);
         floorGeo.translate(35, 0.05, 35);
 
-        var floorTex = loader.load("textures/woodFloor.jpg");
-        floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
-        floorTex.repeat.set(15, 15);
-        floorTex.anisotropy = 25;
-
         var floorMat = new THREE.MeshPhongMaterial({            
             map: floorTex
         });
@@ -223,11 +222,6 @@ function init() {
         floor.translateZ(-70);      
 
         //celing
-        var ceilingTex = loader.load("textures/drywall.jpg");
-        ceilingTex.wrapS = ceilingTex.wrapT = THREE.RepeatWrapping;
-        ceilingTex.repeat.set(15, 15);
-        ceilingTex.anisotropy = 25;
-
         var ceilingMat = new THREE.MeshPhongMaterial({
             map: ceilingTex
         });
@@ -247,7 +241,30 @@ function init() {
         var roof = new THREE.Mesh(roofGeo, roofMat);
         roof.translateY(20.1);
         roof.translateZ(-70);
+
+        //inside walls
+        var innerWall = new THREE.Mesh(sideWallGeo, sideMat);
+        innerWall.scale.x = 0.4;
+        innerWall.translateZ(-35);
+        walls.add(innerWall);
+
+        var innerWall2 = innerWall.clone();
+        innerWall2.translateX(41.6);
+        walls.add(innerWall2);
+
+        var innerWall_Short = innerWall.clone();
+        innerWall_Short.scale.x = 0.25;
+        innerWall_Short.rotateY(Math.PI / 2);
+        innerWall_Short.translateZ(27.7);
+        walls.add(innerWall_Short);
+
+        //light
+        var insideLight = new THREE.PointLight(0xffffff, 0.6, 80);
+        insideLight.translateZ(-35);
+        insideLight.translateX(35);
+        insideLight.translateY(15);
         
+        house.add(insideLight);
         house.add(roof)
         house.add(ceiling);
         house.add(floor);        
