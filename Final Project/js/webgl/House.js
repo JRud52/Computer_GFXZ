@@ -181,13 +181,15 @@ function init() {
         frontWall.add(door);
         
         //walls without windows
+        var wallTex = loader.load("textures/brick.jpg");
+        wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
+        wallTex.repeat.set(15, 15);
+        wallTex.anisotropy = 25;
+
         var sideWallGeo = new THREE.BoxGeometry(70, 20, 1);
         sideWallGeo.translate(35, 10, 0);
         var sideMat = new THREE.MeshPhongMaterial({
-            color: 0x00ff00,
-            emissive: 0x072534,
-            side: THREE.DoubleSide,
-            shading: THREE.SmoothShading
+            map: wallTex
         });
 
         var sideWall_L = new THREE.Mesh(sideWallGeo, sideMat);
@@ -205,20 +207,34 @@ function init() {
         walls.add(frontWall);
         walls.add(frontWall_Top);
 
-        //celing and floor
+        //floor
         var floorGeo = new THREE.BoxGeometry(70, 0.1, 70);
         floorGeo.translate(35, 0.05, 35);
-        var floorMat = new THREE.MeshPhongMaterial({
-            color: 0x0000ff,
-            emissive: 0x072534,
-            side: THREE.DoubleSide,
-            shading: THREE.SmoothShading
+
+        var floorTex = loader.load("textures/woodFloor.jpg");
+        floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
+        floorTex.repeat.set(15, 15);
+        floorTex.anisotropy = 25;
+
+        var floorMat = new THREE.MeshPhongMaterial({            
+            map: floorTex
         });
         var floor = new THREE.Mesh(floorGeo, floorMat);
-        floor.translateZ(-70);
-        var celing = floor.clone();
-        celing.translateY(20);
+        floor.translateZ(-70);      
 
+        //celing
+        var ceilingTex = loader.load("textures/drywall.jpg");
+        ceilingTex.wrapS = ceilingTex.wrapT = THREE.RepeatWrapping;
+        ceilingTex.repeat.set(15, 15);
+        ceilingTex.anisotropy = 25;
+
+        var ceilingMat = new THREE.MeshPhongMaterial({
+            map: ceilingTex
+        });
+
+        var ceiling = new THREE.Mesh(floorGeo, ceilingMat)
+        ceiling.translateY(20);
+        ceiling.translateZ(-70);
 
         //roof 
         var roofGeo = new THREE.CylinderGeometry(0, 70, 25, 4, 32);
@@ -233,8 +249,8 @@ function init() {
         roof.translateZ(-70);
         
         house.add(roof)
-        house.add(floor);
-        house.add(celing);
+        house.add(ceiling);
+        house.add(floor);        
         house.add(walls);
 
         scene.add(house);
