@@ -8,6 +8,10 @@ var clock = new THREE.Clock();
 var collisionForward = false, collisionBack = false;
 var collisionList = [];
 var doorList = [];
+var loader;
+
+//used to disable collision
+var collisionOff = false;
 
 //Variable for entering keys.
 var keyState = [];
@@ -63,7 +67,8 @@ function init() {
         scene.add(directionalLight);
 
 
-        var loader = new THREE.TextureLoader();;
+        loader = new THREE.TextureLoader();
+
         //Making some grass
         var groundTexture = loader.load("textures/grass.jpg");
         groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
@@ -78,7 +83,7 @@ function init() {
         });
 
         //Grass's Mesh
-        var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(200, 200), groundMaterial);
+        var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(500, 500), groundMaterial);
         mesh.position.y = 0;
         mesh.position.x = 20;
         mesh.position.z = 20;
@@ -116,189 +121,15 @@ function init() {
         window.addEventListener('keydown', onKeyDown, false);
         window.addEventListener('keyup', onKeyUp, false);
 
+        //left side of the street when facing positive X direction
+        generateHouse(new THREE.Vector3(0, 0, 0), 0);
+        generateHouse(new THREE.Vector3(150, 0, 0), 0);
+        generateHouse(new THREE.Vector3(-150, 0, 0), 0);
 
-        //Textures
-        var ceilingTex = loader.load("textures/drywall.jpg");
-        ceilingTex.wrapS = ceilingTex.wrapT = THREE.RepeatWrapping;
-        ceilingTex.repeat.set(15, 15);
-        ceilingTex.anisotropy = 25;
-
-        var wallTex = loader.load("textures/brick.jpg");
-        wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
-        wallTex.repeat.set(15, 15);
-        wallTex.anisotropy = 25;
-
-        var floorTex = loader.load("textures/woodFloor.jpg");
-        floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
-        floorTex.repeat.set(15, 15);
-        floorTex.anisotropy = 25;
-
-        var doorTex = loader.load("textures/door.jpg");
-        doorTex.wrapS = doorTex.wrapT = THREE.RepeatWrapping;        
-        doorTex.anisotropy = 25;
-
-        //ENTIRE HOUSE - 70 wide by 70 long by 20 high
-        var house = new THREE.Object3D();
-
-        //WALLS
-        var walls = new THREE.Object3D();
-
-        //FRONT WALL
-        var frontWall = new THREE.Object3D();
-        var frontWall_L = new THREE.Object3D();
-        var frontWall_R = new THREE.Object3D();
-
-        var geometry = new THREE.BoxGeometry(10, 10, 1);
-        //Adjust origin point to the bottom left.
-        geometry.translate(5, 5, 0);
-        var material = new THREE.MeshPhongMaterial({
-            map: wallTex
-        });
-
-        var fullSlab = new THREE.Mesh(geometry, material);       
-
-        geometry = new THREE.BoxGeometry(10, 5, 1);
-        geometry.translate(5, 2.5, 0); //Adjust origin point to the bottom left.
-        var halfSlabY = new THREE.Mesh(geometry, material);
-        halfSlabY.position.x = 10;
-                
-        var fullSlab2 = fullSlab.clone();
-        fullSlab2.position.x = 20;
-        
-        frontWall_L.add(fullSlab);
-        frontWall_L.add(halfSlabY);
-        frontWall_L.add(fullSlab2);
-
-        frontWall_R = frontWall_L.clone();
-        frontWall_R.position.x = 40;
-        frontWall.add(frontWall_L);
-        frontWall.add(frontWall_R);
-
-        //DOOR
-        var doorMat = new THREE.MeshPhongMaterial({
-            map: doorTex
-        });
-
-        var door = fullSlab.clone();
-        door.material = doorMat;
-        door.position.x = 30;
-
-        var door_Top = door.clone();
-        door_Top.material = material;
-
-        //add the door to the list of interactable doors
-        doorList.push(door);
-    
-        var frontWall_Top = frontWall.clone();
-        frontWall_Top.rotation.x = Math.PI;
-        frontWall_Top.position.y = 20;
-
-        frontWall_Top.add(door_Top);
-        frontWall.add(door);
-        
-        //outer walls without windows        
-        var sideWallGeo = new THREE.BoxGeometry(71, 20, 1);
-        sideWallGeo.translate(35, 10, 0);
-        var sideMat = new THREE.MeshPhongMaterial({
-            map: wallTex
-        });
-
-        var sideWall_L = new THREE.Mesh(sideWallGeo, sideMat);
-        var sideWall_R = sideWall_L.clone();
-        var sideWall_Back = sideWall_L.clone();
-
-        sideWall_L.rotation.y = Math.PI / 2;
-        sideWall_R.rotation.y = Math.PI / 2;
-        sideWall_L.position.x = 70;
-        sideWall_Back.position.z = -70;
-
-        walls.add(sideWall_L);
-        walls.add(sideWall_R);
-        walls.add(sideWall_Back);
-        walls.add(frontWall);
-        walls.add(frontWall_Top);
-
-        //floor
-        var floorGeo = new THREE.BoxGeometry(70, 0.1, 70);
-        floorGeo.translate(35, 0.05, 35);
-
-        var floorMat = new THREE.MeshPhongMaterial({            
-            map: floorTex
-        });
-        var floor = new THREE.Mesh(floorGeo, floorMat);
-        floor.translateZ(-70);      
-
-        //celing
-        var ceilingMat = new THREE.MeshPhongMaterial({
-            map: ceilingTex
-        });
-
-        var ceiling = new THREE.Mesh(floorGeo, ceilingMat)
-        ceiling.translateY(20);
-        ceiling.translateZ(-70);
-
-        //roof 
-        var roofGeo = new THREE.CylinderGeometry(0, 70, 25, 4, 32);
-        roofGeo.rotateY(Math.PI / 4);
-        roofGeo.translate(35, 12.5, 35);
-        var roofMat = new THREE.MeshPhongMaterial({
-            color: 0x000000,
-            emissive: 0x072534
-        });
-        var roof = new THREE.Mesh(roofGeo, roofMat);
-        roof.translateY(20.1);
-        roof.translateZ(-70);
-
-        //inside walls
-        var innerWall = new THREE.Mesh(sideWallGeo, sideMat);
-        innerWall.scale.x = 0.4;
-        innerWall.translateZ(-35);
-        walls.add(innerWall);
-
-        var innerWall2 = innerWall.clone();
-        innerWall2.translateX(41.6);
-        walls.add(innerWall2);
-
-        var innerWall_Short = innerWall.clone();
-        innerWall_Short.scale.x = 0.25;
-        innerWall_Short.rotateY(Math.PI / 2);
-        innerWall_Short.translateZ(27.7);
-        walls.add(innerWall_Short);
-
-        var innerWall_Short2 = innerWall_Short.clone();
-        innerWall_Short2.translateZ(14.2);
-        innerWall_Short2.translateX(17.2);
-        walls.add(innerWall_Short2);
-
-        //light
-        var insideLight = new THREE.PointLight(0xffffff, 0.6, 80);
-        insideLight.translateZ(-35);
-        insideLight.translateX(35);
-        insideLight.translateY(15);
-        
-        house.add(insideLight);
-        house.add(roof)
-        house.add(ceiling);
-        house.add(floor);        
-        house.add(walls);
-
-
-        //add all of the walls to the collision list
-        for (var i = 0; i < frontWall_L.children.length; i++) {
-            collisionList.push(frontWall_L.children[i]);
-        }
-
-        for (var i = 0; i < frontWall_R.children.length; i++) {
-            collisionList.push(frontWall_R.children[i]);
-        }
-
-        for (var i = 0; i < walls.children.length; i++) {           
-            collisionList.push(walls.children[i]);            
-        }
-
-        collisionList.push(door);
-
-        scene.add(house);
+        //right side of the street when facing positive X direction
+        generateHouse(new THREE.Vector3(0, 0, 150), Math.PI);
+        generateHouse(new THREE.Vector3(150, 0, 150), Math.PI);
+        generateHouse(new THREE.Vector3(-150, 0, 150), Math.PI);
 }
 
 //Returns a random int in a range, inclusive.
@@ -384,6 +215,206 @@ function handleInput() {
 }
 
 
+function generateHouse(positionVector, rotationRads) {
+    //Textures
+    var ceilingTex = loader.load("textures/drywall.jpg");
+    ceilingTex.wrapS = ceilingTex.wrapT = THREE.RepeatWrapping;
+    ceilingTex.repeat.set(15, 15);
+    ceilingTex.anisotropy = 25;
+
+    var wallTex = loader.load("textures/brick.jpg");
+    wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
+    wallTex.repeat.set(15, 15);
+    wallTex.anisotropy = 25;
+
+    var floorTex = loader.load("textures/woodFloor.jpg");
+    floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
+    floorTex.repeat.set(15, 15);
+    floorTex.anisotropy = 25;
+
+    var doorTex = loader.load("textures/door.jpg");
+    doorTex.wrapS = doorTex.wrapT = THREE.RepeatWrapping;
+    doorTex.anisotropy = 25;
+
+    //ENTIRE HOUSE - 70 wide by 70 long by 20 high
+    var house = new THREE.Object3D();
+
+    //WALLS
+    var walls = new THREE.Object3D();
+
+    //FRONT WALL
+    var frontWall = new THREE.Object3D();
+    var frontWall_L = new THREE.Object3D();
+    var frontWall_R = new THREE.Object3D();
+
+    var geometry = new THREE.BoxGeometry(10, 10, 1);
+    //Adjust origin point to the bottom left.
+    geometry.translate(5, 5, 0);
+    var material = new THREE.MeshPhongMaterial({
+        map: wallTex
+    });
+
+    var fullSlab = new THREE.Mesh(geometry, material);
+
+    geometry = new THREE.BoxGeometry(10, 5, 1);
+    geometry.translate(5, 2.5, 0); //Adjust origin point to the bottom left.
+    var halfSlabY = new THREE.Mesh(geometry, material);
+    halfSlabY.position.x = 10;
+
+    var fullSlab2 = fullSlab.clone();
+    fullSlab2.position.x = 20;
+
+    frontWall_L.add(fullSlab);
+    frontWall_L.add(halfSlabY);
+    frontWall_L.add(fullSlab2);
+
+    frontWall_R = frontWall_L.clone();
+    frontWall_R.position.x = 40;
+    frontWall.add(frontWall_L);
+    frontWall.add(frontWall_R);
+
+    //DOOR
+    var doorMat = new THREE.MeshPhongMaterial({
+        map: doorTex
+    });
+
+    var door = fullSlab.clone();
+    door.material = doorMat;
+    door.position.x = 30;
+
+    var door_Top = door.clone();
+    door_Top.material = material;
+
+    //add the door to the list of interactable doors
+    doorList.push(door);
+
+    var frontWall_Top = frontWall.clone();
+    frontWall_Top.rotation.x = Math.PI;
+    frontWall_Top.position.y = 20;
+
+    frontWall_Top.add(door_Top);
+    frontWall.add(door);
+
+    //outer walls without windows        
+    var sideWallGeo = new THREE.BoxGeometry(71, 20, 1);
+    sideWallGeo.translate(35, 10, 0);
+    var sideMat = new THREE.MeshPhongMaterial({
+        map: wallTex
+    });
+
+    var sideWall_L = new THREE.Mesh(sideWallGeo, sideMat);
+    var sideWall_R = sideWall_L.clone();
+    var sideWall_Back = sideWall_L.clone();
+
+    sideWall_L.rotation.y = Math.PI / 2;
+    sideWall_R.rotation.y = Math.PI / 2;
+    sideWall_L.position.x = 70;
+    sideWall_Back.position.z = -70;
+
+    walls.add(sideWall_L);
+    walls.add(sideWall_R);
+    walls.add(sideWall_Back);
+    walls.add(frontWall);
+    walls.add(frontWall_Top);
+
+    //floor
+    var floorGeo = new THREE.BoxGeometry(70, 0.1, 70);
+    floorGeo.translate(35, 0.05, 35);
+
+    var floorMat = new THREE.MeshPhongMaterial({
+        map: floorTex
+    });
+    var floor = new THREE.Mesh(floorGeo, floorMat);
+    floor.translateZ(-70);
+
+    //celing
+    var ceilingMat = new THREE.MeshPhongMaterial({
+        map: ceilingTex
+    });
+
+    var ceiling = new THREE.Mesh(floorGeo, ceilingMat)
+    ceiling.translateY(20);
+    ceiling.translateZ(-70);
+
+    //roof 
+    var roofGeo = new THREE.CylinderGeometry(0, 70, 25, 4, 32);
+    roofGeo.rotateY(Math.PI / 4);
+    roofGeo.translate(35, 12.5, 35);
+    var roofMat = new THREE.MeshPhongMaterial({
+        color: 0x000000,
+        emissive: 0x072534
+    });
+    var roof = new THREE.Mesh(roofGeo, roofMat);
+    roof.translateY(20.1);
+    roof.translateZ(-70);
+
+    //inside walls
+    var innerWall = new THREE.Mesh(sideWallGeo, sideMat);
+    innerWall.scale.x = 0.4;
+    innerWall.translateZ(-35);
+    walls.add(innerWall);
+
+    var innerWall2 = innerWall.clone();
+    innerWall2.translateX(41.6);
+    walls.add(innerWall2);
+
+    var innerWall_Short = innerWall.clone();
+    innerWall_Short.scale.x = 0.25;
+    innerWall_Short.rotateY(Math.PI / 2);
+    innerWall_Short.translateZ(27.7);
+    walls.add(innerWall_Short);
+
+    var innerWall_ExtraShort = innerWall_Short.clone();
+    innerWall_ExtraShort.scale.x = 0.1;
+    innerWall_ExtraShort.translateX(28);
+    walls.add(innerWall_ExtraShort);
+
+
+    var innerWall_Short2 = innerWall_Short.clone();
+    innerWall_Short2.translateZ(14.2);
+    innerWall_Short2.translateX(17.2);
+    walls.add(innerWall_Short2);
+
+    var innerWall_ExtraShort2 = innerWall_Short2.clone();
+    innerWall_ExtraShort2.scale.x = 0.1;
+    innerWall_ExtraShort2.translateX(-17);
+    walls.add(innerWall_ExtraShort2);
+
+    //light
+    var insideLight = new THREE.PointLight(0xffffff, 0.6, 80);
+    insideLight.translateZ(-35);
+    insideLight.translateX(35);
+    insideLight.translateY(15);
+
+    house.add(insideLight);
+    house.add(roof)
+    house.add(ceiling);
+    house.add(floor);
+    house.add(walls);
+
+
+    //add all of the walls to the collision list
+    for (var i = 0; i < frontWall_L.children.length; i++) {
+        collisionList.push(frontWall_L.children[i]);
+    }
+
+    for (var i = 0; i < frontWall_R.children.length; i++) {
+        collisionList.push(frontWall_R.children[i]);
+    }
+
+    for (var i = 0; i < walls.children.length; i++) {
+        collisionList.push(walls.children[i]);
+    }
+
+    collisionList.push(door);
+
+    
+    house.position.set(positionVector.x, positionVector.y, positionVector.z);
+    house.rotateY(rotationRads);
+
+    scene.add(house);
+}
+
 //open a door
 function interactDoor(door) {
     var delta = 0;
@@ -395,7 +426,8 @@ function interactDoor(door) {
 
 //check the vertex at the front or back of the object depending on collision
 function checkCollision(direction) {    
-    
+    if (collisionOff) return false;
+
     //get the forward/backward direction from the front/back node to the center of the collisionObj
     var rayDirection = new THREE.Vector3();
 
