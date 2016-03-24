@@ -7,12 +7,15 @@ var camera, scene, renderer, controls, stats, collisionObj, frontNode, backNode;
 var clock = new THREE.Clock();
 var collisionForward = false, collisionBack = false;
 var collisionList = [];
+var doorList = [];
 
 //Variable for entering keys.
 var keyState = [];
 
 //testing purposes only remove later
 var point = null, point2 = null, point3 = null;
+
+
 
 /*
 myAudio = new Audio('music/scary.ogg');
@@ -91,7 +94,8 @@ function init() {
         });
         collisionObj = new THREE.Mesh(collisionGeo, collisionMat);
         collisionObj.position.y = 5;
-        collisionObj.position.z = -5;
+        collisionObj.position.z = 35;
+        collisionObj.position.x = 35;
 
         //3D points in space used to represent collision nodes on the front/back of our character
         frontNode = new THREE.Object3D();
@@ -100,8 +104,8 @@ function init() {
         //the front/back nodes are parented to the collision cylinder 
         collisionObj.add(frontNode);
         collisionObj.add(backNode);
-        scene.add(collisionObj);
-
+        scene.add(collisionObj);      
+        
         frontNode.position.z = -3;
         backNode.position.z = 3;
 
@@ -136,7 +140,7 @@ function init() {
         //ENTIRE HOUSE - 70 wide by 70 long by 20 high
         var house = new THREE.Object3D();
 
-        //OUTER WALLS
+        //WALLS
         var walls = new THREE.Object3D();
 
         //FRONT WALL
@@ -170,6 +174,7 @@ function init() {
         frontWall.add(frontWall_L);
         frontWall.add(frontWall_R);
 
+        //DOOR
         var doorMat = new THREE.MeshPhongMaterial({
             map: doorTex
         });
@@ -181,6 +186,8 @@ function init() {
         var door_Top = door.clone();
         door_Top.material = material;
 
+        //add the door to the list of interactable doors
+        doorList.push(door);
     
         var frontWall_Top = frontWall.clone();
         frontWall_Top.rotation.x = Math.PI;
@@ -258,6 +265,11 @@ function init() {
         innerWall_Short.translateZ(27.7);
         walls.add(innerWall_Short);
 
+        var innerWall_Short2 = innerWall_Short.clone();
+        innerWall_Short2.translateZ(14.2);
+        innerWall_Short2.translateX(17.2);
+        walls.add(innerWall_Short2);
+
         //light
         var insideLight = new THREE.PointLight(0xffffff, 0.6, 80);
         insideLight.translateZ(-35);
@@ -269,6 +281,22 @@ function init() {
         house.add(ceiling);
         house.add(floor);        
         house.add(walls);
+
+
+        //add all of the walls to the collision list
+        for (var i = 0; i < frontWall_L.children.length; i++) {
+            collisionList.push(frontWall_L.children[i]);
+        }
+
+        for (var i = 0; i < frontWall_R.children.length; i++) {
+            collisionList.push(frontWall_R.children[i]);
+        }
+
+        for (var i = 0; i < walls.children.length; i++) {           
+            collisionList.push(walls.children[i]);            
+        }
+
+        collisionList.push(door);
 
         scene.add(house);
 }
@@ -283,237 +311,12 @@ function toRads(degrees) {
         return degrees * (3.14 / 180)
 }
 
-//Function that will actually draw the maze, will only draw the wall if it has information for the wall.
-function drawMaze(cells) {
-
-        for (var i = 0; i < cells.length; i++) {
-                for (var j = 0; j < cells[i].length; j++) {
-
-                        if (cells[i][j].leftWall != null)
-                                drawWall(cells[i][j].leftWall[0], cells[i][j].leftWall[1], cells[i][j].leftWall[2], cells[i][j].leftColor);
-                        if (cells[i][j].rightWall != null)
-                                drawWall(cells[i][j].rightWall[0], cells[i][j].rightWall[1], cells[i][j].rightWall[2], cells[i][j].rightColor);
-                        if (cells[i][j].topWall != null)
-                                drawWall(cells[i][j].topWall[0], cells[i][j].topWall[1], cells[i][j].topWall[2], cells[i][j].topColor);
-                        if (cells[i][j].bottomWall != null)
-                                drawWall(cells[i][j].bottomWall[0], cells[i][j].bottomWall[1], cells[i][j].bottomWall[2], cells[i][j].bottomColor);
-                }
-        }
-}
-
-//Makes the code a bit more readable, will add a cell to the frontier and mark it as visited.
-function pushFrontier(cells, frontier, direction, i, j) {
-
-        if (direction == "right")
-                j += 1;
-
-        else if (direction == "left")
-                j -= 1;
-
-        else if (direction == "up")
-                i -= 1;
-
-        else if (direction == "down")
-                i += 1;
-
-        if (cells[i][j].visited != true) {
-                cells[i][j].visited = true;
-                frontier.push(cells[i][j]);
-        }
-}
-
-//Main decision making function, will push cells to the frontier depending on its location in the maze.
-function addNeighbours(cells, frontier, i, j) {
-
-        if (i == 0) { //Top Row
-
-                if (j == 0) { //Top Left
-                        pushFrontier(cells, frontier, "right", i, j);
-                } else if (j == cells.length - 1) { //Top Right
-                        pushFrontier(cells, frontier, "left", i, j);
-                } else { //Middle
-                        pushFrontier(cells, frontier, "right", i, j);
-                        pushFrontier(cells, frontier, "left", i, j);
-                }
-                pushFrontier(cells, frontier, "down", i, j);
-        } else if (i == cells.length - 1) { //Bottom Row
-
-                if (j == 0) { //Bottom Left
-                        pushFrontier(cells, frontier, "right", i, j);
-                } else if (j == cells.length - 1) { //Bottom Right
-                        pushFrontier(cells, frontier, "left", i, j);
-                } else { //Middle
-                        pushFrontier(cells, frontier, "right", i, j);
-                        pushFrontier(cells, frontier, "left", i, j);
-                }
-                pushFrontier(cells, frontier, "up", i, j);
-        } else if (j == 0) { //Left Column
-
-                //Top Left already taken care of.
-                //Bottom Left already taken care of.
-                pushFrontier(cells, frontier, "up", i, j);
-                pushFrontier(cells, frontier, "down", i, j);
-                pushFrontier(cells, frontier, "right", i, j);
-        } else if (j == cells.length - 1) { //Right Column
-
-                //Top right already taken care of.
-                //Bottom right already taken care of.
-                pushFrontier(cells, frontier, "up", i, j);
-                pushFrontier(cells, frontier, "down", i, j);
-                pushFrontier(cells, frontier, "left", i, j);
-        } else { //Its somewhere NORMAL
-
-                pushFrontier(cells, frontier, "up", i, j); //up
-                pushFrontier(cells, frontier, "down", i, j); //DOWN
-                pushFrontier(cells, frontier, "left", i, j); //left
-                pushFrontier(cells, frontier, "right", i, j); //right
-        }
-}
-
-//Function to remove a wall between two cells, you pass it the selected frontier cells' indexes.
-function removeWall(cells, i, j) {
-
-        var adjacentCells = [];
-
-        //Determine the possible adjacent cells we can select
-        if (i != 0 && cells[i - 1][j].inMaze == true) //Up
-                adjacentCells.push({
-                cell: cells[i - 1][j],
-                direction: "up"
-        });
-        if (i != cells.length - 1 && cells[i + 1][j].inMaze == true) //Down
-                adjacentCells.push({
-                cell: cells[i + 1][j],
-                direction: "down"
-        });
-        if (j != 0 && cells[i][j - 1].inMaze == true) //Left
-                adjacentCells.push({
-                cell: cells[i][j - 1],
-                direction: "left"
-        });
-        if (j != cells.length - 1 && cells[i][j + 1].inMaze == true) //Right
-                adjacentCells.push({
-                cell: cells[i][j + 1],
-                direction: "right"
-        });
-
-        //Select a random adjacent cell.
-        var selectedCell = adjacentCells[randomInt(0, adjacentCells.length - 1)];
-
-        //Determine its directions so we can delete the respective walls.
-        if (selectedCell.direction == "up") {
-                cells[i][j].topWall = null;
-                selectedCell.cell.bottomWall = null;
-        } else if (selectedCell.direction == "down") {
-                cells[i][j].bottomWall = null;
-                selectedCell.cell.topWall = null;
-        } else if (selectedCell.direction == "left") {
-                cells[i][j].leftWall = null;
-                selectedCell.cell.rightWall = null;
-        } else if (selectedCell.direction == "right") {
-                cells[i][j].rightWall = null;
-                selectedCell.cell.leftWall = null;
-        }
-}
-
-//Main algorithm function, uses a randomized prims algorithm to draw a maze.
-function primsMaze(cells) {
-
-        var frontier = [];
-
-        //First we have to select a random cell in the maze to start with.
-        var i = randomInt(0, cells.length - 1);
-        var j = randomInt(0, cells.length - 1);
-
-        //That cell is now in the maze, and is visited.
-        cells[i][j].inMaze = true;
-        cells[i][j].visited = true;
-
-        //Add it's neighbours to the frontier
-        addNeighbours(cells, frontier, i, j);
-
-        while (frontier.length != 0) { //If we have cells to choose in the frontier.
-
-                //Pick a random frontier cell
-                var randomNeighbour = randomInt(0, frontier.length - 1);
-
-                //And find it's x and y values.
-                var cellX = frontier[randomNeighbour].xIndex;
-                var cellY = frontier[randomNeighbour].yIndex;
-
-                //The frontier cell is now in the maze, we now clear a path.
-                cells[cellX][cellY].inMaze = true;
-                removeWall(cells, cellX, cellY);
-
-                //Add all the neighbours from the frontier cell to the frontier.
-                addNeighbours(cells, frontier, cellX, cellY);
-
-                frontier.splice(randomNeighbour, 1); // Remove it from the frontier
-        }
-
-        //Remove an entrance and an exit.
-        var entranceX = randomInt(0, cells.length - 1);
-        var exitX = randomInt(0, cells.length - 1);
-
-        cells[entranceX][0].leftWall = null;
-        cells[exitX][cells.length - 1].rightWall = null;
-}
-
-//Simple function to initialize the array of cells.
-function generateArrays(size) {
-
-        //Make a 2D Array
-        cells = new Array(size);
-        for (i = 0; i < size; i++)
-                cells[i] = new Array(size);
-
-        //Initialize each cell with an object holding coordinates for the walls, its index, and flags.
-        for (i = 0; i < cells.length; i++) {
-
-                for (j = 0; j < cells[i].length; j++) {
-
-                        cells[i][j] = {
-
-                                leftWall: [i, j, 270],
-                                rightWall: [i, j + 1, 270],
-                                topWall: [i, j, 0],
-                                bottomWall: [i + 1, j, 0],
-                                xIndex: i,
-                                yIndex: j,
-                                visited: false,
-                                inMaze: false,
-                                leftColor: 0xFF0000,
-                                rightColor: 0x00FF00,
-                                topColor: 0x0000FF,
-                                bottomColor: 0xF0F0F0
-                        };
-                }
-        }
-
-        return cells;
-}
-
-//Will draw a wall given coordinates and a rotation value.
-function drawWall(z, x, rY, clr) {
-
-        var geometry = new THREE.BoxGeometry(10, 10, 1);
-        geometry.translate(5, 5, 0); //Adjust origin point to the bottom left.
-        var material = new THREE.MeshPhongMaterial({
-                color: clr,
-                emissive: 0x072534,
-                side: THREE.DoubleSide,
-                shading: THREE.SmoothShading
-        });
-        var cube = new THREE.Mesh(geometry, material);
-
-        //Bring the cube above the ground, and move it depending on the coordinates.
-        cube.position.x = x * 10;
-        cube.position.z = z * 10;
-        cube.rotateY(toRads(rY)); //Rotate it.
-        scene.add(cube);
-
-        //add the cube to the list of walls needed for collision
-        wallList.push(cube);
+//get the distane between 2 points
+function distance(v1, v2) {
+    var dx = v2.x - v1.x;
+    var dy = v2.y - v1.y;
+    var dz = v2.z - v1.z;    
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
 }
 
 
@@ -547,7 +350,7 @@ function onKeyUp(event) {
 }
 
 //checks if the user hit specific keys for movement
-function handleInput() {
+function handleInput() {     
         //movement and rotation using WASD
         if (keyState['a'.charCodeAt(0) - 32]) {
             collisionObj.rotateY(0.025);
@@ -567,6 +370,27 @@ function handleInput() {
                     collisionObj.translateZ(0.25);
                 }                
         }
+
+        //e for interaction
+        if (keyState['e'.charCodeAt(0) - 32]) {
+            for (var i = 0; i < doorList.length; i++) {                
+                if (distance(collisionObj.position, doorList[i].position) < 10) {                                        
+                    interactDoor(doorList[i]);
+                }
+            }
+        }
+
+        
+}
+
+
+//open a door
+function interactDoor(door) {
+    var delta = 0;
+    if (door.rotation.y < 1.5) {
+        delta = 0.4;
+        door.rotateY(delta);        
+    }
 }
 
 //check the vertex at the front or back of the object depending on collision
