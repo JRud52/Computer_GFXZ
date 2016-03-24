@@ -6,8 +6,7 @@
 var camera, scene, renderer, controls, stats, collisionObj, frontNode, backNode;
 var clock = new THREE.Clock();
 var collisionForward = false, collisionBack = false;
-var collisionList = [];
-var doorList = [];
+var collisionList = [], houseList = [], doorList = [];
 var loader;
 
 //used to disable collision
@@ -203,9 +202,22 @@ function handleInput() {
         }
 
         //e for interaction
-        if (keyState['e'.charCodeAt(0) - 32]) {
-            for (var i = 0; i < doorList.length; i++) {                
-                if (distance(collisionObj.position, doorList[i].position) < 10) {                                        
+        if (keyState['e'.charCodeAt(0) - 32]) {            
+            for (var i = 0; i < houseList.length; i++) {                                
+                var x, y, z;
+                y = houseList[i].position.y;
+                z = houseList[i].position.z;
+
+                if (houseList[i].rotation > 1) {
+                    x = houseList[i].position.x - doorList[i].position.x;                                        
+                }
+                else {
+                    x = houseList[i].position.x + doorList[i].position.x;                
+                }
+
+                var doorPos = new THREE.Vector3(x, y, z);
+                                
+                if (distance(collisionObj.position, doorPos) < 10) {                                        
                     interactDoor(doorList[i]);
                 }
             }
@@ -386,6 +398,7 @@ function generateHouse(positionVector, rotationRads) {
     insideLight.translateX(35);
     insideLight.translateY(15);
 
+    //parent all of the objects to the house object
     house.add(insideLight);
     house.add(roof)
     house.add(ceiling);
@@ -406,11 +419,23 @@ function generateHouse(positionVector, rotationRads) {
         collisionList.push(walls.children[i]);
     }
 
+    //add the door to the collision list
     collisionList.push(door);
 
-    
+    //move the house
     house.position.set(positionVector.x, positionVector.y, positionVector.z);
-    house.rotateY(rotationRads);
+
+    if (rotationRads > 0) {
+        //rotate the house        
+        house.rotateY(rotationRads);        
+        
+        //compensate for pivot point not being in the center of the house by moving it
+        house.translateX(-70);
+        house.translateZ(70);
+    }
+
+    //add this new house to the list of houses
+    houseList.push(house);
 
     scene.add(house);
 }
