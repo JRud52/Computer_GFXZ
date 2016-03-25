@@ -141,12 +141,9 @@ function toRads(degrees) {
         return degrees * (3.14 / 180)
 }
 
-//get the distane between 2 points
-function distance(v1, v2) {
-    var dx = v2.x - v1.x;
-    var dy = v2.y - v1.y;
-    var dz = v2.z - v1.z;    
-    return Math.sqrt(dx * dx + dy * dy + dz * dz);
+//get the magnitude of a 3D vector
+function magnitude(vector3) {
+    return vector3.x * vector3.x + vector3.y * vector3.y + vector3.z * vector3.z;
 }
 
 
@@ -202,28 +199,27 @@ function handleInput() {
         }
 
         //e for interaction
-        if (keyState['e'.charCodeAt(0) - 32]) {            
+        if (keyState['e'.charCodeAt(0) - 32]) {
             for (var i = 0; i < houseList.length; i++) {                                
                 var x, y, z;
                 y = houseList[i].position.y;
                 z = houseList[i].position.z;
 
-                if (houseList[i].rotation > 1) {
+                if (magnitude(houseList[i].rotation) > 1) {
                     x = houseList[i].position.x - doorList[i].position.x;                                        
                 }
                 else {
                     x = houseList[i].position.x + doorList[i].position.x;                
                 }
 
+
                 var doorPos = new THREE.Vector3(x, y, z);
-                                
-                if (distance(collisionObj.position, doorPos) < 10) {                                        
+
+                if (collisionObj.position.distanceTo(doorPos) < 10) {                                        
                     interactDoor(doorList[i]);
                 }
             }
-        }
-
-        
+        }       
 }
 
 
