@@ -281,6 +281,62 @@ function generateHouse(positionVector, rotationRads) {
     frontWall.add(frontWall_L);
     frontWall.add(frontWall_R);
 
+    //HOUSE WINDOWS
+    var glassGeo = new THREE.BoxGeometry(9, 9, 0.5);
+    glassGeo.translate(4.5, 4.5, 0);
+    var glassMat = new THREE.MeshPhongMaterial({
+        transparent: true,
+        opacity: 0.4,
+        color: 0x0C0C0C
+    });
+    var glass = new THREE.Mesh(glassGeo, glassMat);
+    glass.translateX(1);
+    glass.translateY(1);
+
+    var windowEdgeGeo = new THREE.BoxGeometry(10, 1, 1);
+    windowEdgeGeo.translate(5, 0.5, 0);
+    var windowEdgeMat = new THREE.MeshPhongMaterial({
+        color: 0xffffff
+    });
+
+    var windowEdge = new THREE.Mesh(windowEdgeGeo, windowEdgeMat);
+    var windowEdge2 = windowEdge.clone();
+    windowEdge2.translateX(1);
+    windowEdge2.rotateZ(Math.PI / 2);
+
+
+    var windowEdge3 = windowEdge.clone();
+    windowEdge3.translateY(9);
+
+    var windowEdge4 = windowEdge.clone();
+    windowEdge4.translateX(10);
+    windowEdge4.rotateZ(Math.PI / 2);
+
+    var windowEdge5 = windowEdge.clone();
+    windowEdge5.translateX(5.5);
+    windowEdge5.rotateZ(Math.PI / 2);
+
+    var windowEdge6 = windowEdge.clone();
+    windowEdge6.translateY(4.25);
+
+    var houseWindow = new THREE.Object3D();
+    houseWindow.add(windowEdge6);
+    houseWindow.add(windowEdge5);
+    houseWindow.add(windowEdge4);
+    houseWindow.add(windowEdge3);
+    houseWindow.add(windowEdge2);
+    houseWindow.add(windowEdge);
+    houseWindow.add(glass);
+
+    houseWindow.translateX(10);
+    houseWindow.translateY(5);
+
+    var houseWindow2 = houseWindow.clone();
+    houseWindow2.translateX(40);
+
+    frontWall.add(houseWindow);
+    frontWall.add(houseWindow2);
+
     //DOOR
     var doorMat = new THREE.MeshPhongMaterial({
         map: doorTex
