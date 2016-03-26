@@ -628,4 +628,16 @@ function decorate(){
       obj.translateZ(-15);
       //  obj.scale.set(0.1, 0.1, 0.1);
   });
+
+
+  //LAMP
+  objectLoader.load("models/toilet.json", function (obj) {
+      scene.add(obj);
+
+      obj.translateX(20);
+      obj.translateZ(-65);
+      obj.rotateY(1.5);
+
+
+  });
 }
