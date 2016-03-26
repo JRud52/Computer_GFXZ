@@ -151,6 +151,17 @@ function init() {
         generateHouse(new THREE.Vector3(0, 0, 150), Math.PI);
         generateHouse(new THREE.Vector3(150, 0, 150), Math.PI);
         generateHouse(new THREE.Vector3(-150, 0, 150), Math.PI);
+
+
+        var objectLoader = new THREE.ObjectLoader();
+        objectLoader.load("models/sofa.json", function (obj) {
+
+            scene.add(obj);
+            
+            obj.translateY(5);
+            obj.translateZ(10);
+            //  obj.scale.set(0.1, 0.1, 0.1);            
+        });
 }
 
 //Returns a random int in a range, inclusive.
@@ -244,9 +255,82 @@ function handleInput() {
         }       
 }
 
+function generateAssets(positionVector, rotationRads) {
+    var assets = new THREE.Object3D();
+
+    var framedPicGeo = new THREE.BoxGeometry(5, 5, 0.5);
+    framedPicGeo.translate(2.5, 2.5, 0);
+    var framedPicMat = new THREE.MeshPhongMaterial({
+        color: 0x00ff00
+    });
+    var framedPic = new THREE.Mesh(framedPicGeo, framedPicMat);
+
+    var picFrame = new THREE.Object3D();
+    var picFrameEdgeGeo = new THREE.CylinderGeometry(0.5, 0.5, 5, 3, 1);
+    picFrameEdgeGeo.translate(0, 2.5, 0);
+    var picFrameMat = new THREE.MeshPhongMaterial({
+        color: 0xffffff
+    });
+    var picFrameEdge = new THREE.Mesh(picFrameEdgeGeo, picFrameMat);
+    var picFrameEdge2 = new THREE.Mesh(picFrameEdgeGeo, picFrameMat);
+    var picFrameEdge3 = new THREE.Mesh(picFrameEdgeGeo, picFrameMat);
+    var picFrameEdge4 = new THREE.Mesh(picFrameEdgeGeo, picFrameMat);
+
+    var picFrameCornerGeo = new THREE.BoxGeometry(1, 1, 1);
+   // picFrameCornerGeo.translate(0.25, 0.25, 0);
+    var picFrameCorner = new THREE.Mesh(picFrameCornerGeo, picFrameMat);
+    var picFrameCorner2 = new THREE.Mesh(picFrameCornerGeo, picFrameMat);
+    var picFrameCorner3 = new THREE.Mesh(picFrameCornerGeo, picFrameMat);
+    var picFrameCorner4 = new THREE.Mesh(picFrameCornerGeo, picFrameMat);
+    picFrameCorner2.translateY(5);
+    picFrameCorner3.translateX(5);
+    picFrameCorner4.translateX(5);
+    picFrameCorner4.translateY(5);
+
+    picFrameEdge2.translateX(5);
+    picFrameEdge3.translateX(5);
+    picFrameEdge3.rotateZ(Math.PI / 2);
+    picFrameEdge4.translateX(5);
+    picFrameEdge4.translateY(5);
+    picFrameEdge4.rotateZ(Math.PI / 2);
+
+    picFrame.add(picFrameEdge);
+    picFrame.add(picFrameEdge2);
+    picFrame.add(picFrameEdge3);
+    picFrame.add(picFrameEdge4);
+    picFrame.add(framedPic);
+
+    picFrame.add(picFrameCorner);
+    picFrame.add(picFrameCorner2);
+    picFrame.add(picFrameCorner3);
+    picFrame.add(picFrameCorner4);
+
+    picFrame.translateY(10);
+    picFrame.translateX(32.5);
+    picFrame.translateZ(-69.5);
+
+    assets.add(picFrame);
+
+    //move the house
+    assets.position.set(positionVector.x, positionVector.y, positionVector.z);
+
+    if (rotationRads > 0) {
+        //rotate the house        
+        assets.rotateY(rotationRads);
+
+        //compensate for pivot point not being in the center of the house by moving it
+        assets.translateX(-70);
+        assets.translateZ(70);
+    }
+
+    scene.add(assets);
+}
 
 function generateHouse(positionVector, rotationRads) {
-    //ENTIRE HOUSE - 70 wide by 70 long by 20 high
+
+    generateAssets(positionVector, rotationRads);
+
+    //ENTIRE HOUSE - 70 wide by 70 long by 20 high (not including the roof)
     var house = new THREE.Object3D();
 
     //WALLS
@@ -407,8 +491,7 @@ function generateHouse(positionVector, rotationRads) {
     roofGeo.rotateY(Math.PI / 4);
     roofGeo.translate(35, 12.5, 35);
     var roofMat = new THREE.MeshPhongMaterial({
-        color: 0x000000,
-        emissive: 0x072534
+        color: 0x000000
     });
     var roof = new THREE.Mesh(roofGeo, roofMat);
     roof.translateY(20.1);
