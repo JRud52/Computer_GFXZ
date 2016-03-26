@@ -613,8 +613,10 @@ function decorate(){
 
       scene.add(obj);
 
-      obj.translateY(5);
-      obj.translateZ(10);
+      obj.translateX(50);
+      obj.translateY(3);
+      obj.translateZ(-20);
+      obj.rotateY(-Math.PI / 2);
       //  obj.scale.set(0.1, 0.1, 0.1);
   });
 
