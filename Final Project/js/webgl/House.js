@@ -62,9 +62,9 @@ function init() {
 
         var ambientLight = new THREE.AmbientLight(0x1f1f1f);
         scene.add(ambientLight);
-                        
-        var directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-        directionalLight.position.set(0, 0, 10);        
+
+        var directionalLight = new THREE.DirectionalLight(0xf8f9dc, 0.5);
+        directionalLight.position.set(0, 0, 10);
         scene.add(directionalLight);
 
         //texture loader
@@ -98,7 +98,7 @@ function init() {
 
         //Grass's material
         var groundMaterial = new THREE.MeshPhongMaterial({
-                color: 0x505050,
+                color: 0xffffff,
                 specular: 0x101010,
                 map: groundTexture
         });
@@ -127,16 +127,16 @@ function init() {
         frontNode = new THREE.Object3D();
         backNode = new THREE.Object3D();
 
-        //the front/back nodes are parented to the collision cylinder 
+        //the front/back nodes are parented to the collision cylinder
         collisionObj.add(frontNode);
         collisionObj.add(backNode);
-        scene.add(collisionObj);      
-        
+        scene.add(collisionObj);
+
         frontNode.position.z = -3;
         backNode.position.z = 3;
 
         camera.position.y = 5;
-        camera.rotation.y = Math.PI / 4;                
+        camera.rotation.y = Math.PI / 4;
 
         //event listeners for movement and firing
         window.addEventListener('keydown', onKeyDown, false);
@@ -157,10 +157,21 @@ function init() {
         objectLoader.load("models/sofa.json", function (obj) {
 
             scene.add(obj);
-            
+
             obj.translateY(5);
             obj.translateZ(10);
-            //  obj.scale.set(0.1, 0.1, 0.1);            
+            //  obj.scale.set(0.1, 0.1, 0.1);
+        });
+
+        //LAMP
+        objectLoader.load("models/lamp.json", function (obj) {
+
+            scene.add(obj);
+
+            obj.translateX(10);
+            obj.translateY(20);
+            obj.translateZ(-15);
+            //  obj.scale.set(0.1, 0.1, 0.1);
         });
 }
 
@@ -182,9 +193,9 @@ function magnitude(vector3) {
 
 //updates every frame used for animation and input handling
 function render() {
-        //make the camera follow the collisionObj 
+        //make the camera follow the collisionObj
         camera.position.set(collisionObj.position.x, collisionObj.position.y, collisionObj.position.z);
-        camera.rotation.set(collisionObj.rotation.x, collisionObj.rotation.y, collisionObj.rotation.z);    
+        camera.rotation.set(collisionObj.rotation.x, collisionObj.rotation.y, collisionObj.rotation.z);
 
         //check for user input
         handleInput();
@@ -210,49 +221,49 @@ function onKeyUp(event) {
 }
 
 //checks if the user hit specific keys for movement
-function handleInput() {     
+function handleInput() {
         //movement and rotation using WASD
         if (keyState['a'.charCodeAt(0) - 32]) {
             collisionObj.rotateY(0.025);
         }
         if (keyState['d'.charCodeAt(0) - 32]) {
-            collisionObj.rotateY(-0.025);            
+            collisionObj.rotateY(-0.025);
         }
         if (keyState['w'.charCodeAt(0) - 32]) {
                 //disable forward movement if the frontNode collides with a wall
                 if (!checkCollision(0)) {
-                    collisionObj.translateZ(-0.25);                    
-                }    
+                    collisionObj.translateZ(-0.25);
+                }
         }
         if (keyState['s'.charCodeAt(0) - 32]) {
                 //disable backward movement if the backNode collides with a wall
                 if (!checkCollision(1)) {
                     collisionObj.translateZ(0.25);
-                }                
+                }
         }
 
         //e for interaction
         if (keyState['e'.charCodeAt(0) - 32]) {
-            for (var i = 0; i < houseList.length; i++) {                                
+            for (var i = 0; i < houseList.length; i++) {
                 var x, y, z;
                 y = houseList[i].position.y;
                 z = houseList[i].position.z;
 
                 if (magnitude(houseList[i].rotation) > 1) {
-                    x = houseList[i].position.x - doorList[i].position.x;                                        
+                    x = houseList[i].position.x - doorList[i].position.x;
                 }
                 else {
-                    x = houseList[i].position.x + doorList[i].position.x;                
+                    x = houseList[i].position.x + doorList[i].position.x;
                 }
 
 
                 var doorPos = new THREE.Vector3(x, y, z);
 
-                if (collisionObj.position.distanceTo(doorPos) < 10) {                                        
+                if (collisionObj.position.distanceTo(doorPos) < 10) {
                     interactDoor(doorList[i]);
                 }
             }
-        }       
+        }
 }
 
 function generateAssets(positionVector, rotationRads) {
@@ -315,7 +326,7 @@ function generateAssets(positionVector, rotationRads) {
     assets.position.set(positionVector.x, positionVector.y, positionVector.z);
 
     if (rotationRads > 0) {
-        //rotate the house        
+        //rotate the house
         assets.rotateY(rotationRads);
 
         //compensate for pivot point not being in the center of the house by moving it
@@ -445,7 +456,7 @@ function generateHouse(positionVector, rotationRads) {
     frontWall_Top.add(door_Top);
     frontWall.add(door);
 
-    //outer walls without windows        
+    //outer walls without windows
     var sideWallGeo = new THREE.BoxGeometry(71, 20, 1);
     sideWallGeo.translate(35, 10, 0);
     var sideMat = new THREE.MeshPhongMaterial({
@@ -486,12 +497,12 @@ function generateHouse(positionVector, rotationRads) {
     ceiling.translateY(20);
     ceiling.translateZ(-70);
 
-    //roof 
-    var roofGeo = new THREE.CylinderGeometry(0, 70, 25, 4, 32);
+    //roof
+    var roofGeo = new THREE.CylinderGeometry(0, 60, 25, 4, 32);
     roofGeo.rotateY(Math.PI / 4);
     roofGeo.translate(35, 12.5, 35);
     var roofMat = new THREE.MeshPhongMaterial({
-        color: 0x000000
+        color: 0x444444
     });
     var roof = new THREE.Mesh(roofGeo, roofMat);
     roof.translateY(20.1);
@@ -563,9 +574,9 @@ function generateHouse(positionVector, rotationRads) {
     house.position.set(positionVector.x, positionVector.y, positionVector.z);
 
     if (rotationRads > 0) {
-        //rotate the house        
-        house.rotateY(rotationRads);        
-        
+        //rotate the house
+        house.rotateY(rotationRads);
+
         //compensate for pivot point not being in the center of the house by moving it
         house.translateX(-70);
         house.translateZ(70);
@@ -582,12 +593,12 @@ function interactDoor(door) {
     var delta = 0;
     if (door.rotation.y < 1.5) {
         delta = 0.4;
-        door.rotateY(delta);        
+        door.rotateY(delta);
     }
 }
 
 //check the vertex at the front or back of the object depending on collision
-function checkCollision(direction) {    
+function checkCollision(direction) {
     if (collisionOff) return false;
 
     //get the forward/backward direction from the front/back node to the center of the collisionObj
@@ -600,11 +611,11 @@ function checkCollision(direction) {
     else {
         rayDirection.setFromMatrixPosition(backNode.matrixWorld).sub(collisionObj.position);
     }
-    
-    
+
+
     var collision = false;
 
-    //cast a ray forward the origin of the player's collision object 
+    //cast a ray forward the origin of the player's collision object
     var ray = new THREE.Raycaster(collisionObj.position, rayDirection.clone().normalize());
 
     //check if the ray to the node collides with any of the walls
