@@ -611,21 +611,6 @@ function decorate(){
   var objectLoader = new THREE.ObjectLoader();
   objectLoader.load("models/sofa.json", function (obj) {
 
-      obj.translateX(50);
-      obj.translateY(3);
-      obj.translateZ(-20);
-      obj.rotateY(-Math.PI / 2);
-
-      var collisionCubeGeo = new THREE.BoxGeometry(15, 5, 7.5);
-      var collisionCubeMat = new THREE.MeshPhongMaterial({
-          transparent: true,
-          opacity: 0
-      });
-      var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
-      obj.add(collisionCube);
-      collisionCube.translateZ(-0.75);
-      collisionList.push(collisionCube);
-      scene.add(obj);
   });
 
   //LAMP
