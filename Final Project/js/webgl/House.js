@@ -7,7 +7,7 @@ var camera, scene, renderer, controls, stats, collisionObj, frontNode, backNode;
 var clock = new THREE.Clock();
 var collisionForward = false, collisionBack = false;
 var collisionList = [], houseList = [], doorList = [];
-var loader;
+var loader, objectLoader;
 
 var doorTex, floorTex, wallTex, ceilingTex;
 
@@ -69,6 +69,9 @@ function init() {
 
         //texture loader
         loader = new THREE.TextureLoader();
+
+        //object loader
+        objectLoader = new THREE.ObjectLoader();
 
         //Textures
         ceilingTex = loader.load("textures/drywall.jpg");
@@ -151,8 +154,6 @@ function init() {
         generateHouse(new THREE.Vector3(0, 0, 150), Math.PI);
         generateHouse(new THREE.Vector3(150, 0, 150), Math.PI);
         generateHouse(new THREE.Vector3(-150, 0, 150), Math.PI);
-
-        decorate();
 }
 
 //Returns a random int in a range, inclusive.
@@ -301,6 +302,49 @@ function generateAssets(positionVector, rotationRads) {
     picFrame.translateZ(-69.5);
 
     assets.add(picFrame);
+
+
+    objectLoader.load("models/sofa.json", function (obj) {
+
+        obj.translateX(50);
+        obj.translateY(3);
+        obj.translateZ(-20);
+        obj.rotateY(-Math.PI / 2);
+
+        var collisionCubeGeo = new THREE.BoxGeometry(15, 5, 7.5);
+        var collisionCubeMat = new THREE.MeshPhongMaterial({
+            transparent: true,
+            opacity: 0
+        });
+        var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
+        obj.add(collisionCube);
+        collisionCube.translateZ(-0.75);
+        collisionList.push(collisionCube);
+        assets.add(obj);
+    });
+
+    //LAMP
+    objectLoader.load("models/lamp.json", function (obj) {
+      
+        obj.translateX(10);
+        obj.translateY(20);
+        obj.translateZ(-15);
+
+        assets.add(obj);
+    });
+
+
+    //Toilet
+    objectLoader.load("models/toilet.json", function (obj) {
+        obj.translateX(5);
+        obj.translateZ(-68);
+        obj.rotateY(1.5);
+        obj.scale.set(0.5, 0.5, 0.5);
+
+        assets.add(obj);
+    });
+
+
 
     //move the house
     assets.position.set(positionVector.x, positionVector.y, positionVector.z);
@@ -605,50 +649,4 @@ function checkCollision(direction) {
     }
 
     return collision;
-}
-
-function decorate(){
-  var objectLoader = new THREE.ObjectLoader();
-  objectLoader.load("models/sofa.json", function (obj) {
-
-      obj.translateX(50);
-      obj.translateY(3);
-      obj.translateZ(-20);
-      obj.rotateY(-Math.PI / 2);
-
-      var collisionCubeGeo = new THREE.BoxGeometry(15, 5, 7.5);
-      var collisionCubeMat = new THREE.MeshPhongMaterial({
-          transparent: true,
-          opacity: 0
-      });
-      var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
-      obj.add(collisionCube);
-      collisionCube.translateZ(-0.75);
-      collisionList.push(collisionCube);
-      scene.add(obj);
-  });
-
-  //LAMP
-  objectLoader.load("models/lamp.json", function (obj) {
-
-      scene.add(obj);
-
-      obj.translateX(10);
-      obj.translateY(20);
-      obj.translateZ(-15);
-      //  obj.scale.set(0.1, 0.1, 0.1);
-  });
-
-
-  //Toilet
-  objectLoader.load("models/toilet.json", function (obj) {
-      scene.add(obj);
-
-      obj.translateX(5);
-      obj.translateZ(-68);
-      obj.rotateY(1.5);
-      obj.scale.set(0.5,0.5,0.5);
-
-
-  });
 }
