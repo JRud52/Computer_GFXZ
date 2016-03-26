@@ -312,6 +312,7 @@ function generateAssets(positionVector, rotationRads) {
         obj.translateZ(-20);
         obj.rotateY(-Math.PI / 2);
 
+        //collision box
         var collisionCubeGeo = new THREE.BoxGeometry(15, 5, 7.5);
         var collisionCubeMat = new THREE.MeshPhongMaterial({
             transparent: true,
@@ -323,6 +324,28 @@ function generateAssets(positionVector, rotationRads) {
         collisionList.push(collisionCube);
         assets.add(obj);
     });
+
+    //BED
+    objectLoader.load("models/bed.json", function (obj) {
+
+        obj.translateX(62);
+        obj.translateY(2);
+        obj.translateZ(-43);
+
+        //collision box
+        var collisionCubeGeo = new THREE.BoxGeometry(14, 8, 15.5);
+        var collisionCubeMat = new THREE.MeshPhongMaterial({
+            transparent: true,
+            opacity: 0
+        });
+        var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
+        obj.add(collisionCube);
+        collisionCube.translateZ(-0.25);
+        collisionList.push(collisionCube);
+
+        assets.add(obj);
+    });
+
 
     //LAMP
     objectLoader.load("models/lamp.json", function (obj) {
@@ -338,9 +361,19 @@ function generateAssets(positionVector, rotationRads) {
     //Toilet
     objectLoader.load("models/toilet.json", function (obj) {
         obj.translateX(5);
-        obj.translateZ(-68);
+        obj.translateZ(-68.5);
         obj.rotateY(1.5);
         obj.scale.set(0.5, 0.5, 0.5);
+
+        //collision box
+        var collisionCubeGeo = new THREE.BoxGeometry(10, 20, 5);
+        var collisionCubeMat = new THREE.MeshPhongMaterial({
+            transparent: true,
+            opacity: 0
+        });
+        var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
+        obj.add(collisionCube);
+        collisionList.push(collisionCube);
 
         assets.add(obj);
     });
