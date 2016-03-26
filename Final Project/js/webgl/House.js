@@ -9,6 +9,8 @@ var collisionForward = false, collisionBack = false;
 var collisionList = [], houseList = [], doorList = [];
 var loader;
 
+var doorTex, floorTex, wallTex, ceilingTex;
+
 //used to disable collision
 var collisionOff = false;
 
@@ -65,8 +67,28 @@ function init() {
         directionalLight.position.set(0, 0, 10);        
         scene.add(directionalLight);
 
-
+        //texture loader
         loader = new THREE.TextureLoader();
+
+        //Textures
+        ceilingTex = loader.load("textures/drywall.jpg");
+        ceilingTex.wrapS = ceilingTex.wrapT = THREE.RepeatWrapping;
+        ceilingTex.repeat.set(15, 15);
+        ceilingTex.anisotropy = 25;
+
+        wallTex = loader.load("textures/brick.jpg");
+        wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
+        wallTex.repeat.set(15, 15);
+        wallTex.anisotropy = 25;
+
+        floorTex = loader.load("textures/woodFloor.jpg");
+        floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
+        floorTex.repeat.set(15, 15);
+        floorTex.anisotropy = 25;
+
+        doorTex = loader.load("textures/door.jpg");
+        doorTex.wrapS = doorTex.wrapT = THREE.RepeatWrapping;
+        doorTex.anisotropy = 25;
 
         //Making some grass
         var groundTexture = loader.load("textures/grass.jpg");
@@ -224,26 +246,6 @@ function handleInput() {
 
 
 function generateHouse(positionVector, rotationRads) {
-    //Textures
-    var ceilingTex = loader.load("textures/drywall.jpg");
-    ceilingTex.wrapS = ceilingTex.wrapT = THREE.RepeatWrapping;
-    ceilingTex.repeat.set(15, 15);
-    ceilingTex.anisotropy = 25;
-
-    var wallTex = loader.load("textures/brick.jpg");
-    wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
-    wallTex.repeat.set(15, 15);
-    wallTex.anisotropy = 25;
-
-    var floorTex = loader.load("textures/woodFloor.jpg");
-    floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
-    floorTex.repeat.set(15, 15);
-    floorTex.anisotropy = 25;
-
-    var doorTex = loader.load("textures/door.jpg");
-    doorTex.wrapS = doorTex.wrapT = THREE.RepeatWrapping;
-    doorTex.anisotropy = 25;
-
     //ENTIRE HOUSE - 70 wide by 70 long by 20 high
     var house = new THREE.Object3D();
 
