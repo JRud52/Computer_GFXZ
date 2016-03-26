@@ -60,11 +60,12 @@ function init() {
 
         scene = new THREE.Scene();
 
-        var ambientLight = new THREE.AmbientLight(0x1f1f1f);
+        var ambientLight = new THREE.AmbientLight(0xaaaaaa);
         scene.add(ambientLight);
 
         var directionalLight = new THREE.DirectionalLight(0xf8f9dc, 0.5);
-        directionalLight.position.set(0, 0, 10);
+        directionalLight.position.set(0, 100, 100);
+        //directionalLight.rotateY(45);
         scene.add(directionalLight);
 
         //texture loader
@@ -102,7 +103,7 @@ function init() {
         //Grass's material
         var groundMaterial = new THREE.MeshPhongMaterial({
                 color: 0xffffff,
-                specular: 0x101010,
+                specular: 0x111111,
                 map: groundTexture
         });
 
@@ -325,7 +326,7 @@ function generateAssets(positionVector, rotationRads) {
 
     //LAMP
     objectLoader.load("models/lamp.json", function (obj) {
-      
+
         obj.translateX(10);
         obj.translateY(20);
         obj.translateZ(-15);
@@ -565,13 +566,13 @@ function generateHouse(positionVector, rotationRads) {
     walls.add(innerWall_ExtraShort2);
 
     //light
-    var insideLight = new THREE.PointLight(0xffffff, 0.6, 80);
+    var insideLight = new THREE.PointLight(0xffffff, 0.3, 80);
     insideLight.translateZ(-35);
     insideLight.translateX(35);
     insideLight.translateY(15);
 
     //parent all of the objects to the house object
-    house.add(insideLight);
+    //house.add(insideLight);
     house.add(roof)
     house.add(ceiling);
     house.add(floor);
