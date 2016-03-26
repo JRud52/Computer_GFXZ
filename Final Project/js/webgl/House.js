@@ -632,13 +632,14 @@ function decorate(){
   });
 
 
-  //LAMP
+  //Toilet
   objectLoader.load("models/toilet.json", function (obj) {
       scene.add(obj);
 
-      obj.translateX(20);
-      obj.translateZ(-65);
+      obj.translateX(5);
+      obj.translateZ(-68);
       obj.rotateY(1.5);
+      obj.scale.set(0.5,0.5,0.5);
 
 
   });
