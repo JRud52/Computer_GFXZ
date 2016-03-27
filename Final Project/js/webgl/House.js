@@ -28,6 +28,12 @@ var point = null,
         point2 = null,
         point3 = null;
 
+var doorOpen = new Audio('music/door.ogg');
+
+var options, spawnerOptions, particleSystem;
+var tick = 0;
+
+
 /*
     ONLOAD FUNCTION
 */
@@ -77,7 +83,7 @@ function init() {
 
         wallTex = loader.load("textures/brick.jpg");
         wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
-        wallTex.repeat.set(2.5,2.5);
+        wallTex.repeat.set(2.5, 2.5);
         wallTex.anisotropy = 25;
 
         floorTex = loader.load("textures/woodFloor.jpg");
@@ -101,7 +107,8 @@ function init() {
         roadTexture.anisotropy = 25;
 
         //Grid
-        var size = 250, step = 10;
+        var size = 250,
+                step = 10;
         var geometry = new THREE.Geometry();
         for (var i = -size; i <= size; i += step) {
                 geometry.vertices.push(new THREE.Vector3(-size, 0, i));
@@ -123,7 +130,7 @@ function init() {
                 specular: 0x111111,
                 map: groundTexture
         });
-        var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(450,1080), groundMaterial);
+        var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(450, 1080), groundMaterial);
         mesh.position.y = 0;
         mesh.position.x = 35;
         mesh.position.z = 340;
@@ -138,33 +145,41 @@ function init() {
                 map: roadTexture
         });
 
-        var roadMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(50,750), roadMaterial);
+        var roadMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(50, 750), roadMaterial);
         roadMesh.position.y = 0.01;
         roadMesh.position.x = 35;
-        roadMesh.position.z = 375+30;
+        roadMesh.position.z = 375 + 30;
         roadMesh.rotation.x = -Math.PI / 2;
         roadMesh.receiveShadow = true;
         scene.add(roadMesh);
 
-        var geometry = new THREE.SphereGeometry( 1, 32, 32 );
-        var material = new THREE.MeshBasicMaterial( {color: 0xffffFF} );
-        var sphereC = new THREE.Mesh( geometry, material );
-        scene.add( sphereC );
-        var geometry = new THREE.SphereGeometry( 1, 32, 32 );
-        var material = new THREE.MeshBasicMaterial( {color: 0x42ff00} );
-        var sphereY = new THREE.Mesh( geometry, material );
-        scene.add( sphereY );
+        var geometry = new THREE.SphereGeometry(1, 32, 32);
+        var material = new THREE.MeshBasicMaterial({
+                color: 0xffffFF
+        });
+        var sphereC = new THREE.Mesh(geometry, material);
+        scene.add(sphereC);
+        var geometry = new THREE.SphereGeometry(1, 32, 32);
+        var material = new THREE.MeshBasicMaterial({
+                color: 0x42ff00
+        });
+        var sphereY = new THREE.Mesh(geometry, material);
+        scene.add(sphereY);
         sphereY.position.y += 1;
-        var geometry = new THREE.SphereGeometry( 1, 32, 32 );
-        var material = new THREE.MeshBasicMaterial( {color: 0x0d00ff} );
-        var sphereZ = new THREE.Mesh( geometry, material );
+        var geometry = new THREE.SphereGeometry(1, 32, 32);
+        var material = new THREE.MeshBasicMaterial({
+                color: 0x0d00ff
+        });
+        var sphereZ = new THREE.Mesh(geometry, material);
         sphereZ.position.z += 1;
-        scene.add( sphereZ );
-        var geometry = new THREE.SphereGeometry( 1, 32, 32 );
-        var material = new THREE.MeshBasicMaterial( {color: 0xff0000} );
-        var sphereX = new THREE.Mesh( geometry, material );
+        scene.add(sphereZ);
+        var geometry = new THREE.SphereGeometry(1, 32, 32);
+        var material = new THREE.MeshBasicMaterial({
+                color: 0xff0000
+        });
+        var sphereX = new THREE.Mesh(geometry, material);
         sphereX.position.x += 1;
-        scene.add( sphereX );
+        scene.add(sphereX);
 
 
 
@@ -231,22 +246,23 @@ function init() {
         var distance = 400000;
 
         var uniforms = sky.uniforms;
-	    uniforms.turbidity.value = 1;
-	    uniforms.reileigh.value = 0.3;
-	    uniforms.luminance.value = 1;
-	    uniforms.mieCoefficient.value = 0.001;
-	    uniforms.mieDirectionalG.value = 0.9;
+        uniforms.turbidity.value = 1;
+        uniforms.reileigh.value = 0.3;
+        uniforms.luminance.value = 1;
+        uniforms.mieCoefficient.value = 0.001;
+        uniforms.mieDirectionalG.value = 0.9;
 
-	    var theta = Math.PI * ( 0 - 0.5 );
-	    var phi = 2 * Math.PI * ( 0 - 0.5 );
+        var theta = Math.PI * (0 - 0.5);
+        var phi = 2 * Math.PI * (0 - 0.5);
 
-	    sunSphere.position.x = distance * Math.cos( phi );
-	    sunSphere.position.y = distance * Math.sin( phi ) * Math.sin( theta );
-	    sunSphere.position.z = distance * Math.sin( phi ) * Math.cos( theta );
+        sunSphere.position.x = distance * Math.cos(phi);
+        sunSphere.position.y = distance * Math.sin(phi) * Math.sin(theta);
+        sunSphere.position.z = distance * Math.sin(phi) * Math.cos(theta);
 
-	    sunSphere.visible = true;
+        sunSphere.visible = true;
 
-	    sky.uniforms.sunPosition.value.copy( sunSphere.position );
+        sky.uniforms.sunPosition.value.copy(sunSphere.position);
+
 }
 
 //Returns a random int in a range, inclusive.
@@ -267,7 +283,7 @@ function magnitude(vector3) {
 //updates every frame used for animation and input handling
 function render() {
 
-    updateHouses();
+        updateHouses();
         //make the camera follow the collisionObj
         camera.position.set(collisionObj.position.x, collisionObj.position.y, collisionObj.position.z);
         camera.rotation.set(collisionObj.rotation.x, collisionObj.rotation.y, collisionObj.rotation.z);
@@ -275,18 +291,18 @@ function render() {
         //check for user input
         handleInput();
 
-        var theta = Math.PI * ( 0 - 0.5 );
-        if(azimuth >= 0.51)
+        var theta = Math.PI * (0 - 0.5);
+        if (azimuth >= 0.51)
                 azimuth = 0;
-	    var phi = 2 * Math.PI * ( (azimuth+=0.0001) - 0.5 );
+        var phi = 2 * Math.PI * ((azimuth += 0.0001) - 0.5);
 
-            var distance = 400000;
+        var distance = 400000;
 
-	    sunSphere.position.x = distance * Math.cos( phi );
-	    sunSphere.position.y = distance * Math.sin( phi ) * Math.sin( theta );
-	    sunSphere.position.z = distance * Math.sin( phi ) * Math.cos( theta );
+        sunSphere.position.x = distance * Math.cos(phi);
+        sunSphere.position.y = distance * Math.sin(phi) * Math.sin(theta);
+        sunSphere.position.z = distance * Math.sin(phi) * Math.cos(theta);
 
-	    sky.uniforms.sunPosition.value.copy( sunSphere.position );
+        sky.uniforms.sunPosition.value.copy(sunSphere.position);
 
         //render the scene
         renderer.render(scene, camera);
@@ -313,10 +329,10 @@ function handleInput() {
         var moveAmount = 1;
         //movement and rotation using WASD
         if (keyState['a'.charCodeAt(0) - 32]) {
-                collisionObj.rotateY(moveAmount/25);
+                collisionObj.rotateY(moveAmount / 25);
         }
         if (keyState['d'.charCodeAt(0) - 32]) {
-                collisionObj.rotateY(-moveAmount/25);
+                collisionObj.rotateY(-moveAmount / 25);
         }
         if (keyState['w'.charCodeAt(0) - 32]) {
                 //disable forward movement if the frontNode collides with a wall
@@ -722,12 +738,13 @@ function generateHouse(positionVector, rotationRads) {
                 house.translateX(-70);
                 house.translateZ(70);
         }
-        
 
         //add this new house to the list of houses
-        houseList.push(house);
 
-        scene.add(house);
+        var houseObject = { house: house, hide: false, animateType: 0, beginAnimation: true };
+        houseList.push(houseObject);
+
+        scene.add(houseObject.house);
 }
 
 //open a door
@@ -736,6 +753,7 @@ function interactDoor(door) {
         if (door.rotation.y < 1.5) {
                 delta = 0.4;
                 door.rotateY(delta);
+                doorOpen.play();
         }
 }
 
@@ -768,31 +786,98 @@ function checkCollision(direction) {
         return collision;
 }
 
+var randomRotate = toRads(randomInt(1,10));
+var rotateTick = 0;
+
 function updateHouses() {
-    var houseIndex;
-    for (var i = 0; i < houseList.length; i++){
-        var x = Math.pow(camera.position.x - houseList[i].position.x, 2);
-        //var y = Math.pow(camera.position.y - houseList[0].position.y, 2);
-        var z = Math.pow(camera.position.z - houseList[i].position.z, 2);
-        var distance = Math.sqrt(x + z);
+        var houseIndex;
+        for (var i = 0; i < houseList.length; i++) {
+                var x = Math.pow(camera.position.x - houseList[i].house.position.x, 2);
+                //var y = Math.pow(camera.position.y - houseList[0].position.y, 2);
+                var z = Math.pow(camera.position.z - houseList[i].house.position.z, 2);
+                var distance = Math.sqrt(x + z);
 
-        if (distance > 200){
-            if (houseList[i].position.y > -50){
-                houseList[i].translateY(-2);
-                if (houseList[i].position.y < -50) {
-                    houseList[i].position.set(houseList[i].position.x,-50,houseList[i].position.z);
+                //If house is far away
+                if (distance > 225)
+                        houseList[i].hide = true;
+                //Its close
+                else
+                        houseList[i].hide = false;
+
+
+                //fallFromHeavens(houseList[i]);
+
+                if(houseList[i].hide == true) {
+
+                        riseOrLowerHouse(houseList[i]);
+
                 }
-            }
+
+                else {
+
+                        riseOrLowerHouse(houseList[i]);
+                }
         }
+}
+//My idea is to have 1 or 3 animations like we were talking about, it will randomly call one of these funcitons
+//All that works, the problem is because it is based on distance it will infinitely call the animation in its current state
+//Because my animation sends the object farther away.  To deal with this im thinking of using some sort of boolean flag but
+//Cant wrap my head around it right now, i think it will increase performance as well.
+function fallFromHeavens(house) {
+
+        if(house.hide == true) {
+
+                house.house.translateY(1);
+                if(rotateTick++ == 0) {
+                        //house.house.rotateZ(randomRotate);
+                        //house.house.rotateX(randomRotate);
+                }
+                else {
+                        //house.house.rotateZ(-randomRotate);
+                        //house.house.rotateX(-randomRotate);
+                }
+
+                if(house.house.position.y >= 50) {
+
+                        house.hide = false;
+                        house.beginAnimation == false;
+                        house.animateType = randomInt(0,1);
+                        randomRotate = toRads(randomInt(1,10));
+
+                        house.house.position.y = -50;
+
+                }
+        }
+
         else {
-            if (houseList[i].position.y < 0){
-                houseList[i].translateY(2);
-                if (houseList[i].position.y > 0) {
-                    houseList[i].position.set(houseList[i].position.x,0,houseList[i].position.z);
+
+        }
+}
+
+function riseOrLowerHouse(house) {
+
+        if(house.hide == true) {
+
+                house.house.translateY(-0.05);
+
+                if(house.house.position.y <= -50) {
+
+                        house.hide = false;
+                        house.animateType = randomInt(0, 1);
+                        randomRotate = toRads(randomInt(1,10));
                 }
-            }
         }
 
-        //console.log(distance);
-    }
+        else {
+
+                if(house.house.position.y < 0) {
+                        house.house.translateY(0.05);
+
+                        if(house.house.position.y >= 0) {
+
+                                house.animateType = randomInt(0, 1);
+                                randomRotate = toRads(randomInt(1,10));
+                        }
+                }
+        }
 }
