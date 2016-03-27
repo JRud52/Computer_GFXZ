@@ -21,8 +21,9 @@ var collisionOff = false;
 var keyState = [];
 
 var sky, sunSphere;
+var azimuth = 0;
 
-//testing purposes only remove later
+//testing purposes only, remove later
 var point = null,
         point2 = null,
         point3 = null;
@@ -264,9 +265,10 @@ function magnitude(vector3) {
 }
 
 
-var azimuth = 0;
 //updates every frame used for animation and input handling
 function render() {
+
+    updateHouses();
         //make the camera follow the collisionObj
         camera.position.set(collisionObj.position.x, collisionObj.position.y, collisionObj.position.z);
         camera.rotation.set(collisionObj.rotation.x, collisionObj.rotation.y, collisionObj.rotation.z);
@@ -295,7 +297,6 @@ function animate() {
         requestAnimationFrame(animate);
         render();
 }
-
 
 //handles keydown events
 function onKeyDown(event) {
@@ -788,4 +789,20 @@ function checkCollision(direction) {
         }
 
         return collision;
+}
+
+function updateHouses() {
+
+
+    var houseIndex;
+    for (var i = 0; i < houseList.length; i++){
+        var x = Math.pow(camera.position.x - houseList[i].position.x, 2);
+        //var y = Math.pow(camera.position.y - houseList[0].position.y, 2);
+        var z = Math.pow(camera.position.z - houseList[i].position.z, 2);
+        var distance = Math.sqrt(x + z);
+
+        if (distance > 200) houseList[i].position.set(houseList[i].position.x,-50,houseList[i].position.z);
+        else houseList[i].position.set(houseList[i].position.x,0,houseList[i].position.z);
+        //console.log(distance);
+    }
 }
