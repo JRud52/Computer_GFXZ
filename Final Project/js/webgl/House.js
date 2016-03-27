@@ -343,7 +343,7 @@ function handleInput() {
         }
 }
 
-function generateAssets(positionVector, rotationRads) {
+function generateAssets() {
         var assets = new THREE.Object3D();
 
         var framedPicGeo = new THREE.BoxGeometry(5, 5, 0.5);
@@ -473,29 +473,17 @@ function generateAssets(positionVector, rotationRads) {
                 assets.add(obj);
         });
 
-
-
-        //move the house
-        assets.position.set(positionVector.x, positionVector.y, positionVector.z);
-
-        if (rotationRads > 0) {
-                //rotate the house
-                assets.rotateY(rotationRads);
-
-                //compensate for pivot point not being in the center of the house by moving it
-                assets.translateX(-70);
-                assets.translateZ(70);
-        }
-
-        scene.add(assets);
+        return assets;
 }
 
 function generateHouse(positionVector, rotationRads) {
 
-        generateAssets(positionVector, rotationRads);
+        var assets = generateAssets();
 
         //ENTIRE HOUSE - 70 wide by 70 long by 20 high (not including the roof)
         var house = new THREE.Object3D();
+
+        house.add(assets);
 
         //WALLS
         var walls = new THREE.Object3D();
@@ -734,6 +722,7 @@ function generateHouse(positionVector, rotationRads) {
                 house.translateX(-70);
                 house.translateZ(70);
         }
+        
 
         //add this new house to the list of houses
         houseList.push(house);
