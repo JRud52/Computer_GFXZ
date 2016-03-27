@@ -91,7 +91,7 @@ function init() {
         //Making some grass
         var groundTexture = loader.load("textures/grass.jpg");
         groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
-        groundTexture.repeat.set(15, 15);
+        groundTexture.repeat.set(30, 30);
         groundTexture.anisotropy = 25;
 
         var roadTexture = loader.load("textures/road.jpg");
@@ -116,34 +116,31 @@ function init() {
         scene.add(line);
 
 
-        //Grass's material
+        //Initial Grass
         var groundMaterial = new THREE.MeshPhongMaterial({
                 color: 0xffffff,
                 specular: 0x111111,
                 map: groundTexture
         });
-
-        //Grass's Mesh
-        var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(250,250), groundMaterial);
+        var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(450,1080), groundMaterial);
         mesh.position.y = 0;
-        mesh.position.x = 0;
-        mesh.position.z = 0;
+        mesh.position.x = 35;
+        mesh.position.z = 340;
         mesh.rotation.x = -Math.PI / 2;
         mesh.receiveShadow = true;
-        //scene.add(mesh);
+        scene.add(mesh);
 
         //Creating Initial Road
-
         var roadMaterial = new THREE.MeshPhongMaterial({
                 color: 0xffffff,
                 specular: 0x111111,
                 map: roadTexture
         });
 
-        var roadMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(70,500), roadMaterial);
-        roadMesh.position.y = 0;
+        var roadMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(50,750), roadMaterial);
+        roadMesh.position.y = 0.01;
         roadMesh.position.x = 35;
-        roadMesh.position.z = 250;
+        roadMesh.position.z = 375+30;
         roadMesh.rotation.x = -Math.PI / 2;
         roadMesh.receiveShadow = true;
         scene.add(roadMesh);
@@ -178,7 +175,7 @@ function init() {
         });
         collisionObj = new THREE.Mesh(collisionGeo, collisionMat);
         collisionObj.position.y = 5;
-        collisionObj.position.z = 35;
+        collisionObj.position.z = 100;
         collisionObj.position.x = 35;
 
         //3D points in space used to represent collision nodes on the front/back of our character
@@ -200,15 +197,21 @@ function init() {
         window.addEventListener('keydown', onKeyDown, false);
         window.addEventListener('keyup', onKeyUp, false);
 
-        //left side of the street when facing positive X direction
-        generateHouse(new THREE.Vector3(0, 0, 0), 0);
-        generateHouse(new THREE.Vector3(150, 0, 0), 0);
-        generateHouse(new THREE.Vector3(-150, 0, 0), 0);
 
-        //right side of the street when facing positive X direction
-        generateHouse(new THREE.Vector3(0, 0, 150), Math.PI);
-        generateHouse(new THREE.Vector3(150, 0, 150), Math.PI);
-        generateHouse(new THREE.Vector3(-150, 0, 150), Math.PI);
+        //Static house
+        generateHouse(new THREE.Vector3(0, 0, 0), 0);
+
+        //Right side of the road
+        generateHouse(new THREE.Vector3(160, 0, 100), toRads(270));
+        generateHouse(new THREE.Vector3(160, 0, 200), toRads(270));
+        generateHouse(new THREE.Vector3(160, 0, 300), toRads(270));
+        generateHouse(new THREE.Vector3(160, 0, 400), toRads(270));
+
+        //Left side of the road
+        generateHouse(new THREE.Vector3(-90, 0, 30), toRads(90));
+        generateHouse(new THREE.Vector3(-90, 0, 130), toRads(90));
+        generateHouse(new THREE.Vector3(-90, 0, 230), toRads(90));
+        generateHouse(new THREE.Vector3(-90, 0, 330), toRads(90));
 
         // Add Sky Mesh
         sky = new THREE.Sky();
