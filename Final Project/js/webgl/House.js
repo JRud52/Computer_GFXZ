@@ -76,7 +76,7 @@ function init() {
 
         wallTex = loader.load("textures/brick.jpg");
         wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
-        wallTex.repeat.set(15, 15);
+        wallTex.repeat.set(2.5,2.5);
         wallTex.anisotropy = 25;
 
         floorTex = loader.load("textures/woodFloor.jpg");
@@ -94,6 +94,28 @@ function init() {
         groundTexture.repeat.set(15, 15);
         groundTexture.anisotropy = 25;
 
+        var roadTexture = loader.load("textures/road.jpg");
+        roadTexture.wrapS = roadTexture.wrapT = THREE.RepeatWrapping;
+        roadTexture.repeat.set(1, 25);
+        roadTexture.anisotropy = 25;
+
+        //Grid
+        var size = 250, step = 10;
+        var geometry = new THREE.Geometry();
+        for (var i = -size; i <= size; i += step) {
+                geometry.vertices.push(new THREE.Vector3(-size, 0, i));
+                geometry.vertices.push(new THREE.Vector3(size, 0, i));
+                geometry.vertices.push(new THREE.Vector3(i, 0, -size));
+                geometry.vertices.push(new THREE.Vector3(i, 0, size));
+        }
+        var material = new THREE.LineBasicMaterial({
+                color: 0x000000,
+                opacity: 0.5
+        });
+        var line = new THREE.LineSegments(geometry, material);
+        scene.add(line);
+
+
         //Grass's material
         var groundMaterial = new THREE.MeshPhongMaterial({
                 color: 0xffffff,
@@ -102,13 +124,51 @@ function init() {
         });
 
         //Grass's Mesh
-        var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(500, 500), groundMaterial);
+        var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(250,250), groundMaterial);
         mesh.position.y = 0;
-        mesh.position.x = 20;
-        mesh.position.z = 20;
+        mesh.position.x = 0;
+        mesh.position.z = 0;
         mesh.rotation.x = -Math.PI / 2;
         mesh.receiveShadow = true;
-        scene.add(mesh);
+        //scene.add(mesh);
+
+        //Creating Initial Road
+
+        var roadMaterial = new THREE.MeshPhongMaterial({
+                color: 0xffffff,
+                specular: 0x111111,
+                map: roadTexture
+        });
+
+        var roadMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(70,500), roadMaterial);
+        roadMesh.position.y = 0;
+        roadMesh.position.x = 35;
+        roadMesh.position.z = 250;
+        roadMesh.rotation.x = -Math.PI / 2;
+        roadMesh.receiveShadow = true;
+        scene.add(roadMesh);
+
+        var geometry = new THREE.SphereGeometry( 1, 32, 32 );
+        var material = new THREE.MeshBasicMaterial( {color: 0xffffFF} );
+        var sphereC = new THREE.Mesh( geometry, material );
+        scene.add( sphereC );
+        var geometry = new THREE.SphereGeometry( 1, 32, 32 );
+        var material = new THREE.MeshBasicMaterial( {color: 0x42ff00} );
+        var sphereY = new THREE.Mesh( geometry, material );
+        scene.add( sphereY );
+        sphereY.position.y += 1;
+        var geometry = new THREE.SphereGeometry( 1, 32, 32 );
+        var material = new THREE.MeshBasicMaterial( {color: 0x0d00ff} );
+        var sphereZ = new THREE.Mesh( geometry, material );
+        sphereZ.position.z += 1;
+        scene.add( sphereZ );
+        var geometry = new THREE.SphereGeometry( 1, 32, 32 );
+        var material = new THREE.MeshBasicMaterial( {color: 0xff0000} );
+        var sphereX = new THREE.Mesh( geometry, material );
+        sphereX.position.x += 1;
+        scene.add( sphereX );
+
+
 
         //The cylinder acts as a bounding box for collision - it is used internally to position the collision nodes
         //the material can be changed for debuging to see the collision box
@@ -246,23 +306,25 @@ function onKeyUp(event) {
 
 //checks if the user hit specific keys for movement
 function handleInput() {
+
+        var moveAmount = 1;
         //movement and rotation using WASD
         if (keyState['a'.charCodeAt(0) - 32]) {
-                collisionObj.rotateY(0.025);
+                collisionObj.rotateY(moveAmount/25);
         }
         if (keyState['d'.charCodeAt(0) - 32]) {
-                collisionObj.rotateY(-0.025);
+                collisionObj.rotateY(-moveAmount/25);
         }
         if (keyState['w'.charCodeAt(0) - 32]) {
                 //disable forward movement if the frontNode collides with a wall
                 if (!checkCollision(0)) {
-                        collisionObj.translateZ(-0.25);
+                        collisionObj.translateZ(-moveAmount);
                 }
         }
         if (keyState['s'.charCodeAt(0) - 32]) {
                 //disable backward movement if the backNode collides with a wall
                 if (!checkCollision(1)) {
-                        collisionObj.translateZ(0.25);
+                        collisionObj.translateZ(moveAmount);
                 }
         }
 
