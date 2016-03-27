@@ -230,22 +230,22 @@ function init() {
         var distance = 400000;
 
         var uniforms = sky.uniforms;
-	uniforms.turbidity.value = 1;
-	uniforms.reileigh.value = 0.3;
-	uniforms.luminance.value = 1;
-	uniforms.mieCoefficient.value = 0.001;
-	uniforms.mieDirectionalG.value = 0.9;
+	    uniforms.turbidity.value = 1;
+	    uniforms.reileigh.value = 0.3;
+	    uniforms.luminance.value = 1;
+	    uniforms.mieCoefficient.value = 0.001;
+	    uniforms.mieDirectionalG.value = 0.9;
 
-	var theta = Math.PI * ( 0 - 0.5 );
-	var phi = 2 * Math.PI * ( 0 - 0.5 );
+	    var theta = Math.PI * ( 0 - 0.5 );
+	    var phi = 2 * Math.PI * ( 0 - 0.5 );
 
-	sunSphere.position.x = distance * Math.cos( phi );
-	sunSphere.position.y = distance * Math.sin( phi ) * Math.sin( theta );
-	sunSphere.position.z = distance * Math.sin( phi ) * Math.cos( theta );
+	    sunSphere.position.x = distance * Math.cos( phi );
+	    sunSphere.position.y = distance * Math.sin( phi ) * Math.sin( theta );
+	    sunSphere.position.z = distance * Math.sin( phi ) * Math.cos( theta );
 
-	sunSphere.visible = true;
+	    sunSphere.visible = true;
 
-	sky.uniforms.sunPosition.value.copy( sunSphere.position );
+	    sky.uniforms.sunPosition.value.copy( sunSphere.position );
 }
 
 //Returns a random int in a range, inclusive.
@@ -277,15 +277,15 @@ function render() {
         var theta = Math.PI * ( 0 - 0.5 );
         if(azimuth >= 0.51)
                 azimuth = 0;
-	var phi = 2 * Math.PI * ( (azimuth+=0.0001) - 0.5 );
+	    var phi = 2 * Math.PI * ( (azimuth+=0.0001) - 0.5 );
 
-        var distance = 400000;
+            var distance = 400000;
 
-	sunSphere.position.x = distance * Math.cos( phi );
-	sunSphere.position.y = distance * Math.sin( phi ) * Math.sin( theta );
-	sunSphere.position.z = distance * Math.sin( phi ) * Math.cos( theta );
+	    sunSphere.position.x = distance * Math.cos( phi );
+	    sunSphere.position.y = distance * Math.sin( phi ) * Math.sin( theta );
+	    sunSphere.position.z = distance * Math.sin( phi ) * Math.cos( theta );
 
-	sky.uniforms.sunPosition.value.copy( sunSphere.position );
+	    sky.uniforms.sunPosition.value.copy( sunSphere.position );
 
         //render the scene
         renderer.render(scene, camera);
@@ -332,20 +332,9 @@ function handleInput() {
         }
 
         //e for interaction
-        if (keyState['e'.charCodeAt(0) - 32]) {
-                for (var i = 0; i < houseList.length; i++) {
-                        var x, y, z;
-                        y = houseList[i].position.y;
-                        z = houseList[i].position.z;
-
-                        if (magnitude(houseList[i].rotation) > 1) {
-                                x = houseList[i].position.x - doorList[i].position.x;
-                        } else {
-                                x = houseList[i].position.x + doorList[i].position.x;
-                        }
-
-
-                        var doorPos = new THREE.Vector3(x, y, z);
+        if (keyState['e'.charCodeAt(0) - 32]) {            
+                for (var i = 0; i < houseList.length; i++) {                        
+                        var doorPos = new THREE.Vector3().setFromMatrixPosition(doorList[i].matrixWorld);
 
                         if (collisionObj.position.distanceTo(doorPos) < 10) {
                                 interactDoor(doorList[i]);
