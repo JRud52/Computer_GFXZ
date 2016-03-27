@@ -264,7 +264,6 @@ function magnitude(vector3) {
         return vector3.x * vector3.x + vector3.y * vector3.y + vector3.z * vector3.z;
 }
 
-
 //updates every frame used for animation and input handling
 function render() {
 
@@ -333,8 +332,8 @@ function handleInput() {
         }
 
         //e for interaction
-        if (keyState['e'.charCodeAt(0) - 32]) {            
-                for (var i = 0; i < houseList.length; i++) {                        
+        if (keyState['e'.charCodeAt(0) - 32]) {
+                for (var i = 0; i < houseList.length; i++) {
                         var doorPos = new THREE.Vector3().setFromMatrixPosition(doorList[i].matrixWorld);
 
                         if (collisionObj.position.distanceTo(doorPos) < 10) {
@@ -781,8 +780,6 @@ function checkCollision(direction) {
 }
 
 function updateHouses() {
-
-
     var houseIndex;
     for (var i = 0; i < houseList.length; i++){
         var x = Math.pow(camera.position.x - houseList[i].position.x, 2);
@@ -790,8 +787,23 @@ function updateHouses() {
         var z = Math.pow(camera.position.z - houseList[i].position.z, 2);
         var distance = Math.sqrt(x + z);
 
-        if (distance > 200) houseList[i].position.set(houseList[i].position.x,-50,houseList[i].position.z);
-        else houseList[i].position.set(houseList[i].position.x,0,houseList[i].position.z);
+        if (distance > 200){
+            if (houseList[i].position.y > -50){
+                houseList[i].translateY(-2);
+                if (houseList[i].position.y < -50) {
+                    houseList[i].position.set(houseList[i].position.x,-50,houseList[i].position.z);
+                }
+            }
+        }
+        else {
+            if (houseList[i].position.y < 0){
+                houseList[i].translateY(2);
+                if (houseList[i].position.y > 0) {
+                    houseList[i].position.set(houseList[i].position.x,0,houseList[i].position.z);
+                }
+            }
+        }
+
         //console.log(distance);
     }
 }
