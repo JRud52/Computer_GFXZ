@@ -1,5 +1,5 @@
 /*
-    Graphics Assignment 3
+    Final Project
     Group Members: Justin, Tyler, Will, Michael, Guy
 */
 
@@ -7,9 +7,7 @@ var camera, scene, renderer, controls, stats, collisionObj, frontNode, backNode;
 var clock = new THREE.Clock();
 var collisionForward = false,
         collisionBack = false;
-var collisionList = [],
-        houseList = [],
-        doorList = [];
+var houseList = [], doorList = [];
 var loader, objectLoader;
 
 var doorTex, floorTex, wallTex, ceilingTex;
@@ -105,7 +103,7 @@ function init() {
         roadTexture.wrapS = roadTexture.wrapT = THREE.RepeatWrapping;
         roadTexture.repeat.set(1, 25);
         roadTexture.anisotropy = 25;
-
+/*
         //Grid
         var size = 250,
                 step = 10;
@@ -122,7 +120,7 @@ function init() {
         });
         var line = new THREE.LineSegments(geometry, material);
         scene.add(line);
-
+*/
 
         //Initial Grass
         var groundMaterial = new THREE.MeshPhongMaterial({
@@ -217,6 +215,7 @@ function init() {
         //Static house
         generateHouse(new THREE.Vector3(0, 0, 0), 0);
 
+/*
         //Right side of the road
         generateHouse(new THREE.Vector3(160, 0, 100), toRads(270));
         generateHouse(new THREE.Vector3(160, 0, 200), toRads(270));
@@ -228,6 +227,13 @@ function init() {
         generateHouse(new THREE.Vector3(-90, 0, 130), toRads(90));
         generateHouse(new THREE.Vector3(-90, 0, 230), toRads(90));
         generateHouse(new THREE.Vector3(-90, 0, 330), toRads(90));
+*/
+
+        for(var i = 0; i < 3; i++){
+            generateHouse(new THREE.Vector3(160, 0, 100 + 100 * i), toRads(270));
+            generateHouse(new THREE.Vector3(-90, 0, 30 + 100 * i), toRads(90));
+        }
+
 
         // Add Sky Mesh
         sky = new THREE.Sky();
@@ -361,6 +367,8 @@ function handleInput() {
 
 function generateAssets() {
         var assets = new THREE.Object3D();
+        var assetCollisionList = [];
+        var ret = [];
 
         var framedPicGeo = new THREE.BoxGeometry(5, 5, 0.5);
         framedPicGeo.translate(2.5, 2.5, 0);
@@ -432,7 +440,7 @@ function generateAssets() {
                 var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
                 obj.add(collisionCube);
                 collisionCube.translateZ(-0.75);
-                collisionList.push(collisionCube);
+                assetCollisionList.push(collisionCube);
                 assets.add(obj);
         });
 
@@ -452,8 +460,7 @@ function generateAssets() {
                 var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
                 obj.add(collisionCube);
                 collisionCube.translateZ(-0.25);
-                collisionList.push(collisionCube);
-
+                assetCollisionList.push(collisionCube);
                 assets.add(obj);
         });
 
@@ -484,17 +491,21 @@ function generateAssets() {
                 });
                 var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
                 obj.add(collisionCube);
-                collisionList.push(collisionCube);
-
+                assetCollisionList.push(collisionCube);
                 assets.add(obj);
         });
 
-        return assets;
+        ret.push(assets);
+        ret.push(assetCollisionList);
+        return ret;
 }
 
 function generateHouse(positionVector, rotationRads) {
 
-        var assets = generateAssets();
+        var allAssets = generateAssets();
+        var assets = allAssets[0];
+        var assetCollision = allAssets[1];
+        var houseCollision = [];
 
         //ENTIRE HOUSE - 70 wide by 70 long by 20 high (not including the roof)
         var house = new THREE.Object3D();
@@ -713,19 +724,19 @@ function generateHouse(positionVector, rotationRads) {
 
         //add all of the walls to the collision list
         for (var i = 0; i < frontWall_L.children.length; i++) {
-                collisionList.push(frontWall_L.children[i]);
+                houseCollision.push(frontWall_L.children[i]);
         }
 
         for (var i = 0; i < frontWall_R.children.length; i++) {
-                collisionList.push(frontWall_R.children[i]);
+                houseCollision.push(frontWall_R.children[i]);
         }
 
         for (var i = 0; i < walls.children.length; i++) {
-                collisionList.push(walls.children[i]);
+                houseCollision.push(walls.children[i]);
         }
 
         //add the door to the collision list
-        collisionList.push(door);
+        houseCollision.push(door);
 
         //move the house
         house.position.set(positionVector.x, positionVector.y, positionVector.z);
@@ -741,7 +752,14 @@ function generateHouse(positionVector, rotationRads) {
 
         //add this new house to the list of houses
 
-        var houseObject = { house: house, hide: false, animateType: 0, beginAnimation: true };
+        var houseObject = {
+            house: house,
+            hide: false,
+            animateType: 0,
+            beginAnimation: true,
+            assetCollisionList: assetCollision,
+            houseCollisionList: houseCollision
+        };
         houseList.push(houseObject);
 
         scene.add(houseObject.house);
@@ -778,9 +796,22 @@ function checkCollision(direction) {
         var ray = new THREE.Raycaster(collisionObj.position, rayDirection.clone().normalize());
 
         //check if the ray to the node collides with any of the walls
-        var collisions = ray.intersectObjects(collisionList);
-        if (collisions.length > 0 && collisions[0].distance < rayDirection.length()) {
-                collision = true;
+        for(var i = 0; i < houseList.length; i++){
+            if(collisionObj.position.distanceTo(houseList[i].house.position) < 100){
+                //check house walls for collision
+                var collisions = ray.intersectObjects(houseList[i].houseCollisionList);
+                if (collisions.length > 0 && collisions[0].distance < rayDirection.length()) {
+                        collision = true;
+                        break;
+                }
+
+                //check assets for collision
+                collisions = ray.intersectObjects(houseList[i].assetCollisionList);
+                if (collisions.length > 0 && collisions[0].distance < rayDirection.length()) {
+                        collision = true;
+                        break;
+                }
+            }
         }
 
         return collision;
@@ -862,7 +893,7 @@ function riseOrLowerHouse(house) {
 
         if(house.hide == true) {
 
-                house.house.translateY(-0.05);
+                house.house.translateY(-0.1);
 
                 if(house.house.position.y <= -50) {
 
@@ -875,7 +906,7 @@ function riseOrLowerHouse(house) {
         else {
 
                 if(house.house.position.y < 0) {
-                        house.house.translateY(0.05);
+                        house.house.translateY(0.1);
 
                         if(house.house.position.y >= 0) {
 
