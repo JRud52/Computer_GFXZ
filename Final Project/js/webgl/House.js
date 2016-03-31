@@ -805,17 +805,17 @@ function updateHouses() {
                         houseList[i].hide = false;
 
 
-                //fallFromHeavens(houseList[i]);
+                fallFromHeavens(houseList[i]);
 
                 if(houseList[i].hide == true) {
 
-                        riseOrLowerHouse(houseList[i]);
+                        //riseOrLowerHouse(houseList[i]);
 
                 }
 
                 else {
 
-                        riseOrLowerHouse(houseList[i]);
+                        //riseOrLowerHouse(houseList[i]);
                 }
         }
 }
@@ -827,15 +827,19 @@ function fallFromHeavens(house) {
 
         if(house.hide == true) {
 
-                house.house.translateY(1);
-                if(rotateTick++ == 0) {
+
+                if(rotateTick == 0) {
                         //house.house.rotateZ(randomRotate);
-                        //house.house.rotateX(randomRotate);
+                        house.house.rotateX(randomRotate);
+                        house.house.translateY(1);
+                        rotateTick++;
                 }
-                else {
+                if (rotateTick == 5) {
                         //house.house.rotateZ(-randomRotate);
-                        //house.house.rotateX(-randomRotate);
+                        house.house.rotateX(-randomRotate);
+                        house.house.translateY(1);
                 }
+
 
                 if(house.house.position.y >= 50) {
 
