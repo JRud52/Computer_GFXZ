@@ -7,7 +7,8 @@ var camera, scene, renderer, controls, stats, collisionObj, frontNode, backNode;
 var clock = new THREE.Clock();
 var collisionForward = false,
         collisionBack = false;
-var houseList = [], doorList = [];
+var houseList = [],
+        doorList = [];
 var loader, objectLoader;
 
 var doorTex, floorTex, wallTex, ceilingTex;
@@ -27,6 +28,7 @@ var point = null,
         point3 = null;
 
 var doorOpen = new Audio('music/door.ogg');
+var houseLand = new Audio('music/land.ogg');
 
 var options, spawnerOptions, particleSystem;
 var tick = 0;
@@ -55,7 +57,7 @@ function init() {
         container.appendChild(renderer.domElement);
 
         //New perspective camera
-        camera = new THREE.PerspectiveCamera(50, 550 / 450, 0.1, 2000000);
+        camera = new THREE.PerspectiveCamera(90, 550 / 450, 0.1, 2000000);
 
         scene = new THREE.Scene();
 
@@ -103,24 +105,24 @@ function init() {
         roadTexture.wrapS = roadTexture.wrapT = THREE.RepeatWrapping;
         roadTexture.repeat.set(1, 25);
         roadTexture.anisotropy = 25;
-/*
-        //Grid
-        var size = 250,
-                step = 10;
-        var geometry = new THREE.Geometry();
-        for (var i = -size; i <= size; i += step) {
-                geometry.vertices.push(new THREE.Vector3(-size, 0, i));
-                geometry.vertices.push(new THREE.Vector3(size, 0, i));
-                geometry.vertices.push(new THREE.Vector3(i, 0, -size));
-                geometry.vertices.push(new THREE.Vector3(i, 0, size));
-        }
-        var material = new THREE.LineBasicMaterial({
-                color: 0x000000,
-                opacity: 0.5
-        });
-        var line = new THREE.LineSegments(geometry, material);
-        scene.add(line);
-*/
+        /*
+                //Grid
+                var size = 250,
+                        step = 10;
+                var geometry = new THREE.Geometry();
+                for (var i = -size; i <= size; i += step) {
+                        geometry.vertices.push(new THREE.Vector3(-size, 0, i));
+                        geometry.vertices.push(new THREE.Vector3(size, 0, i));
+                        geometry.vertices.push(new THREE.Vector3(i, 0, -size));
+                        geometry.vertices.push(new THREE.Vector3(i, 0, size));
+                }
+                var material = new THREE.LineBasicMaterial({
+                        color: 0x000000,
+                        opacity: 0.5
+                });
+                var line = new THREE.LineSegments(geometry, material);
+                scene.add(line);
+        */
 
         //Initial Grass
         var groundMaterial = new THREE.MeshPhongMaterial({
@@ -128,10 +130,10 @@ function init() {
                 specular: 0x111111,
                 map: groundTexture
         });
-        var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(450, 1080), groundMaterial);
+        var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(450, 750), groundMaterial);
         mesh.position.y = 0;
         mesh.position.x = 35;
-        mesh.position.z = 340;
+        mesh.position.z = 5;
         mesh.rotation.x = -Math.PI / 2;
         mesh.receiveShadow = true;
         scene.add(mesh);
@@ -143,10 +145,10 @@ function init() {
                 map: roadTexture
         });
 
-        var roadMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(50, 750), roadMaterial);
+        var roadMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(50, 350), roadMaterial);
         roadMesh.position.y = 0.01;
         roadMesh.position.x = 35;
-        roadMesh.position.z = 375 + 30;
+        roadMesh.position.z = 175 + 30;
         roadMesh.rotation.x = -Math.PI / 2;
         roadMesh.receiveShadow = true;
         scene.add(roadMesh);
@@ -179,8 +181,6 @@ function init() {
         sphereX.position.x += 1;
         scene.add(sphereX);
 
-
-
         //The cylinder acts as a bounding box for collision - it is used internally to position the collision nodes
         //the material can be changed for debuging to see the collision box
         var collisionGeo = new THREE.CylinderGeometry(3, 3, 1, 16, 1);
@@ -189,7 +189,7 @@ function init() {
         });
         collisionObj = new THREE.Mesh(collisionGeo, collisionMat);
         collisionObj.position.y = 5;
-        collisionObj.position.z = 100;
+        collisionObj.position.z = 50;
         collisionObj.position.x = 35;
 
         //3D points in space used to represent collision nodes on the front/back of our character
@@ -215,23 +215,9 @@ function init() {
         //Static house
         generateHouse(new THREE.Vector3(0, 0, 0), 0);
 
-/*
-        //Right side of the road
-        generateHouse(new THREE.Vector3(160, 0, 100), toRads(270));
-        generateHouse(new THREE.Vector3(160, 0, 200), toRads(270));
-        generateHouse(new THREE.Vector3(160, 0, 300), toRads(270));
-        generateHouse(new THREE.Vector3(160, 0, 400), toRads(270));
-
-        //Left side of the road
-        generateHouse(new THREE.Vector3(-90, 0, 30), toRads(90));
-        generateHouse(new THREE.Vector3(-90, 0, 130), toRads(90));
-        generateHouse(new THREE.Vector3(-90, 0, 230), toRads(90));
-        generateHouse(new THREE.Vector3(-90, 0, 330), toRads(90));
-*/
-
-        for(var i = 0; i < 3; i++){
-            generateHouse(new THREE.Vector3(160, 0, 100 + 100 * i), toRads(270));
-            generateHouse(new THREE.Vector3(-90, 0, 30 + 100 * i), toRads(90));
+        for (var i = 0; i < 3; i++) {
+                generateHouse(new THREE.Vector3(160, 0, 100 + 100 * i), toRads(270), 0, false);
+                generateHouse(new THREE.Vector3(-90, 0, 30 + 100 * i), toRads(90), 0, false);
         }
 
 
@@ -286,10 +272,11 @@ function magnitude(vector3) {
         return vector3.x * vector3.x + vector3.y * vector3.y + vector3.z * vector3.z;
 }
 
+var aheadSpawn = 300;
 //updates every frame used for animation and input handling
 function render() {
 
-        updateHouses();
+
         //make the camera follow the collisionObj
         camera.position.set(collisionObj.position.x, collisionObj.position.y, collisionObj.position.z);
         camera.rotation.set(collisionObj.rotation.x, collisionObj.rotation.y, collisionObj.rotation.z);
@@ -310,8 +297,99 @@ function render() {
 
         sky.uniforms.sunPosition.value.copy(sunSphere.position);
 
+        if (collisionObj.position.z > aheadSpawn && collisionObj.position.z < aheadSpawn + 15) {
+
+                //House 1
+                animationOne = randomInt(1,1);
+                animationTwo = randomInt(1,1);
+
+                if (animationOne == 1) {
+                        generateHouse(new THREE.Vector3(160, 100, 400), toRads(270), animationOne, true);
+                }
+                else if (animationOne == 2)
+                        console.log(lmao);
+                else
+                        console.log(lmao);
+
+                if (animationTwo == 1)
+                        generateHouse(new THREE.Vector3(-90, 100, 330), toRads(90), animationTwo, true);
+                else if(animationTwo == 2)
+                        console.log(lmao);
+                else
+                        console.log(lmao);
+                aheadSpawn += 100;
+        }
+
+        updateHouses();
+
         //render the scene
         renderer.render(scene, camera);
+}
+
+function updateHouses() {
+        /*
+        var houseIndex;
+        for (var i = 0; i < houseList.length; i++) {
+                var x = Math.pow(camera.position.x - houseList[i].house.position.x, 2);
+                //var y = Math.pow(camera.position.y - houseList[0].position.y, 2);
+                var z = Math.pow(camera.position.z - houseList[i].house.position.z, 2);
+                var distance = Math.sqrt(x + z);
+
+                //If house is far away
+                if (distance > 225)
+                        houseList[i].hide = true;
+                //Its close
+                else
+        }
+        */ //Will probably use the distance to remove the houses later.
+
+        for(i = 0; i < houseList.length; i++) {
+
+                var house = houseList[i];
+
+                if(house.animateType == 1 && house.house.position.y > 0) {
+                        house.house.position.y -= 0.5;
+                        if(house.house.position.y == 0)
+                                houseLand.play();
+                        continue;
+                }
+
+        }
+}
+
+function fallFromHeavens(vector, radians) {
+
+
+
+        if (house.hide == true) {
+
+
+                if (rotateTick == 0) {
+                        //house.house.rotateZ(randomRotate);
+                        house.house.rotateX(randomRotate);
+                        house.house.translateY(1);
+                        rotateTick++;
+                }
+                if (rotateTick == 5) {
+                        //house.house.rotateZ(-randomRotate);
+                        house.house.rotateX(-randomRotate);
+                        house.house.translateY(1);
+                }
+
+
+                if (house.house.position.y >= 50) {
+
+                        house.hide = false;
+                        house.beginAnimation == false;
+                        house.animateType = randomInt(0, 1);
+                        randomRotate = toRads(randomInt(1, 10));
+
+                        house.house.position.y = -50;
+
+                }
+        } else {
+
+        }
 }
 
 function animate() {
@@ -500,7 +578,7 @@ function generateAssets() {
         return ret;
 }
 
-function generateHouse(positionVector, rotationRads) {
+function generateHouse(positionVector, rotationRads, animationType, animation) {
 
         var allAssets = generateAssets();
         var assets = allAssets[0];
@@ -753,12 +831,11 @@ function generateHouse(positionVector, rotationRads) {
         //add this new house to the list of houses
 
         var houseObject = {
-            house: house,
-            hide: false,
-            animateType: 0,
-            beginAnimation: true,
-            assetCollisionList: assetCollision,
-            houseCollisionList: houseCollision
+                house: house,
+                animateType: animationType,
+                animate: animation,
+                assetCollisionList: assetCollision,
+                houseCollisionList: houseCollision
         };
         houseList.push(houseObject);
 
@@ -796,122 +873,58 @@ function checkCollision(direction) {
         var ray = new THREE.Raycaster(collisionObj.position, rayDirection.clone().normalize());
 
         //check if the ray to the node collides with any of the walls
-        for(var i = 0; i < houseList.length; i++){
-            if(collisionObj.position.distanceTo(houseList[i].house.position) < 100){
-                //check house walls for collision
-                var collisions = ray.intersectObjects(houseList[i].houseCollisionList);
-                if (collisions.length > 0 && collisions[0].distance < rayDirection.length()) {
-                        collision = true;
-                        break;
-                }
+        for (var i = 0; i < houseList.length; i++) {
+                if (collisionObj.position.distanceTo(houseList[i].house.position) < 100) {
+                        //check house walls for collision
+                        var collisions = ray.intersectObjects(houseList[i].houseCollisionList);
+                        if (collisions.length > 0 && collisions[0].distance < rayDirection.length()) {
+                                collision = true;
+                                break;
+                        }
 
-                //check assets for collision
-                collisions = ray.intersectObjects(houseList[i].assetCollisionList);
-                if (collisions.length > 0 && collisions[0].distance < rayDirection.length()) {
-                        collision = true;
-                        break;
+                        //check assets for collision
+                        collisions = ray.intersectObjects(houseList[i].assetCollisionList);
+                        if (collisions.length > 0 && collisions[0].distance < rayDirection.length()) {
+                                collision = true;
+                                break;
+                        }
                 }
-            }
         }
 
         return collision;
 }
 
-var randomRotate = toRads(randomInt(1,10));
+var randomRotate = toRads(randomInt(1, 10));
 var rotateTick = 0;
 
-function updateHouses() {
-        var houseIndex;
-        for (var i = 0; i < houseList.length; i++) {
-                var x = Math.pow(camera.position.x - houseList[i].house.position.x, 2);
-                //var y = Math.pow(camera.position.y - houseList[0].position.y, 2);
-                var z = Math.pow(camera.position.z - houseList[i].house.position.z, 2);
-                var distance = Math.sqrt(x + z);
 
-                //If house is far away
-                if (distance > 225)
-                        houseList[i].hide = true;
-                //Its close
-                else
-                        houseList[i].hide = false;
-
-
-                fallFromHeavens(houseList[i]);
-
-                if(houseList[i].hide == true) {
-
-                        //riseOrLowerHouse(houseList[i]);
-
-                }
-
-                else {
-
-                        //riseOrLowerHouse(houseList[i]);
-                }
-        }
-}
 //My idea is to have 1 or 3 animations like we were talking about, it will randomly call one of these funcitons
 //All that works, the problem is because it is based on distance it will infinitely call the animation in its current state
 //Because my animation sends the object farther away.  To deal with this im thinking of using some sort of boolean flag but
 //Cant wrap my head around it right now, i think it will increase performance as well.
-function fallFromHeavens(house) {
 
-        if(house.hide == true) {
-
-
-                if(rotateTick == 0) {
-                        //house.house.rotateZ(randomRotate);
-                        house.house.rotateX(randomRotate);
-                        house.house.translateY(1);
-                        rotateTick++;
-                }
-                if (rotateTick == 5) {
-                        //house.house.rotateZ(-randomRotate);
-                        house.house.rotateX(-randomRotate);
-                        house.house.translateY(1);
-                }
-
-
-                if(house.house.position.y >= 50) {
-
-                        house.hide = false;
-                        house.beginAnimation == false;
-                        house.animateType = randomInt(0,1);
-                        randomRotate = toRads(randomInt(1,10));
-
-                        house.house.position.y = -50;
-
-                }
-        }
-
-        else {
-
-        }
-}
 
 function riseOrLowerHouse(house) {
 
-        if(house.hide == true) {
+        if (house.hide == true) {
 
                 house.house.translateY(-0.1);
 
-                if(house.house.position.y <= -50) {
+                if (house.house.position.y <= -50) {
 
                         house.hide = false;
                         house.animateType = randomInt(0, 1);
-                        randomRotate = toRads(randomInt(1,10));
+                        randomRotate = toRads(randomInt(1, 10));
                 }
-        }
+        } else {
 
-        else {
-
-                if(house.house.position.y < 0) {
+                if (house.house.position.y < 0) {
                         house.house.translateY(0.1);
 
-                        if(house.house.position.y >= 0) {
+                        if (house.house.position.y >= 0) {
 
                                 house.animateType = randomInt(0, 1);
-                                randomRotate = toRads(randomInt(1,10));
+                                randomRotate = toRads(randomInt(1, 10));
                         }
                 }
         }
