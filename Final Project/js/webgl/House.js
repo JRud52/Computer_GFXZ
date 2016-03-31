@@ -33,7 +33,6 @@ var houseLand = new Audio('music/land.ogg');
 var options, spawnerOptions, particleSystem;
 var tick = 0;
 
-
 /*
     ONLOAD FUNCTION
 */
@@ -125,21 +124,21 @@ function init() {
         */
 
         //Initial Grass
-        var groundMaterial = new THREE.MeshPhongMaterial({
+        grassMaterial = new THREE.MeshPhongMaterial({
                 color: 0xffffff,
                 specular: 0x111111,
                 map: groundTexture
         });
-        var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(450, 750), groundMaterial);
-        mesh.position.y = 0;
-        mesh.position.x = 35;
-        mesh.position.z = 5;
-        mesh.rotation.x = -Math.PI / 2;
-        mesh.receiveShadow = true;
-        scene.add(mesh);
+        var grassMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(450, 750), grassMaterial);
+        grassMesh.position.y = 0;
+        grassMesh.position.x = 35;
+        grassMesh.position.z = 5;
+        grassMesh.rotation.x = -Math.PI / 2;
+        grassMesh.receiveShadow = true;
+        scene.add(grassMesh);
 
         //Creating Initial Road
-        var roadMaterial = new THREE.MeshPhongMaterial({
+        roadMaterial = new THREE.MeshPhongMaterial({
                 color: 0xffffff,
                 specular: 0x111111,
                 map: roadTexture
@@ -273,6 +272,10 @@ function magnitude(vector3) {
 }
 
 var aheadSpawn = 300;
+
+var newGrass = null;
+var newRoad = null;
+
 //updates every frame used for animation and input handling
 function render() {
 
@@ -318,12 +321,67 @@ function render() {
                 else
                         console.log(lmao);
                 aheadSpawn += 100;
+
+                var groundTexture = loader.load("textures/grass.jpg");
+                groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
+                groundTexture.repeat.set(30, 30);
+                groundTexture.anisotropy = 25;
+
+                //Initial Grass
+                var grassMaterial = new THREE.MeshPhongMaterial({
+                        color: 0xffffff,
+                        specular: 0x111111,
+                        map: groundTexture
+                });
+
+                var grassMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(450, 200), grassMaterial);
+                grassMesh.position.y = -50;
+                grassMesh.position.x = 35;
+                grassMesh.position.z = 480;
+                grassMesh.rotation.x = -Math.PI / 2;
+                grassMesh.receiveShadow = true;
+                scene.add(grassMesh);
+
+                newGrass = grassMesh;
+
+                var roadTexture = loader.load("textures/road.jpg");
+                roadTexture.wrapS = roadTexture.wrapT = THREE.RepeatWrapping;
+                roadTexture.repeat.set(1, 25);
+                roadTexture.anisotropy = 25;
+
+                //Creating Initial Road
+                var roadMaterial = new THREE.MeshPhongMaterial({
+                        color: 0xffffff,
+                        specular: 0x111111,
+                        map: roadTexture
+                });
+
+                var roadMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(50, 200), roadMaterial);
+                roadMesh.position.y = 50.01;
+                roadMesh.position.x = 35;
+                roadMesh.position.z = 100 + 380;
+                roadMesh.rotation.x = -Math.PI / 2;
+                roadMesh.receiveShadow = true;
+                scene.add(roadMesh);
+
+                newRoad = roadMesh;
         }
 
         updateHouses();
 
+        if(newGrass != null || newRoad != null)
+                updateGround();
+
         //render the scene
         renderer.render(scene, camera);
+}
+
+function updateGround() {
+
+        if(newGrass.position.y < 0)
+                newGrass.position.y += 1;
+        if(newRoad.position.y > 0.01)
+                newRoad.position.y -= 1;
 }
 
 function updateHouses() {
@@ -349,6 +407,7 @@ function updateHouses() {
 
                 if(house.animateType == 1 && house.house.position.y > 0) {
                         house.house.position.y -= 0.5;
+                        house.house.rotateY(toRads(3.6));
                         if(house.house.position.y == 0)
                                 houseLand.play();
                         continue;
