@@ -11,7 +11,7 @@ var houseList = [],
         doorList = [];
 var loader, objectLoader;
 
-var doorTex, floorTex, wallTex, ceilingTex;
+var doorTex, floorTex, wallTex, ceilingTex, tvVideoTex;
 
 //used to disable collision
 var collisionOff = false;
@@ -32,6 +32,47 @@ var houseLand = new Audio('music/land.ogg');
 
 var options, spawnerOptions, particleSystem;
 var tick = 0;
+
+
+
+
+
+var THREEx = THREEx || {}
+
+THREEx.VideoTexture = function (url) {
+    // create the video element
+    var video = document.createElement('video');
+    video.width = 320;
+    video.height = 240;
+    video.autoplay = true;
+    video.loop = true;
+    video.src = url;
+    // expose video as this.video
+    this.video = video
+
+    // create the texture
+    var texture = new THREE.Texture(video);
+    // expose texture as this.texture
+    this.texture = texture
+
+    /**
+	 * update the object
+	 */
+    this.update = function () {
+        if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
+        texture.needsUpdate = true;
+    }
+
+    /**
+	 * destroy the object
+	 */
+    this.destroy = function () {
+        video.pause()
+    }
+}
+
+
+
 
 /*
     ONLOAD FUNCTION
@@ -255,6 +296,26 @@ function init() {
         sunSphere.visible = true;
 
         sky.uniforms.sunPosition.value.copy(sunSphere.position);
+
+
+        //Video information for the TV
+        // get the video element
+        video = document.getElementById("tvVideo1");
+        video.load(); 
+
+        videoImage = document.createElement('canvas');
+        videoImage.width = 480;
+        videoImage.height = 204;
+
+        //defaults for the initial video image
+        videoImageContext = videoImage.getContext('2d');
+        videoImageContext.fillStyle = '#000000';
+        videoImageContext.fillRect(0, 0, videoImage.width, videoImage.height);
+        
+        //texture representing the video
+        tvVideoTex = new THREE.Texture(videoImage);
+        tvVideoTex.minFilter = THREE.LinearFilter;
+        tvVideoTex.magFilter = THREE.LinearFilter;
 }
 
 //Returns a random int in a range, inclusive.
@@ -280,7 +341,11 @@ var newRoad = null;
 
 //updates every frame used for animation and input handling
 function render() {
-
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            videoImageContext.drawImage(video, 0, 0);
+            if (tvVideoTex)
+                tvVideoTex.needsUpdate = true;
+        }
 
         //make the camera follow the collisionObj
         camera.position.set(collisionObj.position.x, collisionObj.position.y, collisionObj.position.z);
@@ -504,32 +569,8 @@ function handleInput() {
 function generateAssets() {
         var assets = new THREE.Object3D();
         var assetCollisionList = [];
-       
-        /*
-        video = document.createElement('video');    
-        video.src = "videos/test.mp4";
-        video.load(); 
-        video.play();
-
-        videoImage = document.createElement('canvas');
-        videoImage.width = 480;
-        videoImage.height = 204;
-
-        videoImageContext = videoImage.getContext('2d');
-        videoImageContext.fillStyle = '#000000';
-        videoImageContext.fillRect(0, 0, videoImage.width, videoImage.height);
-
-        videoTexture = new THREE.Texture(videoImage);
-        videoTexture.minFilter = THREE.LinearFilter;
-        videoTexture.magFilter = THREE.LinearFilter;
-
-        var movieMaterial = new THREE.MeshBasicMaterial({ map: videoTexture, overdraw: true, side: THREE.DoubleSide });
-        var movieGeometry = new THREE.PlaneGeometry(240, 100, 4, 4);
-        var movieScreen = new THREE.Mesh(movieGeometry, movieMaterial);
-        movieScreen.position.set(0, 50, 0);
-        scene.add(movieScreen);
-        */
-
+    
+        //the picture to be framed
         var framedPicGeo = new THREE.BoxGeometry(5, 5, 0.5);
         framedPicGeo.translate(2.5, 2.5, 0);
         var framedPicMat = new THREE.MeshPhongMaterial({
@@ -537,6 +578,7 @@ function generateAssets() {
         });
         var framedPic = new THREE.Mesh(framedPicGeo, framedPicMat);
 
+        //the edges of the picture frame
         var picFrame = new THREE.Object3D();
         var picFrameEdgeGeo = new THREE.CylinderGeometry(0.5, 0.5, 5, 3, 1);
         picFrameEdgeGeo.translate(0, 2.5, 0);
@@ -548,8 +590,8 @@ function generateAssets() {
         var picFrameEdge3 = new THREE.Mesh(picFrameEdgeGeo, picFrameMat);
         var picFrameEdge4 = new THREE.Mesh(picFrameEdgeGeo, picFrameMat);
 
-        var picFrameCornerGeo = new THREE.BoxGeometry(1, 1, 1);
-        // picFrameCornerGeo.translate(0.25, 0.25, 0);
+        //picture frame corners
+        var picFrameCornerGeo = new THREE.BoxGeometry(1, 1, 1);        
         var picFrameCorner = new THREE.Mesh(picFrameCornerGeo, picFrameMat);
         var picFrameCorner2 = new THREE.Mesh(picFrameCornerGeo, picFrameMat);
         var picFrameCorner3 = new THREE.Mesh(picFrameCornerGeo, picFrameMat);
@@ -582,7 +624,16 @@ function generateAssets() {
         picFrame.translateZ(-69.5);
 
         assets.add(picFrame);
-     
+    
+        //TV
+        var tvScreenGeo = new THREE.PlaneGeometry(15, 10, 4, 4);
+        var tvScreenMat = new THREE.MeshBasicMaterial({ map: tvVideoTex });
+        var tvScreen = new THREE.Mesh(tvScreenGeo, tvScreenMat);
+        tvScreen.translateX(69);
+        tvScreen.translateY(10);
+        tvScreen.translateZ(-20);
+        tvScreen.rotateY(-Math.PI / 2);
+        assets.add(tvScreen);
 
         //SOFA
         objectLoader.load("models/sofa.json", function(obj) {
@@ -603,6 +654,27 @@ function generateAssets() {
                 collisionCube.translateZ(-0.75);
                 assetCollisionList.push(collisionCube);
                 assets.add(obj);
+        });
+
+        //sink
+        objectLoader.load("models/sink.json", function (obj) {
+
+            obj.translateX(15);
+            obj.translateY(0);
+            obj.translateZ(-68);
+            obj.scale.set(1.75, 1.75, 1.75);
+            obj.rotateY(-Math.PI);
+
+            //collision box
+            var collisionCubeGeo = new THREE.BoxGeometry(2, 8, 2);
+            var collisionCubeMat = new THREE.MeshPhongMaterial({
+                transparent: true,
+                opacity: 0
+            });
+            var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
+            obj.add(collisionCube);
+            assetCollisionList.push(collisionCube);
+            assets.add(obj);
         });
 
         //tv stand
