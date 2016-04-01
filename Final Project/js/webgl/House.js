@@ -104,6 +104,8 @@ function init() {
         roadTexture.wrapS = roadTexture.wrapT = THREE.RepeatWrapping;
         roadTexture.repeat.set(1, 25);
         roadTexture.anisotropy = 25;
+
+        //grid
         /*
                 //Grid
                 var size = 250,
@@ -210,7 +212,7 @@ function init() {
         window.addEventListener('keydown', onKeyDown, false);
         window.addEventListener('keyup', onKeyUp, false);
 
-
+ 
         //Static house
         generateHouse(new THREE.Vector3(0, 0, 0), 0);
 
@@ -253,7 +255,6 @@ function init() {
         sunSphere.visible = true;
 
         sky.uniforms.sunPosition.value.copy(sunSphere.position);
-
 }
 
 //Returns a random int in a range, inclusive.
@@ -503,12 +504,36 @@ function handleInput() {
 function generateAssets() {
         var assets = new THREE.Object3D();
         var assetCollisionList = [];
-        var ret = [];
+       
+        /*
+        video = document.createElement('video');    
+        video.src = "videos/test.mp4";
+        video.load(); 
+        video.play();
+
+        videoImage = document.createElement('canvas');
+        videoImage.width = 480;
+        videoImage.height = 204;
+
+        videoImageContext = videoImage.getContext('2d');
+        videoImageContext.fillStyle = '#000000';
+        videoImageContext.fillRect(0, 0, videoImage.width, videoImage.height);
+
+        videoTexture = new THREE.Texture(videoImage);
+        videoTexture.minFilter = THREE.LinearFilter;
+        videoTexture.magFilter = THREE.LinearFilter;
+
+        var movieMaterial = new THREE.MeshBasicMaterial({ map: videoTexture, overdraw: true, side: THREE.DoubleSide });
+        var movieGeometry = new THREE.PlaneGeometry(240, 100, 4, 4);
+        var movieScreen = new THREE.Mesh(movieGeometry, movieMaterial);
+        movieScreen.position.set(0, 50, 0);
+        scene.add(movieScreen);
+        */
 
         var framedPicGeo = new THREE.BoxGeometry(5, 5, 0.5);
         framedPicGeo.translate(2.5, 2.5, 0);
         var framedPicMat = new THREE.MeshPhongMaterial({
-                color: 0x00ff00
+                color: 0x00ff00            
         });
         var framedPic = new THREE.Mesh(framedPicGeo, framedPicMat);
 
@@ -557,8 +582,9 @@ function generateAssets() {
         picFrame.translateZ(-69.5);
 
         assets.add(picFrame);
+     
 
-
+        //SOFA
         objectLoader.load("models/sofa.json", function(obj) {
 
                 obj.translateX(50);
@@ -577,6 +603,28 @@ function generateAssets() {
                 collisionCube.translateZ(-0.75);
                 assetCollisionList.push(collisionCube);
                 assets.add(obj);
+        });
+
+        //tv stand
+        objectLoader.load("models/tvStand.json", function (obj) {
+
+            obj.translateX(68);
+            obj.translateY(0);
+            obj.translateZ(-20);
+            obj.rotateY(Math.PI / 2);
+
+            obj.scale.set(1.5, 1.5, 1.5);
+
+            //collision box
+            var collisionCubeGeo = new THREE.BoxGeometry(7, 8, 2.25);
+            var collisionCubeMat = new THREE.MeshPhongMaterial({
+                transparent: true,
+                opacity: 0
+            });
+            var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
+            obj.add(collisionCube);           
+            assetCollisionList.push(collisionCube);
+            assets.add(obj);
         });
 
         //BED
@@ -629,9 +677,9 @@ function generateAssets() {
                 assetCollisionList.push(collisionCube);
                 assets.add(obj);
         });
+          
 
-        ret.push(assets);
-        ret.push(assetCollisionList);
+        var ret = [assets, assetCollisionList];        
         return ret;
 }
 
