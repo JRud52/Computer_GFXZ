@@ -271,7 +271,8 @@ function magnitude(vector3) {
         return vector3.x * vector3.x + vector3.y * vector3.y + vector3.z * vector3.z;
 }
 
-var aheadSpawn = 300;
+var aheadSpawnHouse = 300;
+var aheadSpawnGrass = 330;
 
 var newGrass = null;
 var newRoad = null;
@@ -300,14 +301,29 @@ function render() {
 
         sky.uniforms.sunPosition.value.copy(sunSphere.position);
 
-        if (collisionObj.position.z > aheadSpawn && collisionObj.position.z < aheadSpawn + 15) {
+        if (collisionObj.position.z > aheadSpawnHouse && collisionObj.position.z < aheadSpawnHouse + 15) {
 
                 //House 1
-                animationOne = randomInt(1,1);
-                animationTwo = randomInt(1,1);
+                animationOne = randomInt(2,2);
+                animationTwo = randomInt(2,2);
 
+                //Animation 1 - Fall from Heavens.
+                //Animation 2 - Rise Up
+                //Animation 3 - Fling
+
+                if(animationOne == 2) {
+
+                        generateHouse(new THREE.Vector3(160, -50, aheadSpawnHouse+100), toRads(270), animationOne, true);
+                }
+
+                if(animationTwo == 2) {
+
+                        generateHouse(new THREE.Vector3(-90, -50, aheadSpawnHouse+30), toRads(90), animationTwo, true);
+                }
+
+                /** Disabled Temporarily
                 if (animationOne == 1) {
-                        generateHouse(new THREE.Vector3(160, 100, 400), toRads(270), animationOne, true);
+                        generateHouse(new THREE.Vector3(160, 100, aheadSpawnHouse+100), toRads(270), animationOne, true);
                 }
                 else if (animationOne == 2)
                         console.log(lmao);
@@ -315,12 +331,14 @@ function render() {
                         console.log(lmao);
 
                 if (animationTwo == 1)
-                        generateHouse(new THREE.Vector3(-90, 100, 330), toRads(90), animationTwo, true);
+                        generateHouse(new THREE.Vector3(-90, 100, aheadSpawnHouse+30), toRads(90), animationTwo, true);
                 else if(animationTwo == 2)
                         console.log(lmao);
                 else
                         console.log(lmao);
-                aheadSpawn += 100;
+
+                */
+                aheadSpawnHouse += 100;
 
                 var groundTexture = loader.load("textures/grass.jpg");
                 groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
@@ -334,10 +352,10 @@ function render() {
                         map: groundTexture
                 });
 
-                var grassMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(450, 200), grassMaterial);
+                var grassMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(450, 100), grassMaterial);
                 grassMesh.position.y = -50;
                 grassMesh.position.x = 35;
-                grassMesh.position.z = 480;
+                grassMesh.position.z = 100 + aheadSpawnGrass;
                 grassMesh.rotation.x = -Math.PI / 2;
                 grassMesh.receiveShadow = true;
                 scene.add(grassMesh);
@@ -356,15 +374,16 @@ function render() {
                         map: roadTexture
                 });
 
-                var roadMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(50, 200), roadMaterial);
+                var roadMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(50, 100), roadMaterial);
                 roadMesh.position.y = 50.01;
                 roadMesh.position.x = 35;
-                roadMesh.position.z = 100 + 380;
+                roadMesh.position.z = 100 + aheadSpawnGrass;
                 roadMesh.rotation.x = -Math.PI / 2;
                 roadMesh.receiveShadow = true;
                 scene.add(roadMesh);
 
                 newRoad = roadMesh;
+                aheadSpawnGrass += 100;
         }
 
         updateHouses();
@@ -375,6 +394,9 @@ function render() {
         //render the scene
         renderer.render(scene, camera);
 }
+//Just need to make it add progressively through the scene.
+//Also need to mess with the spawn locations a bit better, maybe.
+//Add the two other animations.
 
 function updateGround() {
 
@@ -413,6 +435,12 @@ function updateHouses() {
                         continue;
                 }
 
+                if(house.animateType == 2 && house.house.position.y < 0) {
+                        house.house.position.y += 0.25;
+                        if(house.house.position.y == 0)
+                                houseLand.play();
+                        continue;
+                }
         }
 }
 
