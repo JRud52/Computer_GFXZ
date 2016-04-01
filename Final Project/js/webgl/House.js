@@ -304,45 +304,34 @@ function render() {
         if (collisionObj.position.z > aheadSpawnHouse && collisionObj.position.z < aheadSpawnHouse + 15) {
 
                 //House 1
-                animationOne = randomInt(2,2);
-                animationTwo = randomInt(2,2);
+                animationOne = randomInt(1,3);
+                animationTwo = randomInt(1,3);
 
                 //Animation 1 - Fall from Heavens.
                 //Animation 2 - Rise Up
                 //Animation 3 - Fling
 
-                if(animationOne == 2) {
-
-                        generateHouse(new THREE.Vector3(160, -50, aheadSpawnHouse+100), toRads(270), animationOne, true);
-                }
-
-                if(animationTwo == 2) {
-
-                        generateHouse(new THREE.Vector3(-90, -50, aheadSpawnHouse+30), toRads(90), animationTwo, true);
-                }
-
-                /** Disabled Temporarily
                 if (animationOne == 1) {
                         generateHouse(new THREE.Vector3(160, 100, aheadSpawnHouse+100), toRads(270), animationOne, true);
                 }
                 else if (animationOne == 2)
-                        console.log(lmao);
+                        generateHouse(new THREE.Vector3(160, -50, aheadSpawnHouse+100), toRads(270), animationOne, true);
                 else
-                        console.log(lmao);
+                        generateHouse(new THREE.Vector3(160, 0, (aheadSpawnHouse+100)+500), toRads(270), animationOne, true, aheadSpawnHouse+26);
 
                 if (animationTwo == 1)
                         generateHouse(new THREE.Vector3(-90, 100, aheadSpawnHouse+30), toRads(90), animationTwo, true);
                 else if(animationTwo == 2)
-                        console.log(lmao);
+                        generateHouse(new THREE.Vector3(-90, -50, aheadSpawnHouse+30), toRads(90), animationTwo, true);
                 else
-                        console.log(lmao);
+                        generateHouse(new THREE.Vector3(-90, 0, (aheadSpawnHouse+30)+500), toRads(90), animationTwo, true, aheadSpawnHouse+98);
 
-                */
+
                 aheadSpawnHouse += 100;
 
                 var groundTexture = loader.load("textures/grass.jpg");
                 groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
-                groundTexture.repeat.set(30, 30);
+                groundTexture.repeat.set(30, 5);
                 groundTexture.anisotropy = 25;
 
                 //Initial Grass
@@ -441,41 +430,22 @@ function updateHouses() {
                                 houseLand.play();
                         continue;
                 }
-        }
-}
 
-function fallFromHeavens(vector, radians) {
+                if(house.animateType == 3 && house.house.position.z > house.zGoal) {
+                        house.house.position.z -= 2;
 
+                        house.house.rotateZ((Math.PI/126)*25); //Maybe be framerate independent, need outside testingg
 
+                        if(house.house.position.z > house.zGoal+250)
+                                house.house.position.y += 0.8;
+                        else
+                                house.house.position.y -= 0.8;
 
-        if (house.hide == true) {
-
-
-                if (rotateTick == 0) {
-                        //house.house.rotateZ(randomRotate);
-                        house.house.rotateX(randomRotate);
-                        house.house.translateY(1);
-                        rotateTick++;
+                        //Floating point hacks, i wish this was haskell lma0
+                        if(house.house.position.z < house.zGoal || (house.house.position.z > house.zGoal && house.house.position.z < house.zGoal+0.99))
+                                houseLand.play();
+                        continue;
                 }
-                if (rotateTick == 5) {
-                        //house.house.rotateZ(-randomRotate);
-                        house.house.rotateX(-randomRotate);
-                        house.house.translateY(1);
-                }
-
-
-                if (house.house.position.y >= 50) {
-
-                        house.hide = false;
-                        house.beginAnimation == false;
-                        house.animateType = randomInt(0, 1);
-                        randomRotate = toRads(randomInt(1, 10));
-
-                        house.house.position.y = -50;
-
-                }
-        } else {
-
         }
 }
 
@@ -665,7 +635,7 @@ function generateAssets() {
         return ret;
 }
 
-function generateHouse(positionVector, rotationRads, animationType, animation) {
+function generateHouse(positionVector, rotationRads, animationType, animation, zGoal) {
 
         var allAssets = generateAssets();
         var assets = allAssets[0];
@@ -921,6 +891,7 @@ function generateHouse(positionVector, rotationRads, animationType, animation) {
                 house: house,
                 animateType: animationType,
                 animate: animation,
+                zGoal: zGoal,
                 assetCollisionList: assetCollision,
                 houseCollisionList: houseCollision
         };
