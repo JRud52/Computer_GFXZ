@@ -236,15 +236,15 @@ function init() {
         tvVideoTex.magFilter = THREE.LinearFilter;
         tvVideoTex.format = THREE.RGBFormat;
 
-        
+
+        //Static house
+        generateHouse(new THREE.Vector3(0, 0, 0), 0);
+
         //set of inital houses along the road sides
         for (var i = 0; i < 3; i++) {
                 generateHouse(new THREE.Vector3(160, 0, 100 + 100 * i), toRads(270), 0, false);
                 generateHouse(new THREE.Vector3(-90, 0, 30 + 100 * i), toRads(90), 0, false);
         }
-
-        //Static house
-        generateHouse(new THREE.Vector3(0, 0, 0), 0);
 
         // Add Sky Mesh
         sky = new THREE.Sky();
@@ -415,15 +415,9 @@ function render() {
         if (newGrass != null || newRoad != null)
                 updateGround();
 
-                //water.material.uniforms.time.value += 1.0 / 10.0;
-        				//water.render();
-
         //render the scene
         renderer.render(scene, camera);
 }
-//Just need to make it add progressively through the scene.
-//Also need to mess with the spawn locations a bit better, maybe.
-//Add the two other animations.
 
 function updateGround() {
 
@@ -434,34 +428,17 @@ function updateGround() {
 }
 
 function updateHouses() {
-        /*
-        var houseIndex;
-        for (var i = 0; i < houseList.length; i++) {
-                var x = Math.pow(camera.position.x - houseList[i].house.position.x, 2);
-                //var y = Math.pow(camera.position.y - houseList[0].position.y, 2);
-                var z = Math.pow(camera.position.z - houseList[i].house.position.z, 2);
-                var distance = Math.sqrt(x + z);
 
-                //If house is far away
-                if (distance > 225)
-                        houseList[i].hide = true;
-                //Its close
-                else
-        }
-        */ //Will probably use the distance to remove the houses later.
-        
         //remove old houses when there are more than 9 in the scene
-        if (houseCount > 9) {
-            houseCount = 9;
+        if (houseList.length > 9) {
 
             //move the static house forward
-            houseList[6].house.translateZ(100);
-            
-            var removed = houseList.shift();
-            scene.remove(removed.house);
+            houseList[0].house.translateZ(100);
 
-            removed = houseList.shift();
-            scene.remove(removed.house);
+            scene.remove(houseList[2].house);
+            scene.remove(houseList[1].house);
+
+            houseList.splice(1,2);
         }
 
         for (i = 0; i < houseList.length; i++) {
@@ -551,18 +528,6 @@ function handleInput() {
                 }
         }
 }
-
-var waterNormals;
-
-var waterParameters = {
-        width: 10,
-        height: 10,
-        widthSegments: 5,
-        heightSegments: 5,
-        depth: 5,
-        param: 4,
-        filterparam: 1
-};
 
 function generateAssets() {
         var assets = new THREE.Object3D();
@@ -700,34 +665,6 @@ function generateAssets() {
                 assets.add(obj);
         });
 
-        //Water
-        waterNormals = new THREE.TextureLoader().load('textures/waternormals.jpg');
-        waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping;
-
-
-        water = new THREE.Water(renderer, camera, scene, {
-                textureWidth: 512,
-                textureHeight: 512,
-                waterNormals: waterNormals,
-                alpha: 1.0,
-                sunDirection: 1,
-                sunColor: 0xffffff,
-                waterColor: 0x001e0f,
-                distortionScale: 50.0,
-        });
-
-        mirrorMesh = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( waterParameters.width, waterParameters.height),
-					water.material
-		);
-
-        mirrorMesh.translateY(2.5);
-        mirrorMesh.translateX(15);
-        mirrorMesh.translateZ(-40);
-
-        mirrorMesh.add( water );
-				mirrorMesh.rotation.x = - Math.PI * 0.5;
-				assets.add( mirrorMesh );
 
         //tv stand
         objectLoader.load("models/tvStand.json", function(obj) {
@@ -1059,7 +996,6 @@ function generateHouse(positionVector, rotationRads, animationType, animation, z
         }
 
         //add this new house to the list of houses
-
         var houseObject = {
                 house: house,
                 animateType: animationType,
