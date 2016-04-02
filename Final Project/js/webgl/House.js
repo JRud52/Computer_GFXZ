@@ -35,45 +35,6 @@ var tick = 0;
 
 
 
-
-
-var THREEx = THREEx || {}
-
-THREEx.VideoTexture = function (url) {
-    // create the video element
-    var video = document.createElement('video');
-    video.width = 320;
-    video.height = 240;
-    video.autoplay = true;
-    video.loop = true;
-    video.src = url;
-    // expose video as this.video
-    this.video = video
-
-    // create the texture
-    var texture = new THREE.Texture(video);
-    // expose texture as this.texture
-    this.texture = texture
-
-    /**
-	 * update the object
-	 */
-    this.update = function () {
-        if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
-        texture.needsUpdate = true;
-    }
-
-    /**
-	 * destroy the object
-	 */
-    this.destroy = function () {
-        video.pause()
-    }
-}
-
-
-
-
 /*
     ONLOAD FUNCTION
 */
@@ -674,6 +635,28 @@ function generateAssets() {
 
             //collision box
             var collisionCubeGeo = new THREE.BoxGeometry(2, 8, 2);
+            var collisionCubeMat = new THREE.MeshPhongMaterial({
+                transparent: true,
+                opacity: 0
+            });
+            var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
+            obj.add(collisionCube);
+            assetCollisionList.push(collisionCube);
+            assets.add(obj);
+        });
+
+
+        //bath tub
+        objectLoader.load("models/bathtub.json", function (obj) {
+
+            obj.translateX(15);
+            obj.translateY(2.5);
+            obj.translateZ(-40);
+            obj.scale.set(1.75, 1.75, 1.75);
+            obj.rotateY(-Math.PI);
+
+            //collision box
+            var collisionCubeGeo = new THREE.BoxGeometry(5.5, 5, 4);
             var collisionCubeMat = new THREE.MeshPhongMaterial({
                 transparent: true,
                 opacity: 0
