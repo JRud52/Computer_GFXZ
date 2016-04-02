@@ -33,8 +33,7 @@ var houseLand = new Audio('music/land.ogg');
 var options, spawnerOptions, particleSystem;
 var tick = 0;
 
-//number of houses in the scene
-var houseCount = 0;
+var roadMesh, grassMesh;
 
 /*
     ONLOAD FUNCTION
@@ -108,36 +107,16 @@ function init() {
         roadTexture.repeat.set(1, 25);
         roadTexture.anisotropy = 25;
 
-        //grid
-        /*
-                //Grid
-                var size = 250,
-                        step = 10;
-                var geometry = new THREE.Geometry();
-                for (var i = -size; i <= size; i += step) {
-                        geometry.vertices.push(new THREE.Vector3(-size, 0, i));
-                        geometry.vertices.push(new THREE.Vector3(size, 0, i));
-                        geometry.vertices.push(new THREE.Vector3(i, 0, -size));
-                        geometry.vertices.push(new THREE.Vector3(i, 0, size));
-                }
-                var material = new THREE.LineBasicMaterial({
-                        color: 0x000000,
-                        opacity: 0.5
-                });
-                var line = new THREE.LineSegments(geometry, material);
-                scene.add(line);
-        */
-
         //Initial Grass
         grassMaterial = new THREE.MeshPhongMaterial({
                 color: 0xffffff,
                 specular: 0x111111,
                 map: groundTexture
         });
-        var grassMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(450, 750), grassMaterial);
+        grassMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(450, 1000), grassMaterial);
         grassMesh.position.y = 0;
         grassMesh.position.x = 35;
-        grassMesh.position.z = 5;
+        grassMesh.position.z = 125 + 5;
         grassMesh.rotation.x = -Math.PI / 2;
         grassMesh.receiveShadow = true;
         scene.add(grassMesh);
@@ -149,10 +128,10 @@ function init() {
                 map: roadTexture
         });
 
-        var roadMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(50, 350), roadMaterial);
+        roadMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(50, 600), roadMaterial);
         roadMesh.position.y = 0.01;
         roadMesh.position.x = 35;
-        roadMesh.position.z = 175 + 30;
+        roadMesh.position.z = 300 + 30;
         roadMesh.rotation.x = -Math.PI / 2;
         roadMesh.receiveShadow = true;
         scene.add(roadMesh);
@@ -304,10 +283,10 @@ function magnitude(vector3) {
 }
 
 var aheadSpawnHouse = 300;
-var aheadSpawnGrass = 330;
 
-var newGrass = null;
-var newRoad = null;
+
+var moveRoad = false;
+var roadTracker = 0;
 
 //updates every frame used for animation and input handling
 function render() {
@@ -363,57 +342,20 @@ function render() {
 
 
                 aheadSpawnHouse += 100;
-
-                var groundTexture = loader.load("textures/grass.jpg");
-                groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
-                groundTexture.repeat.set(30, 5);
-                groundTexture.anisotropy = 25;
-
-                //Initial Grass
-                var grassMaterial = new THREE.MeshPhongMaterial({
-                        color: 0xffffff,
-                        specular: 0x111111,
-                        map: groundTexture
-                });
-
-                var grassMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(450, 100), grassMaterial);
-                grassMesh.position.y = -50;
-                grassMesh.position.x = 35;
-                grassMesh.position.z = 100 + aheadSpawnGrass;
-                grassMesh.rotation.x = -Math.PI / 2;
-                grassMesh.receiveShadow = true;
-                scene.add(grassMesh);
-
-                newGrass = grassMesh;
-
-                var roadTexture = loader.load("textures/road.jpg");
-                roadTexture.wrapS = roadTexture.wrapT = THREE.RepeatWrapping;
-                roadTexture.repeat.set(1, 25);
-                roadTexture.anisotropy = 25;
-
-                //Creating Initial Road
-                var roadMaterial = new THREE.MeshPhongMaterial({
-                        color: 0xffffff,
-                        specular: 0x111111,
-                        map: roadTexture
-                });
-
-                var roadMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(50, 100), roadMaterial);
-                roadMesh.position.y = 50.01;
-                roadMesh.position.x = 35;
-                roadMesh.position.z = 100 + aheadSpawnGrass;
-                roadMesh.rotation.x = -Math.PI / 2;
-                roadMesh.receiveShadow = true;
-                scene.add(roadMesh);
-
-                newRoad = roadMesh;
-                aheadSpawnGrass += 100;
         }
 
         updateHouses();
 
-        if (newGrass != null || newRoad != null)
-                updateGround();
+        if(moveRoad) {
+            roadMesh.translateY(-1);
+            grassMesh.translateY(-1);
+            roadTracker++;
+
+            if(roadTracker == 100) {
+                roadTracker = 0;
+                moveRoad = false;
+            }
+        }
 
         //render the scene
         renderer.render(scene, camera);
@@ -434,6 +376,8 @@ function updateHouses() {
 
             //move the static house forward
             houseList[0].house.translateZ(100);
+
+            moveRoad = true;
 
             scene.remove(houseList[2].house);
             scene.remove(houseList[1].house);
@@ -745,7 +689,6 @@ function generateAssets() {
 }
 
 function generateHouse(positionVector, rotationRads, animationType, animation, zGoal) {
-        houseCount++;
 
         var allAssets = generateAssets();
         var assets = allAssets[0];
