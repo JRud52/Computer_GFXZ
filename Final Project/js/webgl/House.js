@@ -89,7 +89,7 @@ function init() {
         container = document.getElementById('myCanvasLeft');
 
         renderer = new THREE.WebGLRenderer({
-                antialias: true,
+                antialias: false,
                 alpha: true
         });
         renderer.setPixelRatio(550 / 450);
@@ -257,6 +257,7 @@ function init() {
         // get the video element
         video = document.getElementById("tvVideo1");
         video.load();
+        video.volume = 0.1;
 
         videoImage = document.createElement('canvas');
         videoImage.width = 480;
@@ -286,11 +287,17 @@ function init() {
         sky = new THREE.Sky();
         scene.add(sky.mesh);
 
+        var sunTexture = loader.load("povray/texture.png");
+        sunTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
+        sunTexture.repeat.set(1, 35);
+        sunTexture.anisotropy = 25;
+
         // Add Sun Helper
         sunSphere = new THREE.Mesh(
                 new THREE.SphereBufferGeometry(20000, 16, 8),
                 new THREE.MeshBasicMaterial({
-                        color: 0xffffff
+                        color: 0xffffff,
+                        map: sunTexture
                 })
         );
         sunSphere.position.y = -700000;
@@ -1070,40 +1077,4 @@ function checkCollision(direction) {
         }
 
         return collision;
-}
-
-var randomRotate = toRads(randomInt(1, 10));
-var rotateTick = 0;
-
-
-//My idea is to have 1 or 3 animations like we were talking about, it will randomly call one of these funcitons
-//All that works, the problem is because it is based on distance it will infinitely call the animation in its current state
-//Because my animation sends the object farther away.  To deal with this im thinking of using some sort of boolean flag but
-//Cant wrap my head around it right now, i think it will increase performance as well.
-
-
-function riseOrLowerHouse(house) {
-
-        if (house.hide == true) {
-
-                house.house.translateY(-0.1);
-
-                if (house.house.position.y <= -50) {
-
-                        house.hide = false;
-                        house.animateType = randomInt(0, 1);
-                        randomRotate = toRads(randomInt(1, 10));
-                }
-        } else {
-
-                if (house.house.position.y < 0) {
-                        house.house.translateY(0.1);
-
-                        if (house.house.position.y >= 0) {
-
-                                house.animateType = randomInt(0, 1);
-                                randomRotate = toRads(randomInt(1, 10));
-                        }
-                }
-        }
 }

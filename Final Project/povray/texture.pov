@@ -1,5 +1,5 @@
-//EXAMPLE OF SPHERE
 
+//Render With the Following: povray test.pov +Q11 +A0.1 +R9
 //Files with predefined colors and textures
 #include "colors.inc"
 #include "glass.inc"
@@ -7,6 +7,7 @@
 #include "metals.inc"
 #include "stones.inc"
 #include "woods.inc"
+#include "textures.inc"
 
 //Place the camera
 camera {
@@ -32,17 +33,7 @@ background { color White }
 
 #declare putTextureHere = texture {
 
-        pigment{ magnet 2
-
-                julia <0.360, 0.250>, 20 interior 1, 1
-                scale 1
-                rotate<0,40,0>
-                color_map{[0.0 color rgb <1,0.5,0>]
-                          [0.1 color rgb <1,0,0.5>]
-                          [0.4 color rgb <1,1,0>]
-                          [1.0 color rgb <1,1,1>]
-                          [1.0 color rgb <0,0,0>]}
-        }
+        pigment{Blood_Sky}
 }
 
 //Create a box that extends between the 2 specified points
