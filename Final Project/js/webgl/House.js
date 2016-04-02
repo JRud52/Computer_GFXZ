@@ -33,7 +33,8 @@ var houseLand = new Audio('music/land.ogg');
 var options, spawnerOptions, particleSystem;
 var tick = 0;
 
-
+//number of houses in the scene
+var houseCount = 0;
 
 /*
     ONLOAD FUNCTION
@@ -235,14 +236,15 @@ function init() {
         tvVideoTex.magFilter = THREE.LinearFilter;
         tvVideoTex.format = THREE.RGBFormat;
 
-        //Static house
-        generateHouse(new THREE.Vector3(0, 0, 0), 0);
-
+        
+        //set of inital houses along the road sides
         for (var i = 0; i < 3; i++) {
                 generateHouse(new THREE.Vector3(160, 0, 100 + 100 * i), toRads(270), 0, false);
                 generateHouse(new THREE.Vector3(-90, 0, 30 + 100 * i), toRads(90), 0, false);
         }
 
+        //Static house
+        generateHouse(new THREE.Vector3(0, 0, 0), 0);
 
         // Add Sky Mesh
         sky = new THREE.Sky();
@@ -445,6 +447,20 @@ function updateHouses() {
                 else
         }
         */ //Will probably use the distance to remove the houses later.
+        
+        //remove old houses when there are more than 9 in the scene
+        if (houseCount > 9) {
+            houseCount = 9;
+
+            //move the static house forward
+            houseList[6].house.translateZ(100);
+            
+            var removed = houseList.shift();
+            scene.remove(removed.house);
+
+            removed = houseList.shift();
+            scene.remove(removed.house);
+        }
 
         for(i = 0; i < houseList.length; i++) {
 
@@ -746,6 +762,7 @@ function generateAssets() {
 }
 
 function generateHouse(positionVector, rotationRads, animationType, animation, zGoal) {
+        houseCount++;
 
         var allAssets = generateAssets();
         var assets = allAssets[0];
