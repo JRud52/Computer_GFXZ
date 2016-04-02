@@ -376,7 +376,7 @@ function updateGround() {
 function updateHouses() {
 
         //remove old houses when there are more than 9 in the scene
-        if (houseList.length > 9) {
+        if (houseList.length > 7) {
 
             //move the static house forward
             houseList[0].house.translateZ(100);
@@ -415,7 +415,7 @@ function updateHouses() {
                 if (house.animateType == 3 && house.house.position.z > house.zGoal) {
                         house.house.position.z -= 2;
 
-                        house.house.rotateZ((Math.PI / 126) * 25); //Maybe be framerate independent, need outside testingg
+                        house.house.rotateZ((Math.PI / 126) * 25); //Maybe be framerate independent, need outside testing
 
                         if (house.house.position.z > house.zGoal + 250)
                                 house.house.position.y += 0.8;
@@ -975,6 +975,8 @@ function generateHouse(positionVector, rotationRads, animationType, animation, z
         };
         houseList.push(houseObject);
 
+       // assets.visible = false;
+                
         scene.add(houseObject.house);
 }
 
