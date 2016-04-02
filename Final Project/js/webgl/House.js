@@ -136,6 +136,7 @@ function init() {
         roadMesh.receiveShadow = true;
         scene.add(roadMesh);
 
+        /*
         var geometry = new THREE.SphereGeometry(1, 32, 32);
         var material = new THREE.MeshBasicMaterial({
                 color: 0xffffFF
@@ -163,12 +164,14 @@ function init() {
         var sphereX = new THREE.Mesh(geometry, material);
         sphereX.position.x += 1;
         scene.add(sphereX);
+        */
 
         //The cylinder acts as a bounding box for collision - it is used internally to position the collision nodes
         //the material can be changed for debuging to see the collision box
         var collisionGeo = new THREE.CylinderGeometry(3, 3, 1, 16, 1);
         var collisionMat = new THREE.MeshPhongMaterial({
-                transparent: true
+                transparent: true,
+                opacity: 0
         });
         collisionObj = new THREE.Mesh(collisionGeo, collisionMat);
         collisionObj.position.y = 5;
@@ -263,8 +266,7 @@ function init() {
 
         sunSphere.visible = true;
 
-        sky.uniforms.sunPosition.value.copy(sunSphere.position);
-
+        sky.uniforms.sunPosition.value.copy(sunSphere.position);        
 }
 
 //Returns a random int in a range, inclusive.
@@ -290,6 +292,8 @@ var roadTracker = 0;
 
 //updates every frame used for animation and input handling
 function render() {
+       
+        //get the new frame of the video on the TV
         if (video.readyState === video.HAVE_ENOUGH_DATA) {
                 videoImageContext.drawImage(video, 0, 0);
                 if (tvVideoTex)
@@ -385,9 +389,13 @@ function updateHouses() {
             houseList.splice(1,2);
         }
 
+        //update all houses
         for (i = 0; i < houseList.length; i++) {
 
                 var house = houseList[i];
+
+                //update the bathroom mirrors
+                house.bathroomMirror.renderWithMirror(house.perspectiveMirror);
 
                 if (house.animateType == 1 && house.house.position.y > 0) {
                         house.house.position.y -= 0.5;
@@ -476,6 +484,20 @@ function handleInput() {
 function generateAssets() {
         var assets = new THREE.Object3D();
         var assetCollisionList = [];
+
+        //bathroom mirror
+        var mirrorPlaneGeo = new THREE.PlaneBufferGeometry(8, 8);
+        var bathroomMirror = new THREE.Mirror(renderer, camera, { clipBias: 0.003, textureWidth: window.innerWidth, textureHeight: window.innerHeight, color: 0x77777 });
+
+        var mirrorMesh = new THREE.Mesh(mirrorPlaneGeo, bathroomMirror.material);
+        mirrorMesh.add(bathroomMirror);
+        mirrorMesh.translateZ(-69.4);
+        mirrorMesh.translateY(8);
+        mirrorMesh.translateX(15);
+        assets.add(mirrorMesh);
+
+        //mirror with which the perspective of the bathroom mirror is based off of 
+        var perspectiveMirror = new THREE.Mirror(renderer, camera, { clipBias: 0.003, textureWidth: window.innerWidth, textureHeight: window.innerHeight, color: 0x333333 });       
 
         //the picture to be framed
         var framedPicGeo = new THREE.BoxGeometry(5, 5, 0.5);
@@ -684,7 +706,7 @@ function generateAssets() {
         });
 
 
-        var ret = [assets, assetCollisionList];
+        var ret = [assets, assetCollisionList, bathroomMirror, perspectiveMirror];
         return ret;
 }
 
@@ -693,6 +715,8 @@ function generateHouse(positionVector, rotationRads, animationType, animation, z
         var allAssets = generateAssets();
         var assets = allAssets[0];
         var assetCollision = allAssets[1];
+        var bathMirror = allAssets[2];
+        var persMirror = allAssets[3];
         var houseCollision = [];
 
         //ENTIRE HOUSE - 70 wide by 70 long by 20 high (not including the roof)
@@ -945,7 +969,9 @@ function generateHouse(positionVector, rotationRads, animationType, animation, z
                 animate: animation,
                 zGoal: zGoal,
                 assetCollisionList: assetCollision,
-                houseCollisionList: houseCollision
+                houseCollisionList: houseCollision,
+                bathroomMirror: bathMirror,
+                perspectiveMirror: persMirror
         };
         houseList.push(houseObject);
 
