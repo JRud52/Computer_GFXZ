@@ -253,7 +253,26 @@ function init() {
         window.addEventListener('keydown', onKeyDown, false);
         window.addEventListener('keyup', onKeyUp, false);
 
- 
+        //Video information for the TV
+        // get the video element
+        video = document.getElementById("tvVideo1");
+        video.load();
+
+        videoImage = document.createElement('canvas');
+        videoImage.width = 480;
+        videoImage.height = 204;
+
+        //defaults for the initial video image
+        videoImageContext = videoImage.getContext('2d');
+        videoImageContext.fillStyle = '#000000';
+        videoImageContext.fillRect(0, 0, videoImage.width, videoImage.height);
+
+        //texture representing the video
+        tvVideoTex = new THREE.Texture(videoImage);
+        tvVideoTex.minFilter = THREE.LinearFilter;
+        tvVideoTex.magFilter = THREE.LinearFilter;
+        tvVideoTex.format = THREE.RGBFormat;
+
         //Static house
         generateHouse(new THREE.Vector3(0, 0, 0), 0);
 
@@ -297,25 +316,6 @@ function init() {
 
         sky.uniforms.sunPosition.value.copy(sunSphere.position);
 
-
-        //Video information for the TV
-        // get the video element
-        video = document.getElementById("tvVideo1");
-        video.load(); 
-
-        videoImage = document.createElement('canvas');
-        videoImage.width = 480;
-        videoImage.height = 204;
-
-        //defaults for the initial video image
-        videoImageContext = videoImage.getContext('2d');
-        videoImageContext.fillStyle = '#000000';
-        videoImageContext.fillRect(0, 0, videoImage.width, videoImage.height);
-        
-        //texture representing the video
-        tvVideoTex = new THREE.Texture(videoImage);
-        tvVideoTex.minFilter = THREE.LinearFilter;
-        tvVideoTex.magFilter = THREE.LinearFilter;
 }
 
 //Returns a random int in a range, inclusive.
@@ -569,12 +569,12 @@ function handleInput() {
 function generateAssets() {
         var assets = new THREE.Object3D();
         var assetCollisionList = [];
-    
+
         //the picture to be framed
         var framedPicGeo = new THREE.BoxGeometry(5, 5, 0.5);
         framedPicGeo.translate(2.5, 2.5, 0);
         var framedPicMat = new THREE.MeshPhongMaterial({
-                color: 0x00ff00            
+                color: 0x00ff00
         });
         var framedPic = new THREE.Mesh(framedPicGeo, framedPicMat);
 
@@ -591,7 +591,7 @@ function generateAssets() {
         var picFrameEdge4 = new THREE.Mesh(picFrameEdgeGeo, picFrameMat);
 
         //picture frame corners
-        var picFrameCornerGeo = new THREE.BoxGeometry(1, 1, 1);        
+        var picFrameCornerGeo = new THREE.BoxGeometry(1, 1, 1);
         var picFrameCorner = new THREE.Mesh(picFrameCornerGeo, picFrameMat);
         var picFrameCorner2 = new THREE.Mesh(picFrameCornerGeo, picFrameMat);
         var picFrameCorner3 = new THREE.Mesh(picFrameCornerGeo, picFrameMat);
@@ -624,10 +624,10 @@ function generateAssets() {
         picFrame.translateZ(-69.5);
 
         assets.add(picFrame);
-    
+
         //TV
         var tvScreenGeo = new THREE.PlaneGeometry(15, 10, 4, 4);
-        var tvScreenMat = new THREE.MeshBasicMaterial({ map: tvVideoTex });
+        var tvScreenMat = new THREE.MeshLambertMaterial({ color: 0xFFFFFF, map: tvVideoTex });
         var tvScreen = new THREE.Mesh(tvScreenGeo, tvScreenMat);
         tvScreen.translateX(69);
         tvScreen.translateY(10);
@@ -694,7 +694,7 @@ function generateAssets() {
                 opacity: 0
             });
             var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
-            obj.add(collisionCube);           
+            obj.add(collisionCube);
             assetCollisionList.push(collisionCube);
             assets.add(obj);
         });
@@ -749,9 +749,9 @@ function generateAssets() {
                 assetCollisionList.push(collisionCube);
                 assets.add(obj);
         });
-          
 
-        var ret = [assets, assetCollisionList];        
+
+        var ret = [assets, assetCollisionList];
         return ret;
 }
 
