@@ -310,9 +310,9 @@ var newRoad = null;
 //updates every frame used for animation and input handling
 function render() {
         if (video.readyState === video.HAVE_ENOUGH_DATA) {
-            videoImageContext.drawImage(video, 0, 0);
-            if (tvVideoTex)
-                tvVideoTex.needsUpdate = true;
+                videoImageContext.drawImage(video, 0, 0);
+                if (tvVideoTex)
+                        tvVideoTex.needsUpdate = true;
         }
 
         //make the camera follow the collisionObj
@@ -338,27 +338,26 @@ function render() {
         if (collisionObj.position.z > aheadSpawnHouse && collisionObj.position.z < aheadSpawnHouse + 15) {
 
                 //House 1
-                animationOne = randomInt(1,3);
-                animationTwo = randomInt(1,3);
+                animationOne = randomInt(1, 3);
+                animationTwo = randomInt(1, 3);
 
                 //Animation 1 - Fall from Heavens.
                 //Animation 2 - Rise Up
                 //Animation 3 - Fling
 
                 if (animationOne == 1) {
-                        generateHouse(new THREE.Vector3(160, 100, aheadSpawnHouse+100), toRads(270), animationOne, true);
-                }
-                else if (animationOne == 2)
-                        generateHouse(new THREE.Vector3(160, -50, aheadSpawnHouse+100), toRads(270), animationOne, true);
+                        generateHouse(new THREE.Vector3(160, 100, aheadSpawnHouse + 100), toRads(270), animationOne, true);
+                } else if (animationOne == 2)
+                        generateHouse(new THREE.Vector3(160, -50, aheadSpawnHouse + 100), toRads(270), animationOne, true);
                 else
-                        generateHouse(new THREE.Vector3(160, 0, (aheadSpawnHouse+100)+500), toRads(270), animationOne, true, aheadSpawnHouse+26);
+                        generateHouse(new THREE.Vector3(160, 0, (aheadSpawnHouse + 100) + 500), toRads(270), animationOne, true, aheadSpawnHouse + 26);
 
                 if (animationTwo == 1)
-                        generateHouse(new THREE.Vector3(-90, 100, aheadSpawnHouse+30), toRads(90), animationTwo, true);
-                else if(animationTwo == 2)
-                        generateHouse(new THREE.Vector3(-90, -50, aheadSpawnHouse+30), toRads(90), animationTwo, true);
+                        generateHouse(new THREE.Vector3(-90, 100, aheadSpawnHouse + 30), toRads(90), animationTwo, true);
+                else if (animationTwo == 2)
+                        generateHouse(new THREE.Vector3(-90, -50, aheadSpawnHouse + 30), toRads(90), animationTwo, true);
                 else
-                        generateHouse(new THREE.Vector3(-90, 0, (aheadSpawnHouse+30)+500), toRads(90), animationTwo, true, aheadSpawnHouse+98);
+                        generateHouse(new THREE.Vector3(-90, 0, (aheadSpawnHouse + 30) + 500), toRads(90), animationTwo, true, aheadSpawnHouse + 98);
 
 
                 aheadSpawnHouse += 100;
@@ -411,8 +410,11 @@ function render() {
 
         updateHouses();
 
-        if(newGrass != null || newRoad != null)
+        if (newGrass != null || newRoad != null)
                 updateGround();
+
+                //water.material.uniforms.time.value += 1.0 / 10.0;
+        				//water.render();
 
         //render the scene
         renderer.render(scene, camera);
@@ -423,9 +425,9 @@ function render() {
 
 function updateGround() {
 
-        if(newGrass.position.y < 0)
+        if (newGrass.position.y < 0)
                 newGrass.position.y += 1;
-        if(newRoad.position.y > 0.01)
+        if (newRoad.position.y > 0.01)
                 newRoad.position.y -= 1;
 }
 
@@ -446,37 +448,37 @@ function updateHouses() {
         }
         */ //Will probably use the distance to remove the houses later.
 
-        for(i = 0; i < houseList.length; i++) {
+        for (i = 0; i < houseList.length; i++) {
 
                 var house = houseList[i];
 
-                if(house.animateType == 1 && house.house.position.y > 0) {
+                if (house.animateType == 1 && house.house.position.y > 0) {
                         house.house.position.y -= 0.5;
                         house.house.rotateY(toRads(3.6));
-                        if(house.house.position.y == 0)
+                        if (house.house.position.y == 0)
                                 houseLand.play();
                         continue;
                 }
 
-                if(house.animateType == 2 && house.house.position.y < 0) {
+                if (house.animateType == 2 && house.house.position.y < 0) {
                         house.house.position.y += 0.25;
-                        if(house.house.position.y == 0)
+                        if (house.house.position.y == 0)
                                 houseLand.play();
                         continue;
                 }
 
-                if(house.animateType == 3 && house.house.position.z > house.zGoal) {
+                if (house.animateType == 3 && house.house.position.z > house.zGoal) {
                         house.house.position.z -= 2;
 
-                        house.house.rotateZ((Math.PI/126)*25); //Maybe be framerate independent, need outside testingg
+                        house.house.rotateZ((Math.PI / 126) * 25); //Maybe be framerate independent, need outside testingg
 
-                        if(house.house.position.z > house.zGoal+250)
+                        if (house.house.position.z > house.zGoal + 250)
                                 house.house.position.y += 0.8;
                         else
                                 house.house.position.y -= 0.8;
 
                         //Floating point hacks, i wish this was haskell lma0
-                        if(house.house.position.z < house.zGoal || (house.house.position.z > house.zGoal && house.house.position.z < house.zGoal+0.99))
+                        if (house.house.position.z < house.zGoal || (house.house.position.z > house.zGoal && house.house.position.z < house.zGoal + 0.99))
                                 houseLand.play();
                         continue;
                 }
@@ -533,6 +535,18 @@ function handleInput() {
                 }
         }
 }
+
+var waterNormals;
+
+var waterParameters = {
+        width: 10,
+        height: 10,
+        widthSegments: 5,
+        heightSegments: 5,
+        depth: 5,
+        param: 4,
+        filterparam: 1
+};
 
 function generateAssets() {
         var assets = new THREE.Object3D();
@@ -595,7 +609,10 @@ function generateAssets() {
 
         //TV
         var tvScreenGeo = new THREE.PlaneGeometry(15, 10, 4, 4);
-        var tvScreenMat = new THREE.MeshLambertMaterial({ color: 0xFFFFFF, map: tvVideoTex });
+        var tvScreenMat = new THREE.MeshLambertMaterial({
+                color: 0xFFFFFF,
+                map: tvVideoTex
+        });
         var tvScreen = new THREE.Mesh(tvScreenGeo, tvScreenMat);
         tvScreen.translateX(69);
         tvScreen.translateY(10);
@@ -625,68 +642,97 @@ function generateAssets() {
         });
 
         //sink
-        objectLoader.load("models/sink.json", function (obj) {
+        objectLoader.load("models/sink.json", function(obj) {
 
-            obj.translateX(15);
-            obj.translateY(0);
-            obj.translateZ(-68);
-            obj.scale.set(1.75, 1.75, 1.75);
-            obj.rotateY(-Math.PI);
+                obj.translateX(15);
+                obj.translateY(0);
+                obj.translateZ(-68);
+                obj.scale.set(1.75, 1.75, 1.75);
+                obj.rotateY(-Math.PI);
 
-            //collision box
-            var collisionCubeGeo = new THREE.BoxGeometry(2, 8, 2);
-            var collisionCubeMat = new THREE.MeshPhongMaterial({
-                transparent: true,
-                opacity: 0
-            });
-            var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
-            obj.add(collisionCube);
-            assetCollisionList.push(collisionCube);
-            assets.add(obj);
+                //collision box
+                var collisionCubeGeo = new THREE.BoxGeometry(2, 8, 2);
+                var collisionCubeMat = new THREE.MeshPhongMaterial({
+                        transparent: true,
+                        opacity: 0
+                });
+                var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
+                obj.add(collisionCube);
+                assetCollisionList.push(collisionCube);
+                assets.add(obj);
         });
 
 
         //bath tub
-        objectLoader.load("models/bathtub.json", function (obj) {
+        objectLoader.load("models/bathtub.json", function(obj) {
 
-            obj.translateX(15);
-            obj.translateY(2.5);
-            obj.translateZ(-40);
-            obj.scale.set(1.75, 1.75, 1.75);
-            obj.rotateY(-Math.PI);
+                obj.translateX(15);
+                obj.translateY(2.5);
+                obj.translateZ(-40);
+                obj.scale.set(1.75, 1.75, 1.75);
+                obj.rotateY(-Math.PI);
 
-            //collision box
-            var collisionCubeGeo = new THREE.BoxGeometry(5.5, 5, 4);
-            var collisionCubeMat = new THREE.MeshPhongMaterial({
-                transparent: true,
-                opacity: 0
-            });
-            var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
-            obj.add(collisionCube);
-            assetCollisionList.push(collisionCube);
-            assets.add(obj);
+                //collision box
+                var collisionCubeGeo = new THREE.BoxGeometry(5.5, 5, 4);
+                var collisionCubeMat = new THREE.MeshPhongMaterial({
+                        transparent: true,
+                        opacity: 0
+                });
+                var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
+                obj.add(collisionCube);
+                assetCollisionList.push(collisionCube);
+                assets.add(obj);
         });
 
+        //Water
+        waterNormals = new THREE.TextureLoader().load('textures/waternormals.jpg');
+        waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping;
+
+
+        water = new THREE.Water(renderer, camera, scene, {
+                textureWidth: 512,
+                textureHeight: 512,
+                waterNormals: waterNormals,
+                alpha: 1.0,
+                sunDirection: 1,
+                sunColor: 0xffffff,
+                waterColor: 0x001e0f,
+                distortionScale: 50.0,
+        });
+
+        mirrorMesh = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( waterParameters.width, waterParameters.height),
+					water.material
+		);
+
+        mirrorMesh.translateY(2.5);
+        mirrorMesh.translateX(15);
+        mirrorMesh.translateZ(-40);
+
+        mirrorMesh.add( water );
+				mirrorMesh.rotation.x = - Math.PI * 0.5;
+				assets.add( mirrorMesh );
+
         //tv stand
-        objectLoader.load("models/tvStand.json", function (obj) {
+        objectLoader.load("models/tvStand.json", function(obj) {
 
-            obj.translateX(68);
-            obj.translateY(0);
-            obj.translateZ(-20);
-            obj.rotateY(Math.PI / 2);
+                obj.translateX(68);
+                obj.translateY(0);
+                obj.translateZ(-20);
+                obj.rotateY(Math.PI / 2);
 
-            obj.scale.set(1.5, 1.5, 1.5);
+                obj.scale.set(1.5, 1.5, 1.5);
 
-            //collision box
-            var collisionCubeGeo = new THREE.BoxGeometry(7, 8, 2.25);
-            var collisionCubeMat = new THREE.MeshPhongMaterial({
-                transparent: true,
-                opacity: 0
-            });
-            var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
-            obj.add(collisionCube);
-            assetCollisionList.push(collisionCube);
-            assets.add(obj);
+                //collision box
+                var collisionCubeGeo = new THREE.BoxGeometry(7, 8, 2.25);
+                var collisionCubeMat = new THREE.MeshPhongMaterial({
+                        transparent: true,
+                        opacity: 0
+                });
+                var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
+                obj.add(collisionCube);
+                assetCollisionList.push(collisionCube);
+                assets.add(obj);
         });
 
         //BED
