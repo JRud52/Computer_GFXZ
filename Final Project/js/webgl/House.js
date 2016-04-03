@@ -220,7 +220,7 @@ function init() {
 
 
         //Static house
-        generateHouse(new THREE.Vector3(0, 0, 0), 0);
+        generateHouse(new THREE.Vector3(0, 0, 0), 0, 0, false, 0, 0);
 
         //set of inital houses along the road sides
         for (var i = 0; i < 3; i++) {
@@ -241,8 +241,7 @@ function init() {
         sunSphere = new THREE.Mesh(
                 new THREE.SphereBufferGeometry(20000, 16, 8),
                 new THREE.MeshBasicMaterial({
-                        color: 0xffffff,
-                        map: sunTexture
+                        color: 0xfaecd2
                 })
         );
         sunSphere.position.y = -700000;
@@ -266,7 +265,7 @@ function init() {
 
         sunSphere.visible = true;
 
-        sky.uniforms.sunPosition.value.copy(sunSphere.position);        
+        sky.uniforms.sunPosition.value.copy(sunSphere.position);
 }
 
 //Returns a random int in a range, inclusive.
@@ -292,7 +291,7 @@ var roadTracker = 0;
 
 //updates every frame used for animation and input handling
 function render() {
-       
+
         //get the new frame of the video on the TV
         if (video.readyState === video.HAVE_ENOUGH_DATA) {
                 videoImageContext.drawImage(video, 0, 0);
@@ -389,13 +388,16 @@ function updateHouses() {
             houseList.splice(1,2);
         }
 
+
         //update all houses
         for (i = 0; i < houseList.length; i++) {
 
                 var house = houseList[i];
 
-                //update the bathroom mirrors
-                house.bathroomMirror.renderWithMirror(house.perspectiveMirror);
+                if(i == 0) {
+                    //update the static house's mirror
+                    //houseList[0].bathroomMirror.renderWithMirror(house.perspectiveMirror);
+                }
 
                 if (house.animateType == 1 && house.house.position.y > 0) {
                         house.house.position.y -= 0.5;
@@ -481,23 +483,26 @@ function handleInput() {
         }
 }
 
-function generateAssets() {
+function generateAssets(houseIndex) {
         var assets = new THREE.Object3D();
         var assetCollisionList = [];
 
-        //bathroom mirror
-        var mirrorPlaneGeo = new THREE.PlaneBufferGeometry(8, 8);
-        var bathroomMirror = new THREE.Mirror(renderer, camera, { clipBias: 0.003, textureWidth: window.innerWidth, textureHeight: window.innerHeight, color: 0x77777 });
+        if(houseIndex == 1 && houseIndex == 0) { //Temporarily Disabled
+            //bathroom mirror
+            var mirrorPlaneGeo = new THREE.PlaneBufferGeometry(8, 8);
+            var bathroomMirror = new THREE.Mirror(renderer, camera, { clipBias: 0.003, textureWidth: window.innerWidth, textureHeight: window.innerHeight, color: 0x77777 });
 
-        var mirrorMesh = new THREE.Mesh(mirrorPlaneGeo, bathroomMirror.material);
-        mirrorMesh.add(bathroomMirror);
-        mirrorMesh.translateZ(-69.4);
-        mirrorMesh.translateY(8);
-        mirrorMesh.translateX(15);
-        assets.add(mirrorMesh);
+            var mirrorMesh = new THREE.Mesh(mirrorPlaneGeo, bathroomMirror.material);
+            mirrorMesh.add(bathroomMirror);
+            mirrorMesh.translateZ(-69.4);
+            mirrorMesh.translateY(8);
+            mirrorMesh.translateX(15);
+            assets.add(mirrorMesh);
 
-        //mirror with which the perspective of the bathroom mirror is based off of 
-        var perspectiveMirror = new THREE.Mirror(renderer, camera, { clipBias: 0.003, textureWidth: window.innerWidth, textureHeight: window.innerHeight, color: 0x333333 });       
+            //mirror with which the perspective of the bathroom mirror is based off of
+            var perspectiveMirror = new THREE.Mirror(renderer, camera, { clipBias: 0.003, textureWidth: window.innerWidth, textureHeight: window.innerHeight, color: 0x333333 });
+
+        }
 
         //the picture to be framed
         var framedPicGeo = new THREE.BoxGeometry(5, 5, 0.5);
@@ -710,9 +715,9 @@ function generateAssets() {
         return ret;
 }
 
-function generateHouse(positionVector, rotationRads, animationType, animation, zGoal) {
+function generateHouse(positionVector, rotationRads, animationType, animation, zGoal, houseIndex) {
 
-        var allAssets = generateAssets();
+        var allAssets = generateAssets(houseIndex);
         var assets = allAssets[0];
         var assetCollision = allAssets[1];
         var bathMirror = allAssets[2];
@@ -976,7 +981,7 @@ function generateHouse(positionVector, rotationRads, animationType, animation, z
         houseList.push(houseObject);
 
        // assets.visible = false;
-                
+
         scene.add(houseObject.house);
 }
 
