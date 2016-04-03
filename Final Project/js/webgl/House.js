@@ -105,11 +105,17 @@ function init() {
         wallTex.anisotropy = 25;
         wallTextures.push(wallTex);
 
+        wallTex = loader.load("textures/drywall.jpg");
+        wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
+        wallTex.repeat.set(2.5, 2.5);
+        wallTex.anisotropy = 25;
+        wallTextures.push(wallTex);
+
         floorTex = loader.load("textures/woodFloor.jpg");
         floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
         floorTex.repeat.set(15, 15);
         floorTex.anisotropy = 25;
-        
+
 
         doorTex = loader.load("textures/door.jpg");
         doorTex.wrapS = doorTex.wrapT = THREE.RepeatWrapping;
@@ -514,7 +520,7 @@ function generateHouse(positionVector, rotationRads, animationType, animation, z
             wallTexIndex = 0;
         }
         var wallTex = wallTextures[wallTexIndex];
-        
+
         var geometry = new THREE.BoxGeometry(10, 10, 1);
         //Adjust origin point to the bottom left.
         geometry.translate(5, 5, 0);
