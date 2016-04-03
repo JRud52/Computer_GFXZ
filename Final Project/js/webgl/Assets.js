@@ -176,6 +176,27 @@ function generateAssets(houseIndex) {
                 assets.add(obj);
         });
 
+        objectLoader.load("models/dresser.json", function(obj) {
+
+                obj.translateX(43);
+                obj.translateY(3.5);
+                obj.translateZ(-58);
+                obj.scale.set(4, 4, 4);
+
+
+                //collision box
+                var collisionCubeGeo = new THREE.BoxGeometry(2, 8, 2);
+                var collisionCubeMat = new THREE.MeshPhongMaterial({
+                        transparent: true,
+                        opacity: 0
+                });
+                var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
+                obj.add(collisionCube);
+                assetCollisionList.push(collisionCube);
+                assets.add(obj);
+        });
+
+
         if(table != 0){
             //table
             objectLoader.load(tablePath, function (obj) {
