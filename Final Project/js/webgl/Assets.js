@@ -82,40 +82,46 @@ function generateAssets(houseIndex) {
 
         assets.add(picFrame);
 
-        //TV
-        var tvScreenGeo = new THREE.PlaneGeometry(15, 10, 4, 4);
-        var tvScreenMat = new THREE.MeshLambertMaterial({
-                color: 0xFFFFFF,
-                map: tvVideoTex[randomInt(0,4)]
-        });
+        var sofa, bed, table;
 
-        var tvScreen = new THREE.Mesh(tvScreenGeo, tvScreenMat);
-        tvScreen.translateX(69);
-        tvScreen.translateY(10);
-        tvScreen.translateZ(-20);
-        tvScreen.rotateY(-Math.PI / 2);
-        assets.add(tvScreen);
+        //pick random asset to spawn or none
+        if (houseIndex == 0) {
+            table = 1;
+            bed = 1;
+            sofa = 1;
+        }
+        else{
+            table = Math.floor(Math.random() * 4);
+            bed = Math.floor(Math.random() * 4);
+            sofa = Math.floor(Math.random() * 4);
+        }
 
-        //SOFA
-        objectLoader.load("models/sofa.json", function(obj) {
+        var tablePath = "models/table" + table + ".json";
+        var bedPath = "models/bed" + bed + ".json";
+        var sofaPath = "models/sofa" + sofa + ".json";
+        
+        if(sofa != 0){
+            //SOFA
+            objectLoader.load(sofaPath, function (obj) {
 
-                obj.translateX(50);
-                obj.translateY(3);
-                obj.translateZ(-20);
-                obj.rotateY(-Math.PI / 2);
+                    obj.translateX(50);
+                    obj.translateY(3);
+                    obj.translateZ(-20);                
+                    obj.rotateY(-Math.PI / 2);
 
-                //collision box
-                var collisionCubeGeo = new THREE.BoxGeometry(15, 5, 7.5);
-                var collisionCubeMat = new THREE.MeshPhongMaterial({
-                        transparent: true,
-                        opacity: 0
-                });
-                var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
-                obj.add(collisionCube);
-                collisionCube.translateZ(-0.75);
-                assetCollisionList.push(collisionCube);
-                assets.add(obj);
-        });
+                    //collision box
+                    var collisionCubeGeo = new THREE.BoxGeometry(15, 5, 7.5);
+                    var collisionCubeMat = new THREE.MeshPhongMaterial({
+                            transparent: true,
+                            opacity: 0
+                    });
+                    var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
+                    obj.add(collisionCube);
+                    collisionCube.translateZ(-0.75);
+                    assetCollisionList.push(collisionCube);
+                    assets.add(obj);
+            });
+        }
 
         //sink
         objectLoader.load("models/sink.json", function(obj) {
@@ -138,6 +144,28 @@ function generateAssets(houseIndex) {
                 assets.add(obj);
         });
 
+        if(table != 0){
+            //table
+            objectLoader.load(tablePath, function (obj) {
+
+                obj.translateX(15);
+                obj.translateY(0);
+                obj.translateZ(-18);
+                obj.scale.set(1.75, 1.75, 1.75);
+                obj.rotateY(Math.PI / 2);
+
+                //collision box
+                var collisionCubeGeo = new THREE.BoxGeometry(8, 8, 5);
+                var collisionCubeMat = new THREE.MeshPhongMaterial({
+                    transparent: true,
+                    opacity: 0
+                });
+                var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
+                obj.add(collisionCube);
+                assetCollisionList.push(collisionCube);
+                assets.add(obj);
+            });
+        }
 
         //bath tub
         objectLoader.load("models/bathtub.json", function(obj) {
@@ -183,28 +211,29 @@ function generateAssets(houseIndex) {
                 assets.add(obj);
         });
 
-        //BED
-        objectLoader.load("models/bed.json", function(obj) {
+        if(bed != 0){
+            //BED
+            objectLoader.load(bedPath, function(obj) {
 
-                obj.translateX(62);
-                obj.translateY(2);
-                obj.translateZ(-43);
+                    obj.translateX(62);
+                    obj.translateY(2);
+                    obj.translateZ(-43);
 
-                //collision box
-                var collisionCubeGeo = new THREE.BoxGeometry(14, 8, 15.5);
-                var collisionCubeMat = new THREE.MeshPhongMaterial({
-                        transparent: true,
-                        opacity: 0
-                });
-                var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
-                obj.add(collisionCube);
-                collisionCube.translateZ(-0.25);
-                assetCollisionList.push(collisionCube);
-                assets.add(obj);
-        });
+                    //collision box
+                    var collisionCubeGeo = new THREE.BoxGeometry(14, 8, 15.5);
+                    var collisionCubeMat = new THREE.MeshPhongMaterial({
+                            transparent: true,
+                            opacity: 0
+                    });
+                    var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
+                    obj.add(collisionCube);
+                    collisionCube.translateZ(-0.25);
+                    assetCollisionList.push(collisionCube);
+                    assets.add(obj);
+            });
+        }
 
-
-        //LAMP
+        //LAMP 1 
         objectLoader.load("models/lamp.json", function(obj) {
 
                 obj.translateX(10);
@@ -212,6 +241,16 @@ function generateAssets(houseIndex) {
                 obj.translateZ(-15);
 
                 assets.add(obj);
+        });
+
+        //LAMP 2 
+        objectLoader.load("models/lamp.json", function (obj) {
+
+            obj.translateX(50);
+            obj.translateY(20);
+            obj.translateZ(-15);
+
+            assets.add(obj);
         });
 
 

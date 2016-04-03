@@ -672,6 +672,21 @@ function generateHouse(positionVector, rotationRads, animationType, animation, z
         insideLight.translateX(35);
         insideLight.translateY(15);
 
+
+        //TV
+        var tvScreenGeo = new THREE.PlaneGeometry(15, 10, 4, 4);
+        var tvScreenMat = new THREE.MeshLambertMaterial({
+            color: 0xFFFFFF,
+            map: tvVideoTex[randomInt(0, 4)]
+        });
+
+        var tvScreen = new THREE.Mesh(tvScreenGeo, tvScreenMat);
+        tvScreen.translateX(69);
+        tvScreen.translateY(10);
+        tvScreen.translateZ(-20);
+        tvScreen.rotateY(-Math.PI / 2);
+        house.add(tvScreen);
+
         //parent all of the objects to the house object
         //house.add(insideLight);
         house.add(roof)
