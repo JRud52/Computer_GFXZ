@@ -229,7 +229,7 @@ function init() {
         sky = new THREE.Sky();
         scene.add(sky.mesh);
 
-        var sunTexture = loader.load("povray/texture.png");
+        var sunTexture = loader.load("povray/images/texture.png");
         sunTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
         sunTexture.repeat.set(1, 35);
         sunTexture.anisotropy = 25;
