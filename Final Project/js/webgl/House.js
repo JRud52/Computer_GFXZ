@@ -5,10 +5,9 @@
 
 var camera, scene, renderer, controls, stats, collisionObj, frontNode, backNode;
 var clock = new THREE.Clock();
-var collisionForward = false,
-        collisionBack = false;
-var houseList = [],
-        doorList = [];
+
+var collisionForward = false, collisionBack = false;
+var houseList = [], doorList = [], tvList = [];
 var loader, objectLoader;
 
 var doorTex, floorTex, wallTex, ceilingTex;
@@ -16,6 +15,7 @@ var doorTex, floorTex, wallTex, ceilingTex;
 var tvVideoTex = [];
 var videos = [];
 var videoContext = [];
+var playingVidIndex = -1;
 
 //used to disable collision
 var collisionOff = false;
@@ -276,8 +276,9 @@ function render() {
             //get the new frame of the video on the TV
             if (videos[i].readyState === videos[i].HAVE_ENOUGH_DATA) {
                     videoContext[i].drawImage(videos[i], 0, 0);
-                    if (tvVideoTex[i])
-                            tvVideoTex[i].needsUpdate = true;
+                    if (tvVideoTex[i]){
+                        tvVideoTex[i].needsUpdate = true;
+                    }
             }
         }
 
@@ -448,14 +449,29 @@ function handleInput() {
         //e for interaction
         if (keyState['e'.charCodeAt(0) - 32]) {
                 for (var i = 0; i < houseList.length; i++) {
+                        //get global position of the doors and tv's 
                         var doorPos = new THREE.Vector3().setFromMatrixPosition(doorList[i].matrixWorld);
+                        var tvPos = new THREE.Vector3().setFromMatrixPosition(tvList[i].matrixWorld);
 
                         if (collisionObj.position.distanceTo(doorPos) < 10) {
                                 interactDoor(doorList[i]);
                         }
+
+                        if (collisionObj.position.distanceTo(tvPos) < 20) {
+                            if (playingVidIndex == -1) {
+                                playingVidIndex = houseList[i].houseVid;
+                                videos[playingVidIndex].play();
+                            }
+                            else {
+                                videos[playingVidIndex].pause();
+                                playingVidIndex = -1;
+                            }
+                        }                    
                 }
         }
 }
+
+
 function generateHouse(positionVector, rotationRads, animationType, animation, zGoal, houseIndex) {
 
         var allAssets = generateAssets(houseIndex);
@@ -674,10 +690,11 @@ function generateHouse(positionVector, rotationRads, animationType, animation, z
 
 
         //TV
+        var vidIndex = randomInt(0, 4)
         var tvScreenGeo = new THREE.PlaneGeometry(15, 10, 4, 4);
         var tvScreenMat = new THREE.MeshLambertMaterial({
             color: 0xFFFFFF,
-            map: tvVideoTex[randomInt(0, 4)]
+            map: tvVideoTex[vidIndex]
         });
 
         var tvScreen = new THREE.Mesh(tvScreenGeo, tvScreenMat);
@@ -686,6 +703,7 @@ function generateHouse(positionVector, rotationRads, animationType, animation, z
         tvScreen.translateZ(-20);
         tvScreen.rotateY(-Math.PI / 2);
         house.add(tvScreen);
+        tvList.push(tvScreen);
 
         //parent all of the objects to the house object
         //house.add(insideLight);
@@ -732,7 +750,8 @@ function generateHouse(positionVector, rotationRads, animationType, animation, z
                 assetCollisionList: assetCollision,
                 houseCollisionList: houseCollision,
                 bathroomMirror: bathMirror,
-                perspectiveMirror: persMirror
+                perspectiveMirror: persMirror,
+                houseVid: vidIndex
         };
         houseList.push(houseObject);
 
