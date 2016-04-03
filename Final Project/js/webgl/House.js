@@ -105,6 +105,12 @@ function init() {
         wallTex.anisotropy = 25;
         wallTextures.push(wallTex);
 
+        wallTex = loader.load("textures/drywall.jpg");
+        wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
+        wallTex.repeat.set(2.5, 2.5);
+        wallTex.anisotropy = 25;
+        wallTextures.push(wallTex);
+
         floorTex = loader.load("textures/woodFloor.jpg");
         floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
         floorTex.repeat.set(15, 15);
