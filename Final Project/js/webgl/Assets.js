@@ -130,7 +130,7 @@ function generateAssets(houseIndex) {
 
         var tablePath = "models/table" + table + ".json";
         var bedPath = "models/bed" + bed + ".json";
-        var sofaPath = "models/sofa" + sofa + ".json";
+        var sofaPath = "models/sofa" + 2 + ".json";
 
         if(sofa != 0){
             //SOFA
@@ -281,7 +281,7 @@ function generateAssets(houseIndex) {
             obj.translateX(50);
             obj.translateY(20);
             obj.translateZ(-15);
-
+            obj.add(new THREE.PointLight(0xfffff, 0.5, 100));
             assets.add(obj);
         });
 
