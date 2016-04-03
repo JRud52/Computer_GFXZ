@@ -26,6 +26,9 @@ function generateAssets(houseIndex) {
         povrayPic.repeat.set(1, 1);
         povrayPic.anisotropy = 25;
 
+        //The picture frames around the house
+        var picFrame = new THREE.Object3D();
+
         //the picture to be framed
         var framedPicGeo = new THREE.BoxGeometry(5, 5, 0.5);
         framedPicGeo.translate(2.5, 2.5, 0);
@@ -34,9 +37,9 @@ function generateAssets(houseIndex) {
                 map: povrayPic
         });
         var framedPic = new THREE.Mesh(framedPicGeo, framedPicMat);
+        picFrame.add(framedPic);
 
-        //the edges of the picture frame
-        var picFrame = new THREE.Object3D();
+        //the edges of the picture frame        
         var picFrameEdgeGeo = new THREE.CylinderGeometry(0.5, 0.5, 5, 3, 1);
         picFrameEdgeGeo.translate(0, 2.5, 0);
         var picFrameMat = new THREE.MeshPhongMaterial({
@@ -68,8 +71,7 @@ function generateAssets(houseIndex) {
         picFrame.add(picFrameEdge);
         picFrame.add(picFrameEdge2);
         picFrame.add(picFrameEdge3);
-        picFrame.add(picFrameEdge4);
-        picFrame.add(framedPic);
+        picFrame.add(picFrameEdge4);        
 
         picFrame.add(picFrameCorner);
         picFrame.add(picFrameCorner2);
@@ -81,6 +83,36 @@ function generateAssets(houseIndex) {
         picFrame.translateZ(-69.5);
 
         assets.add(picFrame);
+
+        //get another pov ray image and frame it - this is the one in the bedroom space
+        var picFrame2 = picFrame.clone();
+        povrayPic = loader.load("povray/images/pic" + randomInt(0, 19) + ".png");
+        povrayPic.wrapS = ceilingTex.wrapT = THREE.RepeatWrapping;
+        povrayPic.repeat.set(1, 1);
+        povrayPic.anisotropy = 25;        
+        var framedPicMat2 = new THREE.MeshPhongMaterial({
+            color: 0xFFFFFF,
+            map: povrayPic
+        });
+        picFrame2.children[0].material = framedPicMat2;
+        picFrame2.translateX(20);        
+        assets.add(picFrame2);
+
+        //get another pov ray image and frame it - this is the one in the kitchen space
+        var picFrame3 = picFrame.clone();        
+        povrayPic = loader.load("povray/images/pic" + randomInt(0, 19) + ".png");
+        povrayPic.wrapS = ceilingTex.wrapT = THREE.RepeatWrapping;
+        povrayPic.repeat.set(1, 1);
+        povrayPic.anisotropy = 25;
+        var framedPicMat3 = new THREE.MeshPhongMaterial({
+            color: 0xFFFFFF,
+            map: povrayPic
+        });
+        picFrame3.children[0].material = framedPicMat3;
+        picFrame3.translateZ(55);
+        picFrame3.translateX(-32);
+        picFrame3.rotateY(Math.PI / 2);
+        assets.add(picFrame3);
 
         var sofa, bed, table;
 
