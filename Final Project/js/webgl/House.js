@@ -12,6 +12,7 @@ var loader, objectLoader;
 
 var doorTex, floorTex, wallTex, ceilingTex;
 
+var wallTextures = [];
 var tvVideoTex = [];
 var videos = [];
 var videoContext = [];
@@ -86,15 +87,29 @@ function init() {
         ceilingTex.repeat.set(15, 15);
         ceilingTex.anisotropy = 25;
 
-        wallTex = loader.load("textures/brick.jpg");
+        var wallTex = loader.load("textures/brick.jpg");
         wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
         wallTex.repeat.set(2.5, 2.5);
         wallTex.anisotropy = 25;
+        wallTextures.push(wallTex);
+
+        wallTex = loader.load("textures/brick2.jpg");
+        wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
+        wallTex.repeat.set(2.5, 2.5);
+        wallTex.anisotropy = 25;
+        wallTextures.push(wallTex);
+
+        wallTex = loader.load("textures/brick3.jpg");
+        wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
+        wallTex.repeat.set(2.5, 2.5);
+        wallTex.anisotropy = 25;
+        wallTextures.push(wallTex);
 
         floorTex = loader.load("textures/woodFloor.jpg");
         floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
         floorTex.repeat.set(15, 15);
         floorTex.anisotropy = 25;
+        
 
         doorTex = loader.load("textures/door.jpg");
         doorTex.wrapS = doorTex.wrapT = THREE.RepeatWrapping;
@@ -493,6 +508,13 @@ function generateHouse(positionVector, rotationRads, animationType, animation, z
         var frontWall_L = new THREE.Object3D();
         var frontWall_R = new THREE.Object3D();
 
+        //get a random brick texture for the house, static house always gets image 0
+        var wallTexIndex = randomInt(0, 3);
+        if (houseIndex == 0) {
+            wallTexIndex = 0;
+        }
+        var wallTex = wallTextures[wallTexIndex];
+        console.log(wallTextures);
         var geometry = new THREE.BoxGeometry(10, 10, 1);
         //Adjust origin point to the bottom left.
         geometry.translate(5, 5, 0);
