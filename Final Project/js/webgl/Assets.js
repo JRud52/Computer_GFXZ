@@ -3,7 +3,7 @@ function generateAssets(houseIndex) {
         var assets = new THREE.Object3D();
         var assetCollisionList = [];
 
-        if(houseIndex == 1 && houseIndex == 0) { //Temporarily Disabled
+        if(houseIndex == 0) {
             //bathroom mirror
             var mirrorPlaneGeo = new THREE.PlaneBufferGeometry(8, 8);
             var bathroomMirror = new THREE.Mirror(renderer, camera, { clipBias: 0.003, textureWidth: window.innerWidth, textureHeight: window.innerHeight, color: 0x77777 });
