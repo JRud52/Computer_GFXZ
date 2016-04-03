@@ -130,7 +130,7 @@ function generateAssets(houseIndex) {
 
         var tablePath = "models/table" + table + ".json";
         var bedPath = "models/bed" + bed + ".json";
-        var sofaPath = "models/sofa" + 2 + ".json";
+        var sofaPath = "models/sofa" + sofa + ".json";
 
         if(sofa != 0){
             //SOFA
