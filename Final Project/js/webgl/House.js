@@ -11,7 +11,11 @@ var houseList = [],
         doorList = [];
 var loader, objectLoader;
 
-var doorTex, floorTex, wallTex, ceilingTex, tvVideoTex;
+var doorTex, floorTex, wallTex, ceilingTex;
+
+var tvVideoTex = [];
+var videos = [];
+var videoContext = [];
 
 //used to disable collision
 var collisionOff = false;
@@ -113,7 +117,6 @@ function init() {
                 specular: 0x111111,
                 map: groundTexture
         });
-
         grassMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(450, 1000), grassMaterial);
         grassMesh.position.y = 0;
         grassMesh.position.x = 35;
@@ -168,26 +171,29 @@ function init() {
         window.addEventListener('keydown', onKeyDown, false);
         window.addEventListener('keyup', onKeyUp, false);
 
-        //Video information for the TV
-        // get the video element
-        video = document.getElementById("tvVideo1");
-        video.load();
-        video.volume = 0.1;
+        for(i = 0; i < 5; i++) {
 
-        videoImage = document.createElement('canvas');
-        videoImage.width = 480;
-        videoImage.height = 204;
+            //Video information for the TV
+            // get the video element
+            videos[i] = document.getElementById("tvVideo"+(i+1));
+            videos[i].load();
 
-        //defaults for the initial video image
-        videoImageContext = videoImage.getContext('2d');
-        videoImageContext.fillStyle = '#000000';
-        videoImageContext.fillRect(0, 0, videoImage.width, videoImage.height);
+            videoImage = document.createElement('canvas');
+            videoImage.width = 480;
+            videoImage.height = 204;
 
-        //texture representing the video
-        tvVideoTex = new THREE.Texture(videoImage);
-        tvVideoTex.minFilter = THREE.LinearFilter;
-        tvVideoTex.magFilter = THREE.LinearFilter;
-        tvVideoTex.format = THREE.RGBFormat;
+            //defaults for the initial video image
+            videoContext[i] = videoImage.getContext('2d');
+            videoContext[i].fillStyle = '#000000';
+            videoContext[i].fillRect(0, 0, videoImage.width, videoImage.height);
+
+            //texture representing the video
+            tvVideoTex[i] = new THREE.Texture(videoImage);
+            tvVideoTex[i].minFilter = THREE.LinearFilter;
+            tvVideoTex[i].magFilter = THREE.LinearFilter;
+            tvVideoTex[i].format = THREE.RGBFormat;
+        }
+
 
 
         //Static house
@@ -261,12 +267,16 @@ var roadTracker = 0;
 //updates every frame used for animation and input handling
 function render() {
 
-        //get the new frame of the video on the TV
-        if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                videoImageContext.drawImage(video, 0, 0);
-                if (tvVideoTex)
-                        tvVideoTex.needsUpdate = true;
+        for(i = 0; i < videos.length; i++) {
+
+            //get the new frame of the video on the TV
+            if (videos[i].readyState === videos[i].HAVE_ENOUGH_DATA) {
+                    videoContext[i].drawImage(videos[i], 0, 0);
+                    if (tvVideoTex[i])
+                            tvVideoTex[i].needsUpdate = true;
+            }
         }
+
 
         //make the camera follow the collisionObj
         camera.position.set(collisionObj.position.x, collisionObj.position.y, collisionObj.position.z);
@@ -442,7 +452,6 @@ function handleInput() {
                 }
         }
 }
-
 function generateHouse(positionVector, rotationRads, animationType, animation, zGoal, houseIndex) {
 
         var allAssets = generateAssets(houseIndex);

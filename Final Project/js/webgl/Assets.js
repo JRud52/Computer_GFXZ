@@ -1,5 +1,5 @@
 function generateAssets(houseIndex) {
-    
+
         var assets = new THREE.Object3D();
         var assetCollisionList = [];
 
@@ -20,11 +20,18 @@ function generateAssets(houseIndex) {
 
         }
 
+        //Textures
+        povrayPic = loader.load("povray/images/pic"+randomInt(0,19)+".png");
+        povrayPic.wrapS = ceilingTex.wrapT = THREE.RepeatWrapping;
+        povrayPic.repeat.set(1, 1);
+        povrayPic.anisotropy = 25;
+
         //the picture to be framed
         var framedPicGeo = new THREE.BoxGeometry(5, 5, 0.5);
         framedPicGeo.translate(2.5, 2.5, 0);
         var framedPicMat = new THREE.MeshPhongMaterial({
-                color: 0x00ff00
+                color: 0xFFFFFF,
+                map: povrayPic
         });
         var framedPic = new THREE.Mesh(framedPicGeo, framedPicMat);
 
@@ -79,8 +86,9 @@ function generateAssets(houseIndex) {
         var tvScreenGeo = new THREE.PlaneGeometry(15, 10, 4, 4);
         var tvScreenMat = new THREE.MeshLambertMaterial({
                 color: 0xFFFFFF,
-                map: tvVideoTex
+                map: tvVideoTex[randomInt(0,4)]
         });
+
         var tvScreen = new THREE.Mesh(tvScreenGeo, tvScreenMat);
         tvScreen.translateX(69);
         tvScreen.translateY(10);
