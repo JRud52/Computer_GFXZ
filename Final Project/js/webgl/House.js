@@ -514,7 +514,7 @@ function generateHouse(positionVector, rotationRads, animationType, animation, z
             wallTexIndex = 0;
         }
         var wallTex = wallTextures[wallTexIndex];
-        console.log(wallTextures);
+        
         var geometry = new THREE.BoxGeometry(10, 10, 1);
         //Adjust origin point to the bottom left.
         geometry.translate(5, 5, 0);
