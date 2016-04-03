@@ -99,14 +99,14 @@ function generateAssets(houseIndex) {
         var tablePath = "models/table" + table + ".json";
         var bedPath = "models/bed" + bed + ".json";
         var sofaPath = "models/sofa" + sofa + ".json";
-        
+
         if(sofa != 0){
             //SOFA
             objectLoader.load(sofaPath, function (obj) {
 
                     obj.translateX(50);
                     obj.translateY(3);
-                    obj.translateZ(-20);                
+                    obj.translateZ(-20);
                     obj.rotateY(-Math.PI / 2);
 
                     //collision box
@@ -233,7 +233,7 @@ function generateAssets(houseIndex) {
             });
         }
 
-        //LAMP 1 
+        //LAMP 1
         objectLoader.load("models/lamp.json", function(obj) {
 
                 obj.translateX(10);
@@ -243,7 +243,7 @@ function generateAssets(houseIndex) {
                 assets.add(obj);
         });
 
-        //LAMP 2 
+        //LAMP 2
         objectLoader.load("models/lamp.json", function (obj) {
 
             obj.translateX(50);
