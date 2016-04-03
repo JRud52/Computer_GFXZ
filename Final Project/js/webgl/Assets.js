@@ -39,7 +39,7 @@ function generateAssets(houseIndex) {
         var framedPic = new THREE.Mesh(framedPicGeo, framedPicMat);
         picFrame.add(framedPic);
 
-        //the edges of the picture frame        
+        //the edges of the picture frame
         var picFrameEdgeGeo = new THREE.CylinderGeometry(0.5, 0.5, 5, 3, 1);
         picFrameEdgeGeo.translate(0, 2.5, 0);
         var picFrameMat = new THREE.MeshPhongMaterial({
@@ -71,7 +71,7 @@ function generateAssets(houseIndex) {
         picFrame.add(picFrameEdge);
         picFrame.add(picFrameEdge2);
         picFrame.add(picFrameEdge3);
-        picFrame.add(picFrameEdge4);        
+        picFrame.add(picFrameEdge4);
 
         picFrame.add(picFrameCorner);
         picFrame.add(picFrameCorner2);
@@ -89,17 +89,17 @@ function generateAssets(houseIndex) {
         povrayPic = loader.load("povray/images/pic" + randomInt(0, 19) + ".png");
         povrayPic.wrapS = ceilingTex.wrapT = THREE.RepeatWrapping;
         povrayPic.repeat.set(1, 1);
-        povrayPic.anisotropy = 25;        
+        povrayPic.anisotropy = 25;
         var framedPicMat2 = new THREE.MeshPhongMaterial({
             color: 0xFFFFFF,
             map: povrayPic
         });
         picFrame2.children[0].material = framedPicMat2;
-        picFrame2.translateX(20);        
+        picFrame2.translateX(20);
         assets.add(picFrame2);
 
         //get another pov ray image and frame it - this is the one in the kitchen space
-        var picFrame3 = picFrame.clone();        
+        var picFrame3 = picFrame.clone();
         povrayPic = loader.load("povray/images/pic" + randomInt(0, 19) + ".png");
         povrayPic.wrapS = ceilingTex.wrapT = THREE.RepeatWrapping;
         povrayPic.repeat.set(1, 1);
@@ -175,6 +175,27 @@ function generateAssets(houseIndex) {
                 assetCollisionList.push(collisionCube);
                 assets.add(obj);
         });
+
+        objectLoader.load("models/dresser.json", function(obj) {
+
+                obj.translateX(43);
+                obj.translateY(3.5);
+                obj.translateZ(-58);
+                obj.scale.set(4, 4, 4);
+
+
+                //collision box
+                var collisionCubeGeo = new THREE.BoxGeometry(2, 8, 2);
+                var collisionCubeMat = new THREE.MeshPhongMaterial({
+                        transparent: true,
+                        opacity: 0
+                });
+                var collisionCube = new THREE.Mesh(collisionCubeGeo, collisionCubeMat);
+                obj.add(collisionCube);
+                assetCollisionList.push(collisionCube);
+                assets.add(obj);
+        });
+
 
         if(table != 0){
             //table
