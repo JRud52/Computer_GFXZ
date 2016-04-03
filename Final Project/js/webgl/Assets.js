@@ -240,6 +240,8 @@ function generateAssets(houseIndex) {
                 obj.translateY(20);
                 obj.translateZ(-15);
 
+                lamp1Light = new THREE.PointLight(0xFFFFFF, 10, 500, 25);
+                obj.add(lamp1Light);
                 assets.add(obj);
         });
 
