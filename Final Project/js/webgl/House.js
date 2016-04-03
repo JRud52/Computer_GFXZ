@@ -244,9 +244,7 @@ function init() {
 
         sky.uniforms.sunPosition.value.copy(sunSphere.position);
 
-
-
-				scene.fog = new THREE.FogExp2( 0xc2f9f5, 0.0025 );
+        scene.fog = new THREE.FogExp2( 0xc2f9f5, 0.0025 );
 }
 
 //Returns a random int in a range, inclusive.
@@ -362,6 +360,8 @@ function updateHouses() {
             scene.remove(houseList[1].house);
 
             houseList.splice(1,2);
+            doorList.splice(1,2);
+            tvList.splice(1,2);
         }
 
         //update all houses
@@ -370,8 +370,7 @@ function updateHouses() {
                 var house = houseList[i];
 
                 if(i == 0) {
-                    //update the static house's mirror
-                    //houseList[0].bathroomMirror.renderWithMirror(house.perspectiveMirror);
+                    houseList[0].bathroomMirror.renderWithMirror(house.perspectiveMirror);
                 }
 
                 if (house.animateType == 1 && house.house.position.y > 0) {
@@ -449,7 +448,7 @@ function handleInput() {
         //e for interaction
         if (keyState['e'.charCodeAt(0) - 32]) {
                 for (var i = 0; i < houseList.length; i++) {
-                        //get global position of the doors and tv's 
+                        //get global position of the doors and tv's
                         var doorPos = new THREE.Vector3().setFromMatrixPosition(doorList[i].matrixWorld);
                         var tvPos = new THREE.Vector3().setFromMatrixPosition(tvList[i].matrixWorld);
 
@@ -457,7 +456,7 @@ function handleInput() {
                                 interactDoor(doorList[i]);
                         }
 
-                        if (collisionObj.position.distanceTo(tvPos) < 20) {
+                        if (collisionObj.position.distanceTo(tvPos) < 30) {
                             if (playingVidIndex == -1) {
                                 playingVidIndex = houseList[i].houseVid;
                                 videos[playingVidIndex].play();
@@ -466,7 +465,7 @@ function handleInput() {
                                 videos[playingVidIndex].pause();
                                 playingVidIndex = -1;
                             }
-                        }                    
+                        }
                 }
         }
 }
