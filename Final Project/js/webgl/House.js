@@ -54,7 +54,7 @@ function init() {
         container = document.getElementById('myCanvasLeft');
 
         renderer = new THREE.WebGLRenderer({
-                antialias: false,
+                antialias: true,
                 alpha: true
         });
         renderer.setPixelRatio(550 / 450);
@@ -243,6 +243,10 @@ function init() {
         sunSphere.visible = true;
 
         sky.uniforms.sunPosition.value.copy(sunSphere.position);
+
+
+
+				scene.fog = new THREE.FogExp2( 0xc2f9f5, 0.0025 );
 }
 
 //Returns a random int in a range, inclusive.
@@ -329,9 +333,9 @@ function render() {
         updateHouses();
 
         if(moveRoad) {
-            roadMesh.translateY(-1);
-            grassMesh.translateY(-1);
-            roadTracker++;
+            roadMesh.translateY(-2);
+            grassMesh.translateY(-2);
+            roadTracker+=2;
 
             if(roadTracker == 100) {
                 roadTracker = 0;
