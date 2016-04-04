@@ -477,14 +477,16 @@ function handleInput() {
                                 interactDoor(doorList[i]);
                         }
 
-                        if (collisionObj.position.distanceTo(tvPos) < 30) {
-                            if (playingVidIndex == -1) {
-                                playingVidIndex = houseList[i].houseVid;
-                                videos[playingVidIndex].play();
-                            }
-                            else {
-                                videos[playingVidIndex].pause();
-                                playingVidIndex = -1;
+                        if(i != 0){
+                            if (collisionObj.position.distanceTo(tvPos) < 30) {
+                                if (playingVidIndex == -1) {
+                                    playingVidIndex = houseList[i].houseVid;
+                                    videos[playingVidIndex].play();
+                                }
+                                else {
+                                    videos[playingVidIndex].pause();
+                                    playingVidIndex = -1;
+                                }
                             }
                         }
                 }
