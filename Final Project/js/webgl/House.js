@@ -716,6 +716,11 @@ function generateHouse(positionVector, rotationRads, animationType, animation, z
         insideLight.translateY(15);
 
 
+        uniform = {
+            time: { type: "f", value: 1.0 },
+            resolution: { type: "v2", value: new THREE.Vector2() }
+        };
+
         //TV
         var vidIndex = randomInt(0, 4)
         var tvScreenGeo = new THREE.PlaneGeometry(15, 10, 4, 4);
@@ -723,6 +728,14 @@ function generateHouse(positionVector, rotationRads, animationType, animation, z
             color: 0xFFFFFF,
             map: tvVideoTex[vidIndex]
         });
+
+        if (houseIndex == 0) {
+            tvScreenMat = new THREE.ShaderMaterial({
+                uniforms: uniform,
+                vertexShader: document.getElementById("vertexShader").textContent,
+                fragmentShader: document.getElementById("fragmentShader").textContent
+            });
+        }
 
         var tvScreen = new THREE.Mesh(tvScreenGeo, tvScreenMat);
         tvScreen.translateX(69);

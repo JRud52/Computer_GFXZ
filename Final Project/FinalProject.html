@@ -20,11 +20,43 @@
         <link href='https://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>
         <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
 
-
-
 </head>
 
 <body onload="main()" id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
+
+    <!-- Fragment shader that produces a striped effect -->
+    <script id="fragmentShader" type="x-shader/x-fragment">
+
+        uniform float time;
+        uniform vec2 resolution;
+
+        varying vec2 vUv;
+
+        void main( void ) {
+
+        vec2 position = -2.0 + 4.0 * vUv;
+
+        float r = abs( cos( (position.x * time + position.y * time) * 4.0 ) / cos( position.x + time / 32.0 ));
+        float g = abs( sin( (position.x * time + position.y * time) * 8.0 ) / sin( position.y + time / 64.0 ));
+        float b = abs( cos( (position.x * time + position.y * time) * 16.0 ) / cos( position.x + time / 128.0 ));
+        gl_FragColor = vec4( r, g, b, 1.0 );
+
+        }
+
+    </script>
+
+    <!-- Basic vertex shader, no alterations to the vertices are made -->
+    <script id="vertexShader" type="x-shader/x-vertex">
+
+        varying vec2 vUv;
+
+        void main(){
+            vUv = uv;
+            vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+            gl_Position = projectionMatrix * mvPosition;
+        }
+
+    </script>
 
         <!-- Navigation -->
         <nav class="navbar navbar-custom navbar-fixed-top" role="navigation">
