@@ -480,11 +480,14 @@ function handleInput() {
                         var doorPos = new THREE.Vector3().setFromMatrixPosition(doorList[i].matrixWorld);
                         var tvPos = new THREE.Vector3().setFromMatrixPosition(tvList[i].matrixWorld);
 
+                        //check if opening a door
                         if (collisionObj.position.distanceTo(doorPos) < 10) {
                                 interactDoor(doorList[i]);
                         }
 
-                        if(i != 0){
+                        //disable video for static house
+                        if (i != 0) {
+                            //play or pause a TV
                             if (collisionObj.position.distanceTo(tvPos) < 30) {
                                 if (playingVidIndex == -1) {
                                     playingVidIndex = houseList[i].houseVid;
@@ -733,6 +736,7 @@ function generateHouse(positionVector, rotationRads, animationType, animation, z
             map: tvVideoTex[vidIndex]
         });
 
+        //static house is index 0
         if (houseIndex == 0) {
             //uniform variables for time and resolution
             uniformTV = {
