@@ -40,6 +40,9 @@ var tick = 0;
 
 var roadMesh, grassMesh;
 
+var clock = new THREE.Clock();
+var uniformTV;
+
 /*
     ONLOAD FUNCTION
 */
@@ -289,6 +292,10 @@ var roadTracker = 0;
 
 //updates every frame used for animation and input handling
 function render() {
+
+    var delta = clock.getDelta();
+    uniformTV.time.value += delta * 5;
+
 
         for(i = 0; i < videos.length; i++) {
 
@@ -717,12 +724,7 @@ function generateHouse(positionVector, rotationRads, animationType, animation, z
         insideLight.translateX(35);
         insideLight.translateY(15);
 
-
-        uniform = {
-            time: { type: "f", value: 1.0 },
-            resolution: { type: "v2", value: new THREE.Vector2() }
-        };
-
+       
         //TV
         var vidIndex = randomInt(0, 4)
         var tvScreenGeo = new THREE.PlaneGeometry(15, 10, 4, 4);
@@ -732,8 +734,15 @@ function generateHouse(positionVector, rotationRads, animationType, animation, z
         });
 
         if (houseIndex == 0) {
+            //uniform variables for time and resolution
+            uniformTV = {
+                time: { type: "f", value: 1.0 },
+                resolution: { type: "v2", value: new THREE.Vector2() }
+            };
+
+            //static house gets a shader material
             tvScreenMat = new THREE.ShaderMaterial({
-                uniforms: uniform,
+                uniforms: uniformTV,
                 vertexShader: document.getElementById("vertexShader").textContent,
                 fragmentShader: document.getElementById("fragmentShader").textContent
             });
