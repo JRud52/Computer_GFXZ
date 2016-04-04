@@ -27,11 +27,6 @@ var keyState = [];
 var sky, sunSphere;
 var azimuth = 0;
 
-//testing purposes only, remove later
-var point = null,
-        point2 = null,
-        point3 = null;
-
 var doorOpen = new Audio('music/door.ogg');
 var houseLand = new Audio('music/land.ogg');
 
@@ -40,6 +35,7 @@ var tick = 0;
 
 var roadMesh, grassMesh;
 
+//variables used for the TV shader material
 var clock = new THREE.Clock();
 var uniformTV;
 
@@ -293,12 +289,12 @@ var roadTracker = 0;
 //updates every frame used for animation and input handling
 function render() {
 
-    var delta = clock.getDelta();
-    uniformTV.time.value += delta * 5;
+        //update the time value of the uniformTV variable based on the clock
+        var delta = clock.getDelta();
+        uniformTV.time.value += delta * 5;
 
-
+        //update all the videos
         for(i = 0; i < videos.length; i++) {
-
             //get the new frame of the video on the TV
             if (videos[i].readyState === videos[i].HAVE_ENOUGH_DATA) {
                     videoContext[i].drawImage(videos[i], 0, 0);
@@ -316,6 +312,7 @@ function render() {
         //check for user input
         handleInput();
 
+        //update the sky
         var theta = Math.PI * (0 - 0.5);
         if (azimuth >= 0.51)
                 azimuth = 0;
@@ -329,6 +326,7 @@ function render() {
 
         sky.uniforms.sunPosition.value.copy(sunSphere.position);
 
+        //spawn new house if user is at appropriate location
         if (collisionObj.position.z > aheadSpawnHouse && collisionObj.position.z < aheadSpawnHouse + 15) {
 
                 //House 1
@@ -357,8 +355,10 @@ function render() {
                 aheadSpawnHouse += 100;
         }
 
+        //update individual house parameters
         updateHouses();
 
+        //check if we need to move the road forward
         if(moveRoad) {
             roadMesh.translateY(-2);
             grassMesh.translateY(-2);
@@ -397,10 +397,12 @@ function updateHouses() {
 
                 var house = houseList[i];
 
+                //update the static house mirror
                 if(i == 0) {
                     houseList[0].bathroomMirror.renderWithMirror(house.perspectiveMirror);
                 }
 
+                //update the animation of a new house coming into the scene
                 if (house.animateType == 1 && house.house.position.y > 0) {
                         house.house.position.y -= 0.5;
                         house.house.rotateY(toRads(3.6));
@@ -504,6 +506,9 @@ function handleInput() {
 }
 
 
+/*
+    Creates a new house at a given location and rotation with a specific animation
+*/
 function generateHouse(positionVector, rotationRads, animationType, animation, zGoal, houseIndex) {
 
         var allAssets = generateAssets(houseIndex);
@@ -727,7 +732,7 @@ function generateHouse(positionVector, rotationRads, animationType, animation, z
         insideLight.translateX(35);
         insideLight.translateY(15);
 
-       
+
         //TV
         var vidIndex = randomInt(0, 4)
         var tvScreenGeo = new THREE.PlaneGeometry(15, 10, 4, 4);
@@ -815,7 +820,7 @@ function generateHouse(positionVector, rotationRads, animationType, animation, z
         scene.add(houseObject.house);
 }
 
-//open a door
+//opens a door by rotating it
 function interactDoor(door) {
         var delta = 0;
         if (door.rotation.y < 1.5) {

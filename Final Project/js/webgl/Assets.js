@@ -1,8 +1,13 @@
+/*
+    Populates a house with a pseudo random set of assets
+        The static house always gets predefined assets
+*/
 function generateAssets(houseIndex) {
 
         var assets = new THREE.Object3D();
         var assetCollisionList = [];
 
+        //only the static house has a mirror to ensure good performance
         if(houseIndex == 0) {
             //bathroom mirror
             var mirrorPlaneGeo = new THREE.PlaneBufferGeometry(8, 8);
@@ -114,6 +119,7 @@ function generateAssets(houseIndex) {
         picFrame3.rotateY(Math.PI / 2);
         assets.add(picFrame3);
 
+        //variables used to randomize the asset - 0 = dont show, 1-3 are specific assets
         var sofa, bed, table;
 
         //pick random asset to spawn or none
@@ -132,6 +138,8 @@ function generateAssets(houseIndex) {
         var bedPath = "models/bed" + bed + ".json";
         var sofaPath = "models/sofa" + sofa + ".json";
 
+        //THe following will load all of the required assets if the house has one
+        
         if(sofa != 0){
             //SOFA
             objectLoader.load(sofaPath, function (obj) {
