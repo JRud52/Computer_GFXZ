@@ -1,2 +1,2 @@
 # Computer_GFXZ
-It's good!
+Various different demos made for the Computer Graphics course at Algoma University.
